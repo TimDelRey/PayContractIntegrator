@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/devcontainers/ruby:4-4.0-trixie
 
 # Install Rails
-RUN su vscode -c "gem install rails webdrivers"
+RUN su vscode -c "gem install rails"
 RUN groupadd --system rubygems \
 	&& usermod --append --groups rubygems vscode \
 	&& chgrp -R rubygems "$GEM_HOME" \
@@ -12,11 +12,17 @@ RUN groupadd --system rubygems \
 # Keeping the package under /opt prevents the /home/vscode/.codex volume from
 # hiding the executable after the container is recreated.
 RUN mkdir -p /opt/codex /home/vscode/.codex \
-	&& curl -fsSL https://chatgpt.com/codex/install.sh \
+	&& if curl -fsSL https://chatgpt.com/codex/install.sh \
 		| CODEX_NON_INTERACTIVE=1 \
 		  CODEX_HOME=/opt/codex \
 		  CODEX_INSTALL_DIR=/usr/local/bin \
 		  sh \
+		&& test -x /usr/local/bin/codex \
+		&& /usr/local/bin/codex --version; then \
+			echo "Codex CLI installed successfully."; \
+		else \
+			echo "WARNING: Codex CLI installation failed; continuing without Codex." >&2; \
+		fi \
 	&& chown -R vscode:vscode /home/vscode/.codex
 
 # Default value to allow debug server to serve content over GitHub Codespace's port forwarding service

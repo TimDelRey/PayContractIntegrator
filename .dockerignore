@@ -47,6 +47,3 @@
 # Ignore Docker-related files
 /.dockerignore
 /Dockerfile*
-
-# Never send Codex credentials or sessions to the Docker build context.
-/.codex-rebuild-backup/

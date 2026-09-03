@@ -37,5 +37,6 @@
 # Local notes and working documents.
 /thoughts/
 
-# Temporary local backup used to migrate Codex state into its Docker volume.
-/.codex-rebuild-backup/
+
+# Developer-local overrides and private local files.
+*.local.*

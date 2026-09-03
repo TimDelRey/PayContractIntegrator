@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/ruby-rails-postgres
+// Ruby dev container documentation: https://containers.dev/
 {
-	"name": "Ruby on Rails & Postgres",
+	"name": "Ruby on Rails",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
@@ -11,10 +11,10 @@
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// This can be used to network with other containers or the host.
-	// "forwardPorts": [3000, 5432],
+	// "forwardPorts": [3000],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": ".devcontainer/post-create.sh"
+	"postCreateCommand": "bundle install --jobs 4 --retry 3"
 
 	// Configure tool-specific properties.
 	// "customizations": {},
