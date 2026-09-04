@@ -2,149 +2,90 @@
 
 Guidance for coding agents working in this repository.
 
-> **Default rule:** keep solutions simple, explicit, and reliable. This is payment routing code: correctness and traceability take priority over cleverness and architectural complexity.
+> **Default rule:** keep solutions simple, explicit, secure, and deterministic. This repository generates payment-provider integration code, so correctness, traceability, and safe failure take priority over cleverness.
 
 ## Instruction precedence
 
-Before applying this file, look for `AGENTS.local.md` in the repository root.
+Read `AGENTS.local.md` first when it exists; it wins on conflict. Never create, modify, commit, or disclose it unless explicitly requested. Follow deeper `AGENTS.md` files within their scope.
 
-1. Read `AGENTS.local.md` first when it exists.
-2. If it conflicts with this file, `AGENTS.local.md` wins.
-3. Never create, modify, commit, or disclose `AGENTS.local.md` unless explicitly requested.
-4. Follow more specific `AGENTS.md` files found deeper in the directory tree for files within their scope.
+## Current project context
 
-## Project context
+This Rails repository generates Ruby integrations from public payment-provider API specifications. The current requirement is `thoughts/idea_2.md`. Do not use superseded routing requirements, contracts, tests, or terminology as product requirements.
 
-This is a Ruby on Rails application implementing payment routing.
+The pipeline safely parses a provider specification, normalizes it into a provider-neutral intermediate representation (IR), validates supported semantics, and generates a `Provider::BaseService` implementation, `INTEGRATION.md`, `fixtures.json`, and a clear CLI result.
 
-Use Rails conventions where useful, but keep core routing logic independent from unnecessary framework and infrastructure concerns.
+Prefer plain Ruby objects. Do not add persistence, controllers, jobs, queues, or external services unless explicitly required.
 
-Do not introduce persistence, controllers, jobs, Redis, Sidekiq, external services, or other infrastructure unless required by the task.
+## Research and missing information
 
-Prefer plain Ruby objects for domain logic that does not require Rails-specific behavior.
+When supplied data or repository contracts are missing or ambiguous, research before assuming.
 
-## Engineering principles
+- Prefer supplied case files and validators for project-specific behavior.
+- Use official public provider API documentation for provider behavior.
+- Use the official OpenAPI specification matching the declared document version for API-description semantics.
+- Prefer official Ruby documentation, Rails Guides/API docs, primary payment/security standards, regulator or payment-network guidance.
+- Treat unresolved review findings as explicit research tasks before implementation.
+- Record source URL, version/access date, conclusion, and affected contract/test in development notes.
+- If research cannot resolve ambiguity, report an unsupported or ambiguous construct to the caller and user. Never invent provider behavior.
+- Research is read-only authorization. Never call live APIs, use credentials, create resources, or move money unless explicitly authorized.
 
-* Prefer the simplest implementation that fully satisfies the requirement.
-* Write straightforward code that is easy to read, verify, test, and debug.
-* Keep business decisions and state changes explicit.
-* Keep classes and methods small and cohesive.
-* Separate domain logic from I/O, serialization, persistence, and framework concerns.
-* Avoid unnecessary abstractions, metaprogramming, hidden behavior, and speculative extensibility.
-* Do not introduce dependencies or infrastructure without a concrete need.
-* Prefer deterministic behavior where possible.
-* Fail clearly rather than silently producing an incorrect result.
-* Follow existing repository structure, conventions, and RuboCop configuration.
-* Make the smallest coherent change required; do not refactor unrelated code.
+## Generator architecture
 
-When several approaches satisfy the requirement, prefer the one with fewer moving parts and failure modes.
+Keep stages separate: safe input loading; OpenAPI/version validation and local reference resolution; immutable provider-neutral IR; semantic validation and diagnostics; deterministic template rendering; artifact verification; atomic publication.
 
-## Payment-system considerations
+Parsing must not render files. Templates must not inspect raw YAML. Generated services must not embed behavior absent from the IR. Use explicit registries for supported auth schemes, operations, transformations, and template versions. Unsupported constructs produce structured diagnostics with source location and severity.
 
-Treat payment-related code as high-risk even when provider behavior is simulated.
+## Security and generated code
 
-* Prioritize correctness and traceability over convenience.
-* Never use `Float` for monetary calculations; use integers or `BigDecimal` as appropriate.
-* Preserve monetary precision and make rounding explicit when required.
-* Pay particular attention to limits and boundary conditions.
-* Keep financially meaningful state changes explicit and testable.
-* Do not allow lower-priority business preferences to bypass mandatory constraints.
-* Distinguish business rejection, ineligibility, timeout, and technical failure where relevant.
-* Keep retries and fallback behavior explicit and bounded.
-* Avoid duplicate processing and duplicate state updates.
-* Preserve enough information to explain financially meaningful decisions.
-* Do not silently recover from inconsistent payment state or ambiguous input.
+Treat specifications as untrusted input.
 
-Do not over-engineer production payment infrastructure that the current task does not require.
+- Use `Psych.safe_load`; do not deserialize arbitrary Ruby objects or YAML aliases by default.
+- Bound input size, nesting, reference traversal, and cycles.
+- Do not fetch remote `$ref` URLs by default; explicit future support must prevent SSRF.
+- Never interpolate untrusted text directly into executable Ruby. Validate identifiers and render escaped Ruby literals.
+- Never generate credentials or secrets; reference environment/configuration.
+- Signature verification uses exact documented bytes and constant-time comparison where applicable.
+- Preserve documented idempotency requirements.
+- Do not expose credentials, signatures, personal payment data, or real customer data in code, logs, docs, errors, or fixtures.
+- Generation and verification never contact a provider.
 
-## Domain design
+## Contracts and failures
 
-Keep business rules separate from infrastructure.
+The actual host `Provider::BaseService` contract is authoritative. If unavailable, use an explicit versioned adapter contract and surface that assumption.
 
-* Prefer domain components that can be tested independently.
-* Avoid large classes or conditional structures mixing unrelated rules.
-* Keep rule precedence and interactions explicit.
-* Do not duplicate the same business rule across layers.
-* Keep decision explanations and reason codes tied to the logic that produced them.
-* Prefer configuration over hard-coded sample-specific behavior when values represent business settings.
-* Make new behavior consistent with existing architecture before introducing new patterns.
+Distinguish invalid syntax, unsupported spec version/construct, ambiguous semantics, invalid mapping, rendering failure, artifact verification failure, and publication failure. Do not emit plausible incomplete code when required payment/security semantics are unresolved.
 
-## State, I/O, and simulation
+Never hide fallback behavior as success. Surface every fallback/default mapping/template with its reason and source. Authorization, signature, money-unit, status, error, and idempotency gaps must never fall back silently.
 
-Keep mutations and external I/O at clear boundaries.
+## Data, determinism, and output
 
-* Avoid global mutable state and accidental dependencies on execution order.
-* Apply state changes consistently when they affect subsequent processing.
-* Do not mutate source input unless explicitly required.
-* Validate external input before relying on it.
-* Preserve required external formats exactly.
-* Keep parsing and serialization outside core domain logic.
-* Keep simulation and randomness separate from business rules.
-* Make randomness controllable in tests when used.
+Never use `Float` for money. Preserve units, conversions, and rounding explicitly in IR, code, docs, and tests. Keep required/optional/null semantics, enums, formats, parameters, responses, statuses, and errors traceable to source or explicit config.
 
-Use repository-provided validators when changing externally consumed output.
-
-## Rails usage
-
-Use Rails where it simplifies the implementation without unnecessarily coupling domain logic to the framework.
-
-* Use Active Record for data that actually requires persistence.
-* Do not add database tables for temporary processing state without a persistence requirement.
-* Do not add controllers or routes without an HTTP requirement.
-* Do not add jobs or queue infrastructure without an asynchronous processing requirement.
-* Follow the existing repository structure before introducing new directories or namespaces.
-* Use Rails facilities already available in the project before adding dependencies.
-* Use Rails time-zone APIs such as `Time.current` when application time is required.
-
-## Errors
-
-Handle expected domain failures explicitly.
-
-Do not broadly rescue errors just to continue execution.
-
-Never convert unexpected programming errors into valid-looking payment results.
-
-Use domain-specific errors or result objects when they make behavior clearer.
-
-Do not expose sensitive information in errors or logs.
+The same input, generator/config/template versions must produce byte-identical artifacts. Validate all artifacts before atomically publishing the complete set. Do not leave mixed old/new output or overwrite existing output unless explicitly requested.
 
 ## Tests
 
-Use RSpec unless the repository establishes another convention.
+Use Minitest unless the repository convention changes.
 
-* Test behavior rather than implementation details.
-* Cover the changed behavior, relevant boundaries, and meaningful failure cases.
-* Verify state changes when they affect subsequent decisions.
-* Prefer focused unit tests for isolated domain behavior and integration tests when component interaction matters.
-* Keep domain values explicit in tests.
-* Keep tests deterministic.
-* Never make real payment-provider calls in tests.
-* Do not add unrelated tests solely to increase coverage.
+- Separate parser, IR, validation, renderer, security, CLI, and end-to-end tests.
+- Use provider-neutral fixtures and at least two structurally different specs.
+- Cover missing/optional fields, response variants, auth alternatives, callbacks/webhooks, units, mappings, local references, cycles, unsupported and malicious input, and atomic rollback.
+- Compile generated Ruby with `ruby -c`, run RuboCop, validate JSON, and execute generated contract tests with fake clients.
+- Never call providers in tests; use synthetic non-sensitive data and deterministic tests.
+- Remove or replace superseded routing tests; they must not remain in default CI.
 
-## Dependencies and security
+## Dependencies
 
-Prefer Ruby standard library, Rails facilities already present, and existing dependencies.
-
-Add a dependency or infrastructure component only when it solves a concrete requirement and materially improves the implementation.
-
-Never commit or expose secrets, credentials, access tokens, private keys, or real payment-provider credentials.
-
-Do not log sensitive payment or personal data unnecessarily.
-
-Never contact real payment providers or initiate real money movement unless explicitly authorized.
+Prefer Ruby standard library, existing Rails facilities, and existing dependencies. Add only open-source dependencies with a concrete need after checking maintenance, license, and security. Proprietary technology and neural networks inside the project are prohibited.
 
 ## Change workflow
 
-1. Read applicable agent instructions.
-2. Read the relevant requirement.
-3. Inspect nearby code, tests, configuration, examples, and validators.
-4. Identify affected payment invariants, state changes, boundaries, and failure cases.
-5. Choose the simplest reliable solution consistent with existing conventions.
-6. Make the smallest coherent change.
-7. Add or update focused tests.
-8. Run relevant specs, RuboCop, and repository validators.
-9. Review the diff for unrelated changes, unnecessary complexity, unsafe monetary calculations, hidden state changes, sample-specific assumptions, nondeterminism, and sensitive data.
+1. Read applicable instructions and `thoughts/idea_2.md`.
+2. Inspect the specification, host contract, examples, tests, and validators.
+3. Research unresolved provider/OpenAPI/security semantics.
+4. Confirm versioned IR and output contracts.
+5. Change one pipeline stage coherently and add focused positive/negative tests.
+6. Run relevant tests, generated-artifact checks, RuboCop, Brakeman, and dependency audit.
+7. Review for provider-specific leakage, unsafe parsing/interpolation, silent fallback, nondeterminism, secrets, and partial output.
 
-Do not modify unrelated user changes.
-
-Do not commit, push, install infrastructure, contact real payment providers, or perform destructive operations unless explicitly requested.
+Do not modify unrelated user changes. Do not commit, push, install infrastructure, contact providers, or perform destructive operations unless explicitly requested.
