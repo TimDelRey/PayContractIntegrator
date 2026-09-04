@@ -1,0 +1,82 @@
+{
+  "provider": "paypal",
+  "source_file": "paypal_provider_api.yaml",
+  "examples": [
+    {
+      "source_path": "#/paths/~1v1~1payments~1payouts/post/requestBody/content/application~1json/examples",
+      "value": {
+        "create_payout_request": {
+          "value": {
+            "sender_batch_header": {
+              "sender_batch_id": "Payouts_2018_100007",
+              "email_subject": "You have a payout!",
+              "email_message": "You have received a payout! Thanks for using our service!"
+            },
+            "items": [
+              {
+                "recipient_type": "EMAIL",
+                "amount": {
+                  "value": "9.87",
+                  "currency": "USD"
+                },
+                "note": "Thanks for your patronage!",
+                "sender_item_id": "201403140001",
+                "receiver": "receiver@example.com",
+                "alternate_notification_method": {
+                  "phone": {
+                    "country_code": "91",
+                    "national_number": "9999988888"
+                  }
+                },
+                "notification_language": "fr-FR"
+              },
+              {
+                "recipient_type": "PHONE",
+                "amount": {
+                  "value": "112.34",
+                  "currency": "USD"
+                },
+                "note": "Thanks for your support!",
+                "sender_item_id": "201403140002",
+                "receiver": "91-734-234-1234"
+              },
+              {
+                "recipient_type": "PAYPAL_ID",
+                "amount": {
+                  "value": "5.32",
+                  "currency": "USD"
+                },
+                "note": "Thanks for your patronage!",
+                "sender_item_id": "201403140003",
+                "receiver": "G83JXTJ5EHCQ2"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/components/schemas/error_500/example",
+      "value": {
+        "name": "INTERNAL_SERVER_ERROR",
+        "message": "An internal server error occurred.",
+        "debug_id": "90957fca61718",
+        "links": [
+          {
+            "href": "https://developer.paypal.com/api/orders/v2/#error-INTERNAL_SERVER_ERROR",
+            "rel": "information_link"
+          }
+        ]
+      }
+    },
+    {
+      "source_path": "#/components/schemas/error_503/example",
+      "value": {
+        "name": "SERVICE_UNAVAILABLE",
+        "message": "Service Unavailable.",
+        "debug_id": "90957fca61718",
+        "information_link": "https://developer.paypal.com/docs/api/orders/v2/#error-SERVICE_UNAVAILABLE"
+      }
+    }
+  ]
+}

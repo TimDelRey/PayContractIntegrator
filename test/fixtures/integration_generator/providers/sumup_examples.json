@@ -1,0 +1,4830 @@
+{
+  "provider": "sumup",
+  "source_file": "sumup_provider_api.yaml",
+  "examples": [
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1payment-methods/get/parameters/0/schema/example",
+      "value": "MH4H92C7"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1payment-methods/get/parameters/1/schema/example",
+      "value": 9.99
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1payment-methods/get/parameters/2/schema/example",
+      "value": "EUR"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1payment-methods/get/responses/200/content/application~1json/schema/properties/available_payment_methods/example",
+      "value": [
+        {
+          "id": "apple_pay"
+        },
+        {
+          "id": "blik"
+        }
+      ]
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1payment-methods/get/responses/200/content/application~1json/schema/properties/available_payment_methods/items/properties/id/example",
+      "value": "qr_code_pix"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1payment-methods/get/responses/200/content/application~1json/examples",
+      "value": {
+        "success": {
+          "description": "Available payment methods",
+          "value": {
+            "available_payment_methods": [
+              {
+                "id": "apple_pay"
+              },
+              {
+                "id": "blik"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1payment-methods/get/responses/400/content/application~1json/examples",
+      "value": {
+        "Invalid_Parameter": {
+          "description": "One or more of the parameters are invalid.",
+          "value": {
+            "failed_constraints": [
+              {
+                "message": "Currency must also be specified when filtering by amount",
+                "reference": "currency"
+              }
+            ],
+            "status": 400,
+            "title": "Bad Request"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts/post/requestBody/content/application~1json/examples",
+      "value": {
+        "Checkout": {
+          "description": "Standard request body for creating a checkout",
+          "value": {
+            "checkout_reference": "f00a8f74-b05d-4605-bd73-2a901bae5802",
+            "amount": 10.1,
+            "currency": "EUR",
+            "merchant_code": "MH4H92C7",
+            "description": "Purchase",
+            "valid_until": "2020-02-29T10:56:56+00:00",
+            "redirect_url": "https://sumup.com"
+          }
+        },
+        "Checkout3DS": {
+          "description": "Create a 3DS checkout",
+          "value": {
+            "checkout_reference": "f00a8f74-b05d-4605-bd73-2a901bae5802",
+            "amount": 10.1,
+            "currency": "EUR",
+            "merchant_code": "MH4H92C7",
+            "description": "Purchase",
+            "return_url": "http://example.com/",
+            "customer_id": "831ff8d4cd5958ab5670",
+            "redirect_url": "https://mysite.com/completed_purchase"
+          }
+        },
+        "CheckoutAPM": {
+          "description": "Create an Alternative Payment Method checkout",
+          "value": {
+            "checkout_reference": "f00a8f74-b05d-4605-bd73-2a901bae5802",
+            "amount": 10.1,
+            "currency": "EUR",
+            "merchant_code": "MH4H92C7",
+            "redirect_url": "https://mysite.com/completed_purchase"
+          }
+        },
+        "HostedCheckout": {
+          "description": "Create a checkout with a SumUp-hosted payment page",
+          "x-beta": true,
+          "value": {
+            "checkout_reference": "b50pr914-6k0e-3091-a592-890010285b3d",
+            "amount": 12,
+            "currency": "EUR",
+            "merchant_code": "MCXXXXXX",
+            "description": "A sample checkout",
+            "hosted_checkout": {
+              "enabled": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts/post/responses/201/content/application~1json/examples",
+      "value": {
+        "Checkout": {
+          "description": "Standard response body for a successfully created checkout",
+          "value": {
+            "checkout_reference": "8ea25ec3-3293-40e9-a165-6d7f3b3073c5",
+            "amount": 10.1,
+            "currency": "EUR",
+            "merchant_code": "MH4H92C7",
+            "merchant_country": "DE",
+            "description": "My Checkout",
+            "return_url": "http://example.com",
+            "id": "88fcf8de-304d-4820-8f1c-ec880290eb92",
+            "status": "PENDING",
+            "date": "2020-02-29T10:56:56+00:00",
+            "valid_until": "2020-02-29T10:56:56+00:00",
+            "customer_id": "831ff8d4cd5958ab5670",
+            "mandate": {
+              "type": "recurrent",
+              "status": "active",
+              "merchant_code": "MH4H92C7"
+            },
+            "transactions": [
+              {
+                "id": "410fc44a-5956-44e1-b5cc-19c6f8d727a4",
+                "transaction_code": "TEENSK4W2K",
+                "amount": 10.1,
+                "currency": "EUR",
+                "timestamp": "2020-02-29T10:56:56.876Z",
+                "status": "SUCCESSFUL",
+                "payment_type": "ECOM",
+                "installments_count": 1,
+                "merchant_code": "MH4H92C7",
+                "vat_amount": 6,
+                "tip_amount": 3,
+                "entry_mode": "CUSTOMER_ENTRY",
+                "auth_code": "012345"
+              }
+            ]
+          }
+        },
+        "Checkout3DS": {
+          "description": "Response body for a successfully created 3DS checkout",
+          "value": {
+            "checkout_reference": "8ea25ec3-3293-40e9-a165-6d7f3b3073c5",
+            "amount": 10.1,
+            "currency": "EUR",
+            "description": "My Checkout",
+            "return_url": "http://example.com",
+            "id": "88fcf8de-304d-4820-8f1c-ec880290eb92",
+            "status": "PENDING",
+            "date": "2020-02-29T10:56:56+00:00",
+            "valid_until": "2020-02-29T10:56:56+00:00",
+            "customer_id": "831ff8d4cd5958ab5670",
+            "redirect_url": "https://mysite.com/completed_purchase",
+            "transactions": [
+              {
+                "id": "410fc44a-5956-44e1-b5cc-19c6f8d727a4",
+                "transaction_code": "TEENSK4W2K",
+                "amount": 10.1,
+                "currency": "EUR",
+                "timestamp": "2020-02-29T10:56:56.876Z",
+                "status": "SUCCESSFUL",
+                "payment_type": "ECOM",
+                "installments_count": 1,
+                "merchant_code": "MH4H92C7",
+                "vat_amount": 6,
+                "tip_amount": 3,
+                "entry_mode": "CUSTOMER_ENTRY",
+                "auth_code": "012345"
+              }
+            ]
+          }
+        },
+        "CheckoutAPM": {
+          "description": "Response body for APMs, including Blik, iDeal, ...",
+          "value": {
+            "checkout_reference": "8ea25ec3-3293-40e9-a165-6d7f3b3073c5",
+            "amount": 10.1,
+            "currency": "EUR",
+            "merchant_code": "MH4H92C7",
+            "description": "My Checkout",
+            "return_url": "http://example.com",
+            "id": "88fcf8de-304d-4820-8f1c-ec880290eb92",
+            "status": "PENDING",
+            "date": "2021-06-29T11:08:36.000+00:00",
+            "merchant_name": "My company",
+            "merchant_country": "DE",
+            "redirect_url": "https://sumup.com",
+            "purpose": "CHECKOUT",
+            "transactions": [
+              {
+                "id": "410fc44a-5956-44e1-b5cc-19c6f8d727a4",
+                "transaction_code": "TEENSK4W2K",
+                "amount": 10.1,
+                "currency": "EUR",
+                "timestamp": "2020-02-29T10:56:56.876Z",
+                "status": "SUCCESSFUL",
+                "payment_type": "ECOM",
+                "installments_count": 1,
+                "merchant_code": "MH4H92C7",
+                "vat_amount": 6,
+                "tip_amount": 3,
+                "entry_mode": "CUSTOMER_ENTRY",
+                "auth_code": "012345"
+              }
+            ]
+          }
+        },
+        "HostedCheckout": {
+          "description": "Response body for a checkout with a SumUp-hosted payment page",
+          "value": {
+            "checkout_reference": "b50pr914-6k0e-3091-a592-890010285b3d",
+            "amount": 12,
+            "currency": "EUR",
+            "merchant_code": "MCXXXXXX",
+            "merchant_country": "DE",
+            "merchant_name": "Sample Shop",
+            "description": "A sample checkout",
+            "id": "64553e20-3f0e-49e4-8af3-fd0eca86ce91",
+            "status": "PENDING",
+            "date": "2000-01-01T12:49:24.899+00:00",
+            "purpose": "CHECKOUT",
+            "hosted_checkout": {
+              "enabled": true
+            },
+            "hosted_checkout_url": "https://checkout.sumup.com/pay/8f9316a3-cda9-42a9-9771-54d534315676",
+            "transactions": []
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts/post/responses/400/content/application~1json/examples",
+      "value": {
+        "Missing_Parameter": {
+          "description": "A required parameter is missing.",
+          "value": {
+            "message": "Validation error",
+            "error_code": "MISSING",
+            "param": "merchant_code"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts/post/responses/401/content/application~1json/examples",
+      "value": {
+        "Problem_Details": {
+          "description": "Unauthorized response returned by API gateway.",
+          "value": {
+            "detail": "Unauthorized.",
+            "status": 401,
+            "title": "Unauthorized",
+            "trace_id": "3c77294349d3b5647ea2d990f0d8f017",
+            "type": "https://developer.sumup.com/problem/unauthorized"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts/post/responses/403/content/application~1json/examples",
+      "value": {
+        "Forbidden": {
+          "description": "You do not have the required permission for making this request.",
+          "value": {
+            "error_message": "checkout_payments_not_allowed",
+            "error_code": "FORBIDDEN",
+            "status_code": "403"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts/post/responses/409/content/application~1json/examples",
+      "value": {
+        "Existing_Checkout": {
+          "description": "A resource with the specified parameters already exists on the server.",
+          "value": {
+            "error_code": "DUPLICATED_CHECKOUT",
+            "message": "Checkout with this checkout reference and pay to email already exists"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts/get/parameters/0/schema/example",
+      "value": "f00a8f74-b05d-4605-bd73-2a901bae5802"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts/get/responses/200/content/application~1json/example",
+      "value": [
+        {
+          "checkout_reference": "f00a8f74-b05d-4605-bd73-2a901bae5802",
+          "amount": 10.1,
+          "currency": "EUR",
+          "merchant_code": "MH4H92C7",
+          "description": "Purchase",
+          "id": "4e425463-3e1b-431d-83fa-1e51c2925e99",
+          "status": "PENDING",
+          "date": "2020-02-29T10:56:56+00:00"
+        }
+      ]
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts/get/responses/401/content/application~1json/examples",
+      "value": {
+        "Problem_Details": {
+          "description": "Unauthorized response returned by API gateway.",
+          "value": {
+            "detail": "Unauthorized.",
+            "status": 401,
+            "title": "Unauthorized",
+            "trace_id": "3c77294349d3b5647ea2d990f0d8f017",
+            "type": "https://developer.sumup.com/problem/unauthorized"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts~1{checkout_id}/parameters/0/schema/example",
+      "value": "4e425463-3e1b-431d-83fa-1e51c2925e99"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts~1{checkout_id}/get/responses/200/content/application~1json/example",
+      "value": {
+        "checkout_reference": "f00a8f74-b05d-4605-bd73-2a901bae5802",
+        "amount": 10.1,
+        "currency": "EUR",
+        "merchant_code": "MH4H92C7",
+        "description": "Purchase",
+        "id": "4e425463-3e1b-431d-83fa-1e51c2925e99",
+        "status": "PENDING",
+        "date": "2020-02-29T10:56:56+00:00",
+        "transaction_code": "TEENSK4W2K",
+        "transaction_id": "410fc44a-5956-44e1-b5cc-19c6f8d727a4"
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts~1{checkout_id}/get/responses/401/content/application~1json/examples",
+      "value": {
+        "Problem_Details": {
+          "description": "Unauthorized response returned by API gateway.",
+          "value": {
+            "detail": "Unauthorized.",
+            "status": 401,
+            "title": "Unauthorized",
+            "trace_id": "3c77294349d3b5647ea2d990f0d8f017",
+            "type": "https://developer.sumup.com/problem/unauthorized"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts~1{checkout_id}/get/responses/404/content/application~1json/examples",
+      "value": {
+        "Not_Found": {
+          "description": "The identified resource is not found on the server.",
+          "value": {
+            "error_code": "NOT_FOUND",
+            "message": "Resource not found"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts~1{checkout_id}/patch/requestBody/content/application~1json/example",
+      "value": {
+        "amount": 12.5,
+        "currency": "EUR",
+        "description": "Updated purchase",
+        "checkout_reference": "f00a8f74-b05d-4605-bd73-2a901bae5802",
+        "valid_until": "2020-02-29T10:56:56+00:00",
+        "customer_id": "831ff8d4cd5958ab5670"
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts~1{checkout_id}/patch/responses/200/content/application~1json/example",
+      "value": {
+        "checkout_reference": "f00a8f74-b05d-4605-bd73-2a901bae5802",
+        "amount": 12.5,
+        "currency": "EUR",
+        "merchant_code": "MH4H92C7",
+        "merchant_country": "DE",
+        "description": "Updated purchase",
+        "id": "88fcf8de-304d-4820-8f1c-ec880290eb92",
+        "status": "PENDING",
+        "date": "2020-02-29T10:56:56+00:00",
+        "valid_until": "2020-02-29T10:56:56+00:00",
+        "customer_id": "831ff8d4cd5958ab5670",
+        "transactions": []
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts~1{checkout_id}/patch/responses/401/content/application~1json/examples",
+      "value": {
+        "Problem_Details": {
+          "description": "Unauthorized response returned by API gateway.",
+          "value": {
+            "detail": "Unauthorized.",
+            "status": 401,
+            "title": "Unauthorized",
+            "trace_id": "3c77294349d3b5647ea2d990f0d8f017",
+            "type": "https://developer.sumup.com/problem/unauthorized"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts~1{checkout_id}/patch/responses/404/content/application~1json/examples",
+      "value": {
+        "Not_Found": {
+          "description": "The identified resource is not found on the server.",
+          "value": {
+            "error_code": "NOT_FOUND",
+            "message": "Resource not found"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts~1{checkout_id}/put/requestBody/content/application~1json/examples",
+      "value": {
+        "ProcessCard": {
+          "description": "Process a checkout with a card",
+          "value": {
+            "payment_type": "card",
+            "installments": 1,
+            "mandate": {
+              "type": "recurrent",
+              "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36",
+              "user_ip": "172.217.169.174"
+            },
+            "card": {
+              "type": "VISA",
+              "name": "John Doe",
+              "number": "1234567890123456",
+              "expiry_year": "2023",
+              "expiry_month": "01",
+              "cvv": "123",
+              "zip_code": "12345"
+            }
+          }
+        },
+        "ProcessToken": {
+          "description": "Process a checkout with a token",
+          "value": {
+            "payment_type": "card",
+            "installments": 1,
+            "token": "ba85dfee-c3cf-48a6-84f5-d7d761fbba50",
+            "customer_id": "MEDKHDTI"
+          }
+        },
+        "ProcessBoleto": {
+          "description": "Process a checkout with Boleto",
+          "value": {
+            "payment_type": "boleto",
+            "personal_details": {
+              "email": "user@example.com",
+              "first_name": "John",
+              "last_name": "Doe",
+              "tax_id": "423.378.593-47",
+              "address": {
+                "country": "BR",
+                "city": "São Paulo",
+                "line1": "Rua Gilberto Sabino, 215",
+                "state": "SP",
+                "postal_code": "05425-020"
+              }
+            }
+          }
+        },
+        "ProcessiDeal": {
+          "description": "Process a checkout with iDeal",
+          "value": {
+            "payment_type": "ideal",
+            "personal_details": {
+              "email": "user@example.com",
+              "first_name": "John",
+              "last_name": "Doe",
+              "address": {
+                "country": "NL"
+              }
+            }
+          }
+        },
+        "ProcessBancontact": {
+          "description": "Process a checkout with Bancontact",
+          "value": {
+            "payment_type": "bancontact",
+            "personal_details": {
+              "email": "user@example.com",
+              "first_name": "John",
+              "last_name": "Doe",
+              "address": {
+                "country": "BE"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts~1{checkout_id}/put/responses/200/content/application~1json/schema/allOf/1/properties/transaction_code/example",
+      "value": "TEENSK4W2K"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts~1{checkout_id}/put/responses/200/content/application~1json/schema/allOf/1/properties/transaction_id/example",
+      "value": "410fc44a-5956-44e1-b5cc-19c6f8d727a4"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts~1{checkout_id}/put/responses/200/content/application~1json/schema/allOf/1/properties/merchant_name/example",
+      "value": "Sample Merchant"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts~1{checkout_id}/put/responses/200/content/application~1json/schema/allOf/1/properties/redirect_url/example",
+      "value": "https://mysite.com/completed_purchase"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts~1{checkout_id}/put/responses/200/content/application~1json/schema/allOf/1/properties/payment_instrument/properties/token/example",
+      "value": "e76d7e5c-9375-4fac-a7e7-b19dc5302fbc"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts~1{checkout_id}/put/responses/200/content/application~1json/examples",
+      "value": {
+        "CheckoutSuccessCard": {
+          "description": "Successfully processed checkout with a card",
+          "value": {
+            "checkout_reference": "f00a8f74-b05d-4605-bd73-2a901bae5802",
+            "amount": 10.1,
+            "currency": "EUR",
+            "merchant_code": "MH4H92C7",
+            "description": "Purchase",
+            "return_url": "http://example.com",
+            "id": "4e425463-3e1b-431d-83fa-1e51c2925e99",
+            "status": "PENDING",
+            "date": "2020-02-29T10:56:56+00:00",
+            "valid_until": "2020-02-29T10:56:56+00:00",
+            "customer_id": "831ff8d4cd5958ab5670",
+            "mandate": {
+              "type": "recurrent",
+              "status": "active",
+              "merchant_code": "MH4H92C7"
+            },
+            "transactions": [
+              {
+                "id": "410fc44a-5956-44e1-b5cc-19c6f8d727a4",
+                "transaction_code": "TEENSK4W2K",
+                "amount": 10.1,
+                "currency": "EUR",
+                "timestamp": "2020-02-29T10:56:56.876Z",
+                "status": "SUCCESSFUL",
+                "payment_type": "ECOM",
+                "installments_count": 1,
+                "merchant_code": "MH4H92C7",
+                "vat_amount": 6,
+                "tip_amount": 3,
+                "entry_mode": "CUSTOMER_ENTRY",
+                "auth_code": "053201"
+              }
+            ],
+            "transaction_code": "TEENSK4W2K",
+            "transaction_id": "410fc44a-5956-44e1-b5cc-19c6f8d727a4"
+          }
+        },
+        "CheckoutSuccessToken": {
+          "description": "Successfully processed checkout with a token",
+          "value": {
+            "checkout_reference": "f00a8f74-b05d-4605-bd73-2a901bae5802",
+            "amount": 10.1,
+            "currency": "EUR",
+            "merchant_code": "MH4H92C7",
+            "description": "Purchase with token",
+            "id": "4e425463-3e1b-431d-83fa-1e51c2925e99",
+            "status": "PENDING",
+            "date": "2020-02-29T10:56:56+00:00",
+            "transaction_code": "TEENSK4W2K",
+            "transaction_id": "410fc44a-5956-44e1-b5cc-19c6f8d727a4",
+            "merchant_name": "Sample Merchant",
+            "redirect_url": "https://mysite.com/completed_purchase",
+            "customer_id": "831ff8d4cd5958ab5670",
+            "payment_instrument": {
+              "token": "e76d7e5c-9375-4fac-a7e7-b19dc5302fbc"
+            },
+            "transactions": [
+              {
+                "id": "410fc44a-5956-44e1-b5cc-19c6f8d727a4",
+                "transaction_code": "TEENSK4W2K",
+                "amount": 10.1,
+                "currency": "EUR",
+                "timestamp": "2020-02-29T10:56:56.876Z",
+                "status": "SUCCESSFUL",
+                "payment_type": "ECOM",
+                "installments_count": 1,
+                "merchant_code": "MH4H92C7",
+                "vat_amount": 6,
+                "tip_amount": 3,
+                "entry_mode": "CUSTOMER_ENTRY",
+                "auth_code": "053201"
+              }
+            ]
+          }
+        },
+        "CheckoutSuccessBoleto": {
+          "description": "Successfully processed checkout with Boleto",
+          "value": {
+            "checkout_reference": "f00a8f74-b05d-4605-bd73-2a901bae5802",
+            "amount": 10.1,
+            "currency": "BRL",
+            "merchant_code": "MH4H92C7",
+            "description": "Boleto checkout",
+            "id": "4e425463-3e1b-431d-83fa-1e51c2925e99",
+            "status": "PENDING",
+            "date": "2021-07-06T12:34:02.000+00:00",
+            "merchant_name": "Sample shop",
+            "boleto": {
+              "barcode": "34191090081790614310603072340007886840000000200",
+              "url": "https://checkouts.sample.com/v0.1/checkouts/2e7a36cc-7897-446b-a966-952ab5f049ea/boleto"
+            },
+            "redirect_url": "https://website.com",
+            "purpose": "CHECKOUT",
+            "transactions": [
+              {
+                "id": "debd2986-9852-4e86-8a8e-7ea9c87dd679",
+                "transaction_code": "TEN3E696NP",
+                "merchant_code": "MH4H92C9",
+                "amount": 10.1,
+                "vat_amount": 6,
+                "tip_amount": 3,
+                "currency": "BRL",
+                "timestamp": "2021-07-06T12:34:16.460+00:00",
+                "status": "PENDING",
+                "payment_type": "BOLETO",
+                "entry_mode": "BOLETO",
+                "installments_count": 1
+              }
+            ]
+          }
+        },
+        "CheckoutSuccessiDeal": {
+          "description": "Successfully processed checkout with iDeal",
+          "value": {
+            "next_step": {
+              "url": "https://r3.girogate.de/ti/simideal",
+              "method": "GET",
+              "payload": {
+                "tx": "961473700",
+                "rs": "ILnaUeQTKJ184fVrjGILrLjePX9E4rmz",
+                "cs": "c8bc0ea231f8372431ca22d6f8319f8de0263d0b1705759ed27155f245f193c5"
+              },
+              "full": "https://r3.girogate.de/ti/simideal?tx=961473700&rs=ILnaUeQTKJ184fVrjGILrLjePX9E4rmz&cs=c8bc0ea231f8372431ca22d6f8319f8de0263d0b1705759ed27155f245f193c5",
+              "mechanism": [
+                "browser"
+              ]
+            }
+          }
+        },
+        "CheckoutSuccessBancontact": {
+          "description": "Successfully processed checkout with Bancontact",
+          "value": {
+            "next_step": {
+              "url": "https://r3.girogate.de/ti/simbcmc",
+              "method": "GET",
+              "payload": {
+                "tx": "624788471",
+                "rs": "5MioXoKt2Gwj9dLgqAX1bMRBuT5xTSdB",
+                "cs": "697edacdd9175f3f99542500fa0ff08280b66aaff3c2641a2e212e4b039473cc"
+              },
+              "full": "https://r3.girogate.de/ti/simbcmc?tx=624788471&rs=5MioXoKt2Gwj9dLgqAX1bMRBuT5xTSdB&cs=697edacdd9175f3f99542500fa0ff08280b66aaff3c2641a2e212e4b039473cc",
+              "mechanism": [
+                "browser"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts~1{checkout_id}/put/responses/400/content/application~1json/examples",
+      "value": {
+        "Invalid_Parameter": {
+          "description": "A required parameter has an invalid value.",
+          "value": {
+            "message": "Validation error",
+            "error_code": "INVALID",
+            "param": "card.expiry_year"
+          }
+        },
+        "Multiple_Invalid_Parameters": {
+          "description": "Multiple required parameters have invalid values.",
+          "value": [
+            {
+              "error_code": "INVALID",
+              "message": "Validation error",
+              "param": "card.name"
+            },
+            {
+              "error_code": "INVALID",
+              "message": "Validation error",
+              "param": "card.number"
+            },
+            {
+              "error_code": "INVALID",
+              "message": "Validation error",
+              "param": "card.expiry_year"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts~1{checkout_id}/put/responses/401/content/application~1json/examples",
+      "value": {
+        "Problem_Details": {
+          "description": "Unauthorized response returned by API gateway.",
+          "value": {
+            "detail": "Unauthorized.",
+            "status": 401,
+            "title": "Unauthorized",
+            "trace_id": "3c77294349d3b5647ea2d990f0d8f017",
+            "type": "https://developer.sumup.com/problem/unauthorized"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts~1{checkout_id}/put/responses/404/content/application~1json/examples",
+      "value": {
+        "Not_Found": {
+          "description": "The identified resource is not found on the server.",
+          "value": {
+            "error_code": "NOT_FOUND",
+            "message": "Resource not found"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts~1{checkout_id}/put/responses/409/content/application~1json/examples",
+      "value": {
+        "Checkout_Processed": {
+          "description": "The identified checkout resource is already processed.",
+          "value": {
+            "error_code": "CHECKOUT_PROCESSED",
+            "message": "Checkout is already processed"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts~1{checkout_id}/delete/responses/200/content/application~1json/example",
+      "value": {
+        "checkout_reference": "f00a8f74-b05d-4605-bd73-2a901bae5802",
+        "id": "817340ce-f1d9-4609-b90a-6152f8ee267j",
+        "amount": 2,
+        "currency": "EUR",
+        "merchant_code": "MH4H92C7",
+        "description": "Deletion example",
+        "purpose": "CHECKOUT",
+        "status": "EXPIRED",
+        "date": "2020-02-29T10:56:56+00:00",
+        "valid_until": "2020-02-29T10:56:56+00:00",
+        "merchant_name": "Sample Merchant",
+        "transactions": []
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts~1{checkout_id}/delete/responses/401/content/application~1json/examples",
+      "value": {
+        "Problem_Details": {
+          "description": "Unauthorized response returned by API gateway.",
+          "value": {
+            "detail": "Unauthorized.",
+            "status": 401,
+            "title": "Unauthorized",
+            "trace_id": "3c77294349d3b5647ea2d990f0d8f017",
+            "type": "https://developer.sumup.com/problem/unauthorized"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts~1{checkout_id}/delete/responses/404/content/application~1json/examples",
+      "value": {
+        "Not_Found": {
+          "description": "The identified resource is not found on the server.",
+          "value": {
+            "error_code": "NOT_FOUND",
+            "message": "Resource not found"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1checkouts~1{checkout_id}/delete/responses/409/content/application~1json/examples",
+      "value": {
+        "Checkout_Processed": {
+          "description": "The identified checkout resource is already processed.",
+          "value": {
+            "error_code": "CHECKOUT_PROCESSED",
+            "message": "Checkout is already processed"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.2~1checkouts~1{checkout_id}~1apple-pay-session/put/parameters/0/schema/example",
+      "value": "4e425463-3e1b-431d-83fa-1e51c2925e99"
+    },
+    {
+      "source_path": "#/paths/~1v0.2~1checkouts~1{checkout_id}~1apple-pay-session/put/requestBody/content/application~1json/schema/properties/context/example",
+      "value": "example.com"
+    },
+    {
+      "source_path": "#/paths/~1v0.2~1checkouts~1{checkout_id}~1apple-pay-session/put/requestBody/content/application~1json/schema/properties/target/example",
+      "value": "https://apple-pay-gateway-cert.apple.com/paymentservices/startSession"
+    },
+    {
+      "source_path": "#/paths/~1v0.2~1checkouts~1{checkout_id}~1apple-pay-session/put/responses/200/content/application~1json/example",
+      "value": {
+        "displayName": "Test Account",
+        "domainName": "pay.sumup.com",
+        "epochTimestamp": 1775323532665,
+        "expiresAt": 1775327132665,
+        "merchantIdentifier": "7801D328E6637EFC1ADE6CE01C671D2CD318E32CA4ED1F9FC390D170D827D9AB",
+        "merchantSessionIdentifier": "SSH92CC412E5FCF4FAB88684914C953C0D4_916523AAED1343F5BC5815E12BEE9250AFFDC1A17C46B0DE5A943F0F94927C24",
+        "nonce": "a968a2bf",
+        "operationalAnalyticsIdentifier": "Test Account:7801D328E6637EFC1ADE6CE01C671D2CD318E32CA4ED1F9FC390D170D827D9AB",
+        "pspId": "7801D328E6637EFC1ADE6CE01C671D2CD318E32CA4ED1F9FC390D170D827D9AB",
+        "retries": 0,
+        "signature": "<apple-pay-signature>"
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.2~1checkouts~1{checkout_id}~1apple-pay-session/put/responses/400/content/application~1json/example",
+      "value": {
+        "error_code": "INVALID",
+        "message": "Bad Request"
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.2~1checkouts~1{checkout_id}~1apple-pay-session/put/responses/404/content/application~1json/examples",
+      "value": {
+        "Not_Found": {
+          "description": "The identified resource is not found on the server.",
+          "value": {
+            "error_code": "NOT_FOUND",
+            "message": "Resource not found"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1customers/post/responses/400/content/application~1json/schema/oneOf/1/properties/instance/example",
+      "value": "32a44c6c-85d3-49e8-86bf-a5bba98c4621"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1customers/post/responses/400/content/application~1json/schema/oneOf/1/properties/error_code/example",
+      "value": "INVALID"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1customers/post/responses/400/content/application~1json/schema/oneOf/1/properties/error_message/example",
+      "value": "customer_id"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1customers/post/responses/400/content/application~1json/examples",
+      "value": {
+        "Missing_Customer_ID": {
+          "description": "The required customer identifier is missing.",
+          "value": {
+            "error_code": "INVALID",
+            "message": "Validation error",
+            "param": "customer_id"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1customers/post/responses/401/content/application~1json/examples",
+      "value": {
+        "Problem_Details": {
+          "description": "Unauthorized response returned by API gateway.",
+          "value": {
+            "detail": "Unauthorized.",
+            "status": 401,
+            "title": "Unauthorized",
+            "trace_id": "3c77294349d3b5647ea2d990f0d8f017",
+            "type": "https://developer.sumup.com/problem/unauthorized"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1customers/post/responses/403/content/application~1json/examples",
+      "value": {
+        "Forbidden": {
+          "description": "You do not have required scopes for making this request.",
+          "value": {
+            "error_message": "request_not_allowed",
+            "error_code": "FORBIDDEN",
+            "status_code": "403"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1customers/post/responses/409/content/application~1json/examples",
+      "value": {
+        "Existing_Customer": {
+          "description": "A resource with the specified identifier already exists on the server.",
+          "value": {
+            "message": "Customer already exists",
+            "error_code": "CUSTOMER_ALREADY_EXISTS"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1customers~1{customer_id}/parameters/0/schema/example",
+      "value": "831ff8d4cd5958ab5670"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1customers~1{customer_id}/get/responses/401/content/application~1json/examples",
+      "value": {
+        "Problem_Details": {
+          "description": "Unauthorized response returned by API gateway.",
+          "value": {
+            "detail": "Unauthorized.",
+            "status": 401,
+            "title": "Unauthorized",
+            "trace_id": "3c77294349d3b5647ea2d990f0d8f017",
+            "type": "https://developer.sumup.com/problem/unauthorized"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1customers~1{customer_id}/get/responses/403/content/application~1json/examples",
+      "value": {
+        "Forbidden": {
+          "description": "You do not have required scopes for making this request.",
+          "value": {
+            "error_message": "request_not_allowed",
+            "error_code": "FORBIDDEN",
+            "status_code": "403"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1customers~1{customer_id}/get/responses/404/content/application~1json/examples",
+      "value": {
+        "Not_Found": {
+          "description": "The identified resource is not found on the server.",
+          "value": {
+            "error_code": "NOT_FOUND",
+            "message": "Resource not found"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1customers~1{customer_id}/put/responses/401/content/application~1json/examples",
+      "value": {
+        "Problem_Details": {
+          "description": "Unauthorized response returned by API gateway.",
+          "value": {
+            "detail": "Unauthorized.",
+            "status": 401,
+            "title": "Unauthorized",
+            "trace_id": "3c77294349d3b5647ea2d990f0d8f017",
+            "type": "https://developer.sumup.com/problem/unauthorized"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1customers~1{customer_id}/put/responses/403/content/application~1json/examples",
+      "value": {
+        "Forbidden": {
+          "description": "You do not have required scopes for making this request.",
+          "value": {
+            "error_message": "request_not_allowed",
+            "error_code": "FORBIDDEN",
+            "status_code": "403"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1customers~1{customer_id}/put/responses/404/content/application~1json/examples",
+      "value": {
+        "Not_Found": {
+          "description": "The identified resource is not found on the server.",
+          "value": {
+            "error_code": "NOT_FOUND",
+            "message": "Resource not found"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1customers~1{customer_id}~1payment-instruments/parameters/0/schema/example",
+      "value": "831ff8d4cd5958ab5670"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1customers~1{customer_id}~1payment-instruments/get/responses/401/content/application~1json/examples",
+      "value": {
+        "Problem_Details": {
+          "description": "Unauthorized response returned by API gateway.",
+          "value": {
+            "detail": "Unauthorized.",
+            "status": 401,
+            "title": "Unauthorized",
+            "trace_id": "3c77294349d3b5647ea2d990f0d8f017",
+            "type": "https://developer.sumup.com/problem/unauthorized"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1customers~1{customer_id}~1payment-instruments/get/responses/403/content/application~1json/examples",
+      "value": {
+        "Forbidden": {
+          "description": "You do not have required scopes for making this request.",
+          "value": {
+            "error_message": "request_not_allowed",
+            "error_code": "FORBIDDEN",
+            "status_code": "403"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1customers~1{customer_id}~1payment-instruments/get/responses/404/content/application~1json/examples",
+      "value": {
+        "Not_Found": {
+          "description": "The identified resource is not found on the server.",
+          "value": {
+            "error_code": "NOT_FOUND",
+            "message": "Resource not found"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1customers~1{customer_id}~1payment-instruments~1{token}/parameters/0/schema/example",
+      "value": "831ff8d4cd5958ab5670"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1customers~1{customer_id}~1payment-instruments~1{token}/parameters/1/schema/example",
+      "value": "bcfc8e5f-3b47-4cb9-854b-3b7a4cce7be3"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1customers~1{customer_id}~1payment-instruments~1{token}/delete/responses/400/content/application~1json/examples",
+      "value": {
+        "Invalid_Request": {
+          "description": "The request cannot be processed.",
+          "value": {
+            "error_code": "INVALID_REQUEST",
+            "message": "bad request"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1customers~1{customer_id}~1payment-instruments~1{token}/delete/responses/401/content/application~1json/examples",
+      "value": {
+        "Problem_Details": {
+          "description": "Unauthorized response returned by API gateway.",
+          "value": {
+            "detail": "Unauthorized.",
+            "status": 401,
+            "title": "Unauthorized",
+            "trace_id": "3c77294349d3b5647ea2d990f0d8f017",
+            "type": "https://developer.sumup.com/problem/unauthorized"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1customers~1{customer_id}~1payment-instruments~1{token}/delete/responses/403/content/application~1json/examples",
+      "value": {
+        "Forbidden": {
+          "description": "You do not have required scopes for making this request.",
+          "value": {
+            "error_message": "request_not_allowed",
+            "error_code": "FORBIDDEN",
+            "status_code": "403"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1customers~1{customer_id}~1payment-instruments~1{token}/delete/responses/404/content/application~1json/examples",
+      "value": {
+        "Not_Found": {
+          "description": "The identified resource is not found on the server.",
+          "value": {
+            "error_code": "NOT_FOUND",
+            "message": "Resource not found"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v1.0~1merchants~1{merchant_code}~1payments~1{transaction_id}~1refunds/parameters/0/schema/example",
+      "value": "MH4H92C7"
+    },
+    {
+      "source_path": "#/paths/~1v1.0~1merchants~1{merchant_code}~1payments~1{transaction_id}~1refunds/parameters/1/schema/example",
+      "value": "4ffb8dfc-7f2b-413d-a497-2ad00766585e"
+    },
+    {
+      "source_path": "#/paths/~1v1.0~1merchants~1{merchant_code}~1payments~1{transaction_id}~1refunds/post/requestBody/content/application~1json/example",
+      "value": {
+        "amount": 5
+      }
+    },
+    {
+      "source_path": "#/paths/~1v1.0~1merchants~1{merchant_code}~1payments~1{transaction_id}~1refunds/post/requestBody/content/application~1json/schema/properties/amount/example",
+      "value": 5
+    },
+    {
+      "source_path": "#/paths/~1v1.0~1merchants~1{merchant_code}~1payments~1{transaction_id}~1refunds/post/responses/201/content/application~1json/example",
+      "value": {}
+    },
+    {
+      "source_path": "#/paths/~1v1.0~1merchants~1{merchant_code}~1payments~1{transaction_id}~1refunds/post/responses/400/content/application~1problem+json/examples",
+      "value": {
+        "Invalid_Amount": {
+          "description": "The refund amount is invalid.",
+          "value": {
+            "type": "https://developer.sumup.com/problem/bad-request",
+            "title": "Bad Request",
+            "status": 400,
+            "detail": "amount must be greater than zero"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v1.0~1merchants~1{merchant_code}~1payments~1{transaction_id}~1refunds/post/responses/403/content/application~1problem+json/examples",
+      "value": {
+        "Forbidden": {
+          "description": "The authenticated user is not allowed to refund this transaction.",
+          "value": {
+            "type": "https://developer.sumup.com/problem/forbidden",
+            "title": "Forbidden",
+            "status": 403,
+            "detail": "users is not allowed to make a refund"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v1.0~1merchants~1{merchant_code}~1payments~1{transaction_id}~1refunds/post/responses/404/content/application~1problem+json/examples",
+      "value": {
+        "Transaction_Not_Found": {
+          "description": "The identified transaction was not found.",
+          "value": {
+            "type": "https://developer.sumup.com/problem/not-found",
+            "title": "Not Found",
+            "status": 404,
+            "detail": "Transaction not found"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v1.0~1merchants~1{merchant_code}~1payments~1{transaction_id}~1refunds/post/responses/409/content/application~1problem+json/examples",
+      "value": {
+        "Transaction_Not_Refundable": {
+          "description": "The state of the identified transaction resource does not permit the requested operation.",
+          "value": {
+            "type": "https://developer.sumup.com/problem/conflict",
+            "title": "Conflict",
+            "status": 409,
+            "detail": "The transaction is not refundable in its current state"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v1.0~1merchants~1{merchant_code}~1payments~1{transaction_id}~1refunds/post/responses/422/content/application~1problem+json/examples",
+      "value": {
+        "Refund_Failed": {
+          "description": "The payment processor rejected the refund.",
+          "value": {
+            "type": "https://developer.sumup.com/problem/unprocessable-entity",
+            "title": "Unprocessable Entity",
+            "status": 422,
+            "detail": "Refund failed.",
+            "errors": [
+              {
+                "code": "INVALID_AMOUNT",
+                "detail": "Amount exceeds the refundable amount",
+                "reason": "amount_too_high",
+                "max_refundable_amount": 1000
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions/get/parameters/0/schema/example",
+      "value": "MH4H92C7"
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions/get/parameters/1/schema/example",
+      "value": "410fc44a-5956-44e1-b5cc-19c6f8d727a4"
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions/get/parameters/2/schema/example",
+      "value": "TEENSK4W2K"
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions/get/parameters/3/schema/example",
+      "value": "J13253253x1"
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions/get/parameters/4/schema/example",
+      "value": "urn:sumup:pos:sale:MNKKNGST:1D4E3B2D-111D-48D7-9AF0-832DAEF63DD7;2"
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions/get/responses/200/content/application~1json/example",
+      "value": {
+        "id": "410fc44a-5956-44e1-b5cc-19c6f8d727a4",
+        "transaction_code": "TEENSK4W2K",
+        "amount": 10.1,
+        "currency": "EUR",
+        "timestamp": "2020-02-29T10:56:56.876Z",
+        "status": "SUCCESSFUL",
+        "payment_type": "ECOM",
+        "installments_count": 1,
+        "merchant_code": "MH4H92C7",
+        "vat_amount": 6,
+        "tip_amount": 3,
+        "entry_mode": "CUSTOMER_ENTRY",
+        "auth_code": "053201"
+      }
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions/get/responses/401/content/application~1json/examples",
+      "value": {
+        "Problem_Details": {
+          "description": "Unauthorized response returned by API gateway.",
+          "value": {
+            "detail": "Unauthorized.",
+            "status": 401,
+            "title": "Unauthorized",
+            "trace_id": "3c77294349d3b5647ea2d990f0d8f017",
+            "type": "https://developer.sumup.com/problem/unauthorized"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions/get/responses/404/content/application~1json/examples",
+      "value": {
+        "Not_Found": {
+          "description": "The identified resource is not found on the server.",
+          "value": {
+            "error_code": "NOT_FOUND",
+            "message": "Resource not found"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions~1history/get/parameters/0/schema/example",
+      "value": "MH4H92C7"
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions~1history/get/parameters/1/schema/example",
+      "value": "TEENSK4W2K"
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions~1history/get/parameters/3/schema/example",
+      "value": 10
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions~1history/get/parameters/4/example",
+      "value": [
+        "merchant@example.com"
+      ]
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions~1history/get/parameters/4/schema/example",
+      "value": [
+        "merchant@example.com"
+      ]
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions~1history/get/parameters/5/schema/example",
+      "value": [
+        "SUCCESSFUL",
+        "REFUNDED"
+      ]
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions~1history/get/parameters/6/schema/example",
+      "value": [
+        "ECOM",
+        "POS"
+      ]
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions~1history/get/parameters/7/schema/example",
+      "value": [
+        "CUSTOMER_ENTRY",
+        "CHIP"
+      ]
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions~1history/get/parameters/8/schema/example",
+      "value": [
+        "PAYMENT",
+        "REFUND"
+      ]
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions~1history/get/parameters/9/schema/example",
+      "value": "2019-08-28T09:00:00Z"
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions~1history/get/parameters/10/schema/example",
+      "value": "2019-08-29T09:00:00Z"
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions~1history/get/parameters/11/schema/example",
+      "value": "090df9bf-93b7-40f1-8181-fbdb236568a1"
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions~1history/get/parameters/12/schema/example",
+      "value": "2019-08-28T09:00:00Z"
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions~1history/get/parameters/13/schema/example",
+      "value": "090df9bf-93b7-40f1-8181-fbdb236568a1"
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions~1history/get/responses/200/content/application~1json/schema/properties/items/example",
+      "value": [
+        {
+          "transaction_code": "TEENSK4W2K",
+          "amount": 10.1,
+          "currency": "EUR",
+          "timestamp": "2020-02-29T10:56:56.876Z",
+          "status": "SUCCESSFUL",
+          "payment_type": "ECOM",
+          "installments_count": 1,
+          "merchant_code": "MH4H92C7",
+          "transaction_id": "410fc44a-5956-44e1-b5cc-19c6f8d727a4",
+          "user": "merchant@example.com",
+          "type": "PAYMENT",
+          "payout_date": "2019-08-28",
+          "payout_type": "BANK_ACCOUNT",
+          "refunded_amount": 0
+        }
+      ]
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions~1history/get/responses/200/content/application~1json/schema/properties/links/example",
+      "value": []
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions~1history/get/responses/200/content/application~1json/example",
+      "value": {
+        "items": [
+          {
+            "transaction_code": "TEENSK4W2K",
+            "amount": 10.1,
+            "currency": "EUR",
+            "timestamp": "2020-02-29T10:56:56.876Z",
+            "status": "SUCCESSFUL",
+            "payment_type": "ECOM",
+            "installments_count": 1,
+            "merchant_code": "MH4H92C7",
+            "transaction_id": "410fc44a-5956-44e1-b5cc-19c6f8d727a4",
+            "user": "merchant@example.com",
+            "type": "PAYMENT",
+            "payout_date": "2019-08-28",
+            "payout_type": "BANK_ACCOUNT",
+            "refunded_amount": 0
+          }
+        ],
+        "links": []
+      }
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions~1history/get/responses/400/content/application~1json/examples",
+      "value": {
+        "Invalid_Parameter": {
+          "description": "A request parameter has an invalid value.",
+          "value": {
+            "message": "Validation error",
+            "error_code": "INVALID"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v2.1~1merchants~1{merchant_code}~1transactions~1history/get/responses/401/content/application~1json/examples",
+      "value": {
+        "Problem_Details": {
+          "description": "Unauthorized response returned by API gateway.",
+          "value": {
+            "detail": "Unauthorized.",
+            "status": 401,
+            "title": "Unauthorized",
+            "trace_id": "3c77294349d3b5647ea2d990f0d8f017",
+            "type": "https://developer.sumup.com/problem/unauthorized"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v1.0~1merchants~1{merchant_code}~1payouts/get/parameters/0/schema/example",
+      "value": "MH4H92C7"
+    },
+    {
+      "source_path": "#/paths/~1v1.0~1merchants~1{merchant_code}~1payouts/get/parameters/1/schema/example",
+      "value": "2024-02-01"
+    },
+    {
+      "source_path": "#/paths/~1v1.0~1merchants~1{merchant_code}~1payouts/get/parameters/2/schema/example",
+      "value": "2024-02-29"
+    },
+    {
+      "source_path": "#/paths/~1v1.0~1merchants~1{merchant_code}~1payouts/get/parameters/3/schema/example",
+      "value": "json"
+    },
+    {
+      "source_path": "#/paths/~1v1.0~1merchants~1{merchant_code}~1payouts/get/parameters/4/schema/example",
+      "value": 10
+    },
+    {
+      "source_path": "#/paths/~1v1.0~1merchants~1{merchant_code}~1payouts/get/parameters/5/schema/example",
+      "value": "desc"
+    },
+    {
+      "source_path": "#/paths/~1v1.0~1merchants~1{merchant_code}~1payouts/get/responses/200/content/application~1json/example",
+      "value": [
+        {
+          "amount": 132.45,
+          "currency": "EUR",
+          "date": "2024-02-29",
+          "fee": 3.12,
+          "id": 123456789,
+          "reference": "payout-2024-02-29",
+          "status": "SUCCESSFUL",
+          "transaction_code": "TEENSK4W2K",
+          "type": "PAYOUT"
+        }
+      ]
+    },
+    {
+      "source_path": "#/paths/~1v1.0~1merchants~1{merchant_code}~1payouts/get/responses/200/content/text~1plain/example",
+      "value": "id,type,amount,date,currency,fee,status,reference,transaction_code\n123456789,PAYOUT,132.45,2024-02-29,EUR,3.12,SUCCESSFUL,payout-2024-02-29,TEENSK4W2K"
+    },
+    {
+      "source_path": "#/paths/~1v1.0~1merchants~1{merchant_code}~1payouts/get/responses/400/content/application~1json/examples",
+      "value": {
+        "Missing required dates": {
+          "description": "Required date filters are missing.",
+          "value": [
+            {
+              "error_code": "MISSING",
+              "message": "Validation error: required",
+              "param": "start_date"
+            },
+            {
+              "error_code": "MISSING",
+              "message": "Validation error: required",
+              "param": "end_date"
+            }
+          ]
+        },
+        "Invalid date range": {
+          "description": "`start_date` cannot be later than `end_date`.",
+          "value": [
+            {
+              "error_code": "INVALID",
+              "message": "negative date range"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v1.0~1merchants~1{merchant_code}~1payouts/get/responses/401/content/application~1json/examples",
+      "value": {
+        "Problem_Details": {
+          "description": "Unauthorized response returned by API gateway.",
+          "value": {
+            "detail": "Unauthorized.",
+            "status": 401,
+            "title": "Unauthorized",
+            "trace_id": "3c77294349d3b5647ea2d990f0d8f017",
+            "type": "https://developer.sumup.com/problem/unauthorized"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v1.1~1receipts~1{transaction_id}/get/parameters/0/schema/example",
+      "value": "410fc44a-5956-44e1-b5cc-19c6f8d727a4"
+    },
+    {
+      "source_path": "#/paths/~1v1.1~1receipts~1{transaction_id}/get/parameters/1/schema/example",
+      "value": "MH4H92C7"
+    },
+    {
+      "source_path": "#/paths/~1v1.1~1receipts~1{transaction_id}/get/parameters/2/schema/example",
+      "value": 9567461191
+    },
+    {
+      "source_path": "#/paths/~1v1.1~1receipts~1{transaction_id}/get/responses/200/content/application~1json/example",
+      "value": {
+        "transaction_data": {
+          "transaction_code": "TEENSK4W2K",
+          "transaction_id": "410fc44a-5956-44e1-b5cc-19c6f8d727a4",
+          "merchant_code": "MH4H92C7",
+          "amount": "10.10",
+          "vat_amount": "6.00",
+          "tip_amount": "3.00",
+          "currency": "EUR",
+          "timestamp": "2020-02-29T10:56:56.876Z",
+          "status": "SUCCESSFUL",
+          "payment_type": "ECOM",
+          "entry_mode": "CUSTOMER_ENTRY",
+          "installments_count": 1,
+          "process_as": "CREDIT"
+        },
+        "merchant_data": {
+          "merchant_profile": {
+            "merchant_code": "MH4H92C7"
+          }
+        },
+        "acquirer_data": {
+          "authorization_code": "053201"
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v1.1~1receipts~1{transaction_id}/get/responses/400/content/application~1json/examples",
+      "value": {
+        "Invalid_Merchant_Code": {
+          "description": "The provided merchant code is invalid.",
+          "value": {
+            "message": "is not a valid merchant code",
+            "error_code": "INVALID"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v1.1~1receipts~1{transaction_id}/get/responses/401/content/application~1json/examples",
+      "value": {
+        "Problem_Details": {
+          "description": "Unauthorized response returned by API gateway.",
+          "value": {
+            "detail": "Unauthorized.",
+            "status": 401,
+            "title": "Unauthorized",
+            "trace_id": "3c77294349d3b5647ea2d990f0d8f017",
+            "type": "https://developer.sumup.com/problem/unauthorized"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v1.1~1receipts~1{transaction_id}/get/responses/404/content/application~1json/examples",
+      "value": {
+        "Event_Not_Found": {
+          "description": "The provided transaction event ID cannot be found for this transaction.",
+          "value": {
+            "message": "No such tx event (ID=9567461191) for transaction 4ffb8dfc-7f2b-413d-a497-2ad00766585e",
+            "error_code": "NOT_FOUND"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0~1merchants~1{merchant_code}~1readers~1{reader_id}~1go-checkout/post/responses/400/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/bad-request",
+        "title": "Bad Request",
+        "status": 400,
+        "detail": "Request validation failed."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0~1merchants~1{merchant_code}~1readers~1{reader_id}~1go-checkout/post/responses/401/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/unauthorized",
+        "title": "Unauthorized",
+        "status": 401,
+        "detail": "Authentication credentials are missing or invalid."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0~1merchants~1{merchant_code}~1readers~1{reader_id}~1go-checkout/post/responses/404/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/not-found",
+        "title": "Requested resource couldn't be found.",
+        "status": 404,
+        "detail": "The requested resource doesn't exist or does not belong to you."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0~1merchants~1{merchant_code}~1readers~1{reader_id}~1go-checkout/post/responses/422/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/validation-error",
+        "title": "Unprocessable Entity",
+        "status": 422,
+        "detail": "Validation failed."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0~1merchants~1{merchant_code}~1readers~1{reader_id}~1go-checkout/post/parameters/0/schema/example",
+      "value": "MK10CL2A"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1memberships/get/parameters/0/schema/example",
+      "value": 0
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1memberships/get/parameters/1/schema/example",
+      "value": 10
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1memberships/get/parameters/9/schema/example",
+      "value": [
+        "role_employee",
+        "role_accountant"
+      ]
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1memberships/get/responses/200/content/application~1json/schema/properties/total_count/example",
+      "value": 3
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1memberships/get/responses/400/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/bad-request",
+        "title": "Bad Request",
+        "status": 400,
+        "detail": "Request validation failed."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1memberships/get/responses/401/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/unauthorized",
+        "title": "Unauthorized",
+        "status": 401,
+        "detail": "Authentication credentials are missing or invalid."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members/get/parameters/0/schema/example",
+      "value": 0
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members/get/parameters/1/schema/example",
+      "value": 10
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members/get/parameters/2/schema/example",
+      "value": true
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members/get/parameters/3/schema/example",
+      "value": "user"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members/get/parameters/4/schema/example",
+      "value": "245b2ead-85bf-45ff-856f-311a88a5d454"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members/get/parameters/7/schema/example",
+      "value": [
+        "role_employee",
+        "role_accountant"
+      ]
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members/get/parameters/8/schema/example",
+      "value": "MK10CL2A"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members/get/responses/200/content/application~1json/schema/properties/total_count/example",
+      "value": 3
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members/get/responses/404/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/not-found",
+        "title": "Requested resource couldn't be found.",
+        "status": 404,
+        "detail": "The requested resource doesn't exist or does not belong to you."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members/post/requestBody/content/application~1json/schema/properties/nickname/example",
+      "value": "Test User"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members/post/requestBody/content/application~1json/schema/example",
+      "value": {
+        "email": "karl.berg@example.com",
+        "roles": [
+          "role_employee"
+        ]
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members/post/responses/400/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/bad-request",
+        "title": "Bad Request",
+        "status": 400,
+        "detail": "Request validation failed."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members/post/responses/404/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/not-found",
+        "title": "Requested resource couldn't be found.",
+        "status": 404,
+        "detail": "The requested resource doesn't exist or does not belong to you."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members/post/responses/429/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/too-many-requests",
+        "title": "Too Many Requests",
+        "status": 429,
+        "detail": "Too many requests were sent. Please try again later."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members/post/parameters/0/schema/example",
+      "value": "MK10CL2A"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members~1{member_id}/get/responses/404/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/not-found",
+        "title": "Requested resource couldn't be found.",
+        "status": 404,
+        "detail": "The requested resource doesn't exist or does not belong to you."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members~1{member_id}/get/parameters/0/schema/example",
+      "value": "MK10CL2A"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members~1{member_id}/get/parameters/1/schema/example",
+      "value": "mem_WZsm7QTPhVrompscmPhoGTXXcrd58fr9MOhP"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members~1{member_id}/put/requestBody/content/application~1json/schema/properties/user/properties/nickname/example",
+      "value": "Test User"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members~1{member_id}/put/requestBody/content/application~1json/schema/example",
+      "value": {
+        "Update member's role": {
+          "roles": [
+            "role_manager"
+          ]
+        },
+        "Update managed user": {
+          "user": {
+            "nickname": "New Employee Name"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members~1{member_id}/put/responses/400/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/bad-request",
+        "title": "Bad Request",
+        "status": 400,
+        "detail": "Request validation failed."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members~1{member_id}/put/responses/403/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/forbidden",
+        "title": "Forbidden",
+        "status": 403,
+        "detail": "You do not have permission to perform this action."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members~1{member_id}/put/responses/404/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/not-found",
+        "title": "Requested resource couldn't be found.",
+        "status": 404,
+        "detail": "The requested resource doesn't exist or does not belong to you."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members~1{member_id}/put/responses/409/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/conflict",
+        "title": "Conflict",
+        "status": 409,
+        "detail": "The request conflicts with the current state of the resource."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members~1{member_id}/put/parameters/0/schema/example",
+      "value": "MK10CL2A"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members~1{member_id}/put/parameters/1/schema/example",
+      "value": "mem_WZsm7QTPhVrompscmPhoGTXXcrd58fr9MOhP"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members~1{member_id}/delete/responses/403/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/forbidden",
+        "title": "Forbidden",
+        "status": 403,
+        "detail": "You do not have permission to perform this action."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members~1{member_id}/delete/responses/404/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/not-found",
+        "title": "Requested resource couldn't be found.",
+        "status": 404,
+        "detail": "The requested resource doesn't exist or does not belong to you."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members~1{member_id}/delete/parameters/0/schema/example",
+      "value": "MK10CL2A"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1members~1{member_id}/delete/parameters/1/schema/example",
+      "value": "mem_WZsm7QTPhVrompscmPhoGTXXcrd58fr9MOhP"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1roles/get/responses/404/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/not-found",
+        "title": "Requested resource couldn't be found.",
+        "status": 404,
+        "detail": "The requested resource doesn't exist or does not belong to you."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1roles/get/parameters/0/schema/example",
+      "value": "MK10CL2A"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1roles/post/requestBody/content/application~1json/schema/properties/name/example",
+      "value": "Senior Shop Manager II"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1roles/post/requestBody/content/application~1json/schema/properties/permissions/example",
+      "value": [
+        "catalog_access",
+        "taxes_access",
+        "members_access"
+      ]
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1roles/post/requestBody/content/application~1json/schema/properties/description/example",
+      "value": "Manges the shop and the employees."
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1roles/post/responses/400/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/bad-request",
+        "title": "Bad Request",
+        "status": 400,
+        "detail": "Request validation failed."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1roles/post/responses/404/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/not-found",
+        "title": "Requested resource couldn't be found.",
+        "status": 404,
+        "detail": "The requested resource doesn't exist or does not belong to you."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1roles/post/parameters/0/schema/example",
+      "value": "MK10CL2A"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1roles~1{role_id}/get/responses/404/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/not-found",
+        "title": "Requested resource couldn't be found.",
+        "status": 404,
+        "detail": "The requested resource doesn't exist or does not belong to you."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1roles~1{role_id}/get/parameters/0/schema/example",
+      "value": "MK10CL2A"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1roles~1{role_id}/get/parameters/1/schema/example",
+      "value": "role_WZsm7QTPhVrompscmPhoGTXXcrd58fr9MOhP"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1roles~1{role_id}/delete/responses/400/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/bad-request",
+        "title": "Bad Request",
+        "status": 400,
+        "detail": "Request validation failed."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1roles~1{role_id}/delete/responses/404/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/not-found",
+        "title": "Requested resource couldn't be found.",
+        "status": 404,
+        "detail": "The requested resource doesn't exist or does not belong to you."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1roles~1{role_id}/delete/parameters/0/schema/example",
+      "value": "MK10CL2A"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1roles~1{role_id}/delete/parameters/1/schema/example",
+      "value": "role_WZsm7QTPhVrompscmPhoGTXXcrd58fr9MOhP"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1roles~1{role_id}/patch/requestBody/content/application~1json/schema/properties/name/example",
+      "value": "Senior Shop Manager II"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1roles~1{role_id}/patch/requestBody/content/application~1json/schema/properties/permissions/example",
+      "value": [
+        "catalog_access",
+        "taxes_access",
+        "members_access"
+      ]
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1roles~1{role_id}/patch/requestBody/content/application~1json/schema/properties/description/example",
+      "value": "Manges the shop and the employees."
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1roles~1{role_id}/patch/requestBody/content/application~1json/schema/example",
+      "value": {
+        "name": "Senior Shop Manager III",
+        "permissions": [
+          "catalog_edit",
+          "taxes_access",
+          "members_edit"
+        ]
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1roles~1{role_id}/patch/responses/400/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/bad-request",
+        "title": "Bad Request",
+        "status": 400,
+        "detail": "Request validation failed."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1roles~1{role_id}/patch/responses/404/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/not-found",
+        "title": "Requested resource couldn't be found.",
+        "status": 404,
+        "detail": "The requested resource doesn't exist or does not belong to you."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1roles~1{role_id}/patch/parameters/0/schema/example",
+      "value": "MK10CL2A"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1roles~1{role_id}/patch/parameters/1/schema/example",
+      "value": "role_WZsm7QTPhVrompscmPhoGTXXcrd58fr9MOhP"
+    },
+    {
+      "source_path": "#/paths/~1v1~1merchants~1{merchant_code}/get/parameters/0/schema/example",
+      "value": "MK10CL2A"
+    },
+    {
+      "source_path": "#/paths/~1v1~1merchants~1{merchant_code}~1persons/get/parameters/0/schema/example",
+      "value": "MK10CL2A"
+    },
+    {
+      "source_path": "#/paths/~1v1~1merchants~1{merchant_code}~1persons~1{person_id}/get/parameters/0/schema/example",
+      "value": "MK10CL2A"
+    },
+    {
+      "source_path": "#/paths/~1v1~1merchants~1{merchant_code}~1persons~1{person_id}/get/parameters/1/schema/example",
+      "value": "pers_5AKFHN2KSK8D3TS79DJE3P3A2Z"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers/get/responses/401/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/unauthorized",
+        "title": "Unauthorized",
+        "status": 401,
+        "detail": "Authentication credentials are missing or invalid."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers/get/parameters/0/schema/example",
+      "value": "MK10CL2A"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers/post/responses/201/content/application~1json/examples",
+      "value": {
+        "created": {
+          "summary": "A reader that waits for the physical device to acknowledge the pairing.",
+          "value": {
+            "id": "rdr_3MSAFM23CK82VSTT4BN6RWSQ65",
+            "name": "Frontdesk",
+            "status": "processing",
+            "device": {
+              "identifier": "U1DT3NA00-CN",
+              "model": "solo"
+            },
+            "created_at": "2023-05-09T14:50:20.214Z",
+            "updated_at": "2023-05-09T14:52:58.714Z"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers/post/responses/400/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/bad-request",
+        "title": "Bad Request",
+        "status": 400,
+        "detail": "Request validation failed."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers/post/responses/404/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/not-found",
+        "title": "Requested resource couldn't be found.",
+        "status": 404,
+        "detail": "The requested resource doesn't exist or does not belong to you."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers/post/responses/409/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/conflict",
+        "title": "Conflict",
+        "status": 409,
+        "detail": "The request conflicts with the current state of the resource."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers/post/parameters/0/schema/example",
+      "value": "MK10CL2A"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}/get/parameters/0/schema/oneOf/0/example",
+      "value": "Tue, 03 May 2022 14:46:44 GMT"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}/get/parameters/0/schema/oneOf/1/example",
+      "value": "2023-05-30T10:38:01+00:00"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}/get/parameters/1/schema/example",
+      "value": "MK10CL2A"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}/get/responses/404/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/not-found",
+        "title": "Requested resource couldn't be found.",
+        "status": 404,
+        "detail": "The requested resource doesn't exist or does not belong to you."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}/delete/responses/404/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/not-found",
+        "title": "Requested resource couldn't be found.",
+        "status": 404,
+        "detail": "The requested resource doesn't exist or does not belong to you."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}/delete/parameters/0/schema/example",
+      "value": "MK10CL2A"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}/patch/responses/403/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/forbidden",
+        "title": "Forbidden",
+        "status": 403,
+        "detail": "You do not have permission to perform this action."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}/patch/responses/404/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/not-found",
+        "title": "Requested resource couldn't be found.",
+        "status": 404,
+        "detail": "The requested resource doesn't exist or does not belong to you."
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}/patch/parameters/0/schema/example",
+      "value": "MK10CL2A"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}~1checkout/post/parameters/0/example",
+      "value": "MC0X0ABC"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}~1checkout/post/parameters/1/example",
+      "value": "rdr_3MSAFM23CK82VSTT4BN6RWSQ65"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}~1checkout/post/responses/400/content/application~1problem+json/example",
+      "value": {
+        "detail": "Bad Request",
+        "status": 400,
+        "title": "Bad Request",
+        "type": "https://developer.sumup.com/problem/bad-request"
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}~1checkout/post/responses/401/content/application~1problem+json/example",
+      "value": {
+        "detail": "Unauthorized",
+        "status": 401,
+        "title": "Unauthorized",
+        "type": "https://developer.sumup.com/problem/unauthorized"
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}~1checkout/post/responses/404/content/application~1problem+json/example",
+      "value": {
+        "detail": "The requested resource doesn't exist or does not belong to you.",
+        "status": 404,
+        "title": "Requested resource couldn't be found.",
+        "type": "https://developer.sumup.com/problem/not-found"
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}~1checkout/post/responses/422/content/application~1problem+json/example",
+      "value": {
+        "detail": "Validation failed",
+        "status": 422,
+        "title": "Unprocessable Entity",
+        "type": "https://developer.sumup.com/problem/validation-error"
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}~1status/get/parameters/0/example",
+      "value": "MC0X0ABC"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}~1status/get/parameters/1/example",
+      "value": "rdr_3MSAFM23CK82VSTT4BN6RWSQ65"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}~1status/get/responses/400/content/application~1problem+json/example",
+      "value": {
+        "detail": "Bad Request",
+        "status": 400,
+        "title": "Bad Request",
+        "type": "https://developer.sumup.com/problem/bad-request"
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}~1status/get/responses/401/content/application~1problem+json/example",
+      "value": {
+        "detail": "Unauthorized",
+        "status": 401,
+        "title": "Unauthorized",
+        "type": "https://developer.sumup.com/problem/unauthorized"
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}~1status/get/responses/404/content/application~1problem+json/example",
+      "value": {
+        "detail": "The requested resource doesn't exist or does not belong to you.",
+        "status": 404,
+        "title": "Requested resource couldn't be found.",
+        "type": "https://developer.sumup.com/problem/not-found"
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}~1terminate/post/parameters/0/example",
+      "value": "MC0X0ABC"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}~1terminate/post/parameters/1/example",
+      "value": "rdr_3MSAFM23CK82VSTT4BN6RWSQ65"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}~1terminate/post/responses/400/content/application~1problem+json/example",
+      "value": {
+        "detail": "Bad Request",
+        "status": 400,
+        "title": "Bad Request",
+        "type": "https://developer.sumup.com/problem/bad-request"
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}~1terminate/post/responses/401/content/application~1problem+json/example",
+      "value": {
+        "detail": "Unauthorized",
+        "status": 401,
+        "title": "Unauthorized",
+        "type": "https://developer.sumup.com/problem/unauthorized"
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}~1terminate/post/responses/404/content/application~1problem+json/example",
+      "value": {
+        "detail": "The requested resource doesn't exist or does not belong to you.",
+        "status": 404,
+        "title": "Requested resource couldn't be found.",
+        "type": "https://developer.sumup.com/problem/not-found"
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}~1terminate/post/responses/422/content/application~1problem+json/example",
+      "value": {
+        "detail": "The device is offline.",
+        "status": 422,
+        "title": "Reader Offline",
+        "type": "https://developer.sumup.com/problem/reader-offline"
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}~1checkout~1{checkout_id}/get/parameters/0/example",
+      "value": "MC0X0ABC"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}~1checkout~1{checkout_id}/get/parameters/1/example",
+      "value": "rdr_3MSAFM23CK82VSTT4BN6RWSQ65"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}~1checkout~1{checkout_id}/get/parameters/2/example",
+      "value": "74ecff66-1655-43ed-8ce3-193f49fa602f"
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}~1checkout~1{checkout_id}/get/responses/401/content/application~1problem+json/example",
+      "value": {
+        "detail": "Unauthorized",
+        "status": 401,
+        "title": "Unauthorized",
+        "type": "https://developer.sumup.com/problem/unauthorized"
+      }
+    },
+    {
+      "source_path": "#/paths/~1v0.1~1merchants~1{merchant_code}~1readers~1{reader_id}~1checkout~1{checkout_id}/get/responses/404/content/application~1problem+json/example",
+      "value": {
+        "detail": "The requested resource doesn't exist or does not belong to you.",
+        "status": 404,
+        "title": "Requested resource couldn't be found.",
+        "type": "https://developer.sumup.com/problem/not-found"
+      }
+    },
+    {
+      "source_path": "#/components/schemas/AddressLegacy/properties/city/example",
+      "value": "Berlin"
+    },
+    {
+      "source_path": "#/components/schemas/AddressLegacy/properties/country/example",
+      "value": "DE"
+    },
+    {
+      "source_path": "#/components/schemas/AddressLegacy/properties/line_1/example",
+      "value": "Sample street"
+    },
+    {
+      "source_path": "#/components/schemas/AddressLegacy/properties/line_2/example",
+      "value": "ap. 5"
+    },
+    {
+      "source_path": "#/components/schemas/AddressLegacy/properties/postal_code/example",
+      "value": "10115"
+    },
+    {
+      "source_path": "#/components/schemas/AddressLegacy/properties/state/example",
+      "value": "Berlin"
+    },
+    {
+      "source_path": "#/components/schemas/Card/properties/name/example",
+      "value": "FIRSTNAME LASTNAME"
+    },
+    {
+      "source_path": "#/components/schemas/Card/properties/number/example",
+      "value": "1234567890123456"
+    },
+    {
+      "source_path": "#/components/schemas/Card/properties/expiry_year/example",
+      "value": "2030"
+    },
+    {
+      "source_path": "#/components/schemas/Card/properties/expiry_month/example",
+      "value": "12"
+    },
+    {
+      "source_path": "#/components/schemas/Card/properties/cvv/example",
+      "value": "123"
+    },
+    {
+      "source_path": "#/components/schemas/Card/properties/zip_code/example",
+      "value": "12345"
+    },
+    {
+      "source_path": "#/components/schemas/CardResponse/properties/last_4_digits/example",
+      "value": "3456"
+    },
+    {
+      "source_path": "#/components/schemas/Device/properties/name/example",
+      "value": "m0xx"
+    },
+    {
+      "source_path": "#/components/schemas/Device/properties/system_name/example",
+      "value": "Android"
+    },
+    {
+      "source_path": "#/components/schemas/Device/properties/model/example",
+      "value": "GT-I9300"
+    },
+    {
+      "source_path": "#/components/schemas/Device/properties/system_version/example",
+      "value": "4.3"
+    },
+    {
+      "source_path": "#/components/schemas/Device/properties/uuid/example",
+      "value": "3ae2a6b7-fb0d-3b50-adbf-cb7e2db30cd2"
+    },
+    {
+      "source_path": "#/components/schemas/ElvCardAccount/properties/sort_code/example",
+      "value": "87096214"
+    },
+    {
+      "source_path": "#/components/schemas/ElvCardAccount/properties/last_4_digits/example",
+      "value": "5674"
+    },
+    {
+      "source_path": "#/components/schemas/ElvCardAccount/properties/sequence_no/example",
+      "value": 1
+    },
+    {
+      "source_path": "#/components/schemas/ElvCardAccount/properties/iban/example",
+      "value": "DE60870962140012345674"
+    },
+    {
+      "source_path": "#/components/schemas/HostedCheckout/properties/enabled/example",
+      "value": true
+    },
+    {
+      "source_path": "#/components/schemas/Checkout/properties/checkout_reference/example",
+      "value": "f00a8f74-b05d-4605-bd73-2a901bae5802"
+    },
+    {
+      "source_path": "#/components/schemas/Checkout/properties/amount/example",
+      "value": 10.1
+    },
+    {
+      "source_path": "#/components/schemas/Checkout/properties/merchant_code/example",
+      "value": "MH4H92C7"
+    },
+    {
+      "source_path": "#/components/schemas/Checkout/properties/description/example",
+      "value": "Purchase"
+    },
+    {
+      "source_path": "#/components/schemas/Checkout/properties/return_url/example",
+      "value": "http://example.com"
+    },
+    {
+      "source_path": "#/components/schemas/Checkout/properties/id/example",
+      "value": "4e425463-3e1b-431d-83fa-1e51c2925e99"
+    },
+    {
+      "source_path": "#/components/schemas/Checkout/properties/status/example",
+      "value": "PENDING"
+    },
+    {
+      "source_path": "#/components/schemas/Checkout/properties/date/example",
+      "value": "2020-02-29T10:56:56+00:00"
+    },
+    {
+      "source_path": "#/components/schemas/Checkout/properties/valid_until/example",
+      "value": "2020-02-29T10:56:56+00:00"
+    },
+    {
+      "source_path": "#/components/schemas/Checkout/properties/customer_id/example",
+      "value": "831ff8d4cd5958ab5670"
+    },
+    {
+      "source_path": "#/components/schemas/Checkout/properties/hosted_checkout_url/example",
+      "value": "https://checkout.sumup.com/pay/8f9316a3-cda9-42a9-9771-54d534315676"
+    },
+    {
+      "source_path": "#/components/schemas/Checkout/properties/transactions/example",
+      "value": [
+        {
+          "id": "410fc44a-5956-44e1-b5cc-19c6f8d727a4",
+          "transaction_code": "TEENSK4W2K",
+          "amount": 10.1,
+          "currency": "EUR",
+          "timestamp": "2020-02-29T10:56:56.876Z",
+          "status": "SUCCESSFUL",
+          "payment_type": "ECOM",
+          "installments_count": 1,
+          "merchant_code": "MH4H92C7",
+          "vat_amount": 6,
+          "tip_amount": 3,
+          "entry_mode": "CUSTOMER_ENTRY",
+          "auth_code": "012345"
+        }
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/CheckoutCreateRequest/properties/checkout_reference/example",
+      "value": "f00a8f74-b05d-4605-bd73-2a901bae5802"
+    },
+    {
+      "source_path": "#/components/schemas/CheckoutCreateRequest/properties/amount/example",
+      "value": 10.1
+    },
+    {
+      "source_path": "#/components/schemas/CheckoutCreateRequest/properties/merchant_code/example",
+      "value": "MH4H92C7"
+    },
+    {
+      "source_path": "#/components/schemas/CheckoutCreateRequest/properties/description/example",
+      "value": "Purchase"
+    },
+    {
+      "source_path": "#/components/schemas/CheckoutCreateRequest/properties/return_url/example",
+      "value": "http://example.com/"
+    },
+    {
+      "source_path": "#/components/schemas/CheckoutCreateRequest/properties/customer_id/example",
+      "value": "831ff8d4cd5958ab5670"
+    },
+    {
+      "source_path": "#/components/schemas/CheckoutCreateRequest/properties/valid_until/example",
+      "value": "2020-02-29T10:56:56+00:00"
+    },
+    {
+      "source_path": "#/components/schemas/CheckoutCreateRequest/properties/redirect_url/example",
+      "value": "https://mysite.com/completed_purchase"
+    },
+    {
+      "source_path": "#/components/schemas/CheckoutUpdateRequest/properties/amount/example",
+      "value": 12.5
+    },
+    {
+      "source_path": "#/components/schemas/CheckoutUpdateRequest/properties/description/example",
+      "value": "Updated purchase"
+    },
+    {
+      "source_path": "#/components/schemas/CheckoutUpdateRequest/properties/checkout_reference/example",
+      "value": "f00a8f74-b05d-4605-bd73-2a901bae5802"
+    },
+    {
+      "source_path": "#/components/schemas/CheckoutUpdateRequest/properties/valid_until/example",
+      "value": "2020-02-29T10:56:56+00:00"
+    },
+    {
+      "source_path": "#/components/schemas/CheckoutUpdateRequest/properties/customer_id/example",
+      "value": "831ff8d4cd5958ab5670"
+    },
+    {
+      "source_path": "#/components/schemas/ProcessCheckout/properties/payment_type/example",
+      "value": "card"
+    },
+    {
+      "source_path": "#/components/schemas/ProcessCheckout/properties/installments/example",
+      "value": 1
+    },
+    {
+      "source_path": "#/components/schemas/ProcessCheckout/properties/google_pay/example",
+      "value": {
+        "apiVersionMinor": 0,
+        "apiVersion": 2,
+        "paymentMethodData": {
+          "description": "Visa •••• 1111",
+          "tokenizationData": {
+            "type": "PAYMENT_GATEWAY",
+            "token": "token-data"
+          },
+          "type": "CARD",
+          "info": {
+            "cardNetwork": "VISA",
+            "cardDetails": "1111"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/components/schemas/ProcessCheckout/properties/apple_pay/example",
+      "value": {
+        "token": {
+          "paymentData": {
+            "data": "si2xuT2ArQo689SfE-long-token",
+            "signature": "MIAGCSqGSIb3DQEHA-long-signature",
+            "header": {
+              "publicKeyHash": "PWfjDi3TSwgZ20TY/A7f3V6J/1rhHyRDCspbeljM0io=",
+              "ephemeralPublicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEaBtz7UN2MNV0qInJVEEhXy10PU0KfO6KxFjXm93oKWL6lCsxZZGDl/EKioUHVSlKgpsKGin0xvgldfxeJVgy0g==",
+              "transactionId": "62e0568bc9258e9d0e059d745650fc8211d05ef7a7a1589a6411bf9b12cdfd04"
+            },
+            "version": "EC_v1"
+          },
+          "paymentMethod": {
+            "displayName": "MasterCard 8837",
+            "network": "MasterCard",
+            "type": "debit"
+          },
+          "transactionIdentifier": "62E0568BC9258E9D0E059D745650FC8211D05EF7A7A1589A6411BF9B12CDFD04"
+        }
+      }
+    },
+    {
+      "source_path": "#/components/schemas/ProcessCheckout/properties/token/example",
+      "value": "ba85dfee-c3cf-48a6-84f5-d7d761fbba50"
+    },
+    {
+      "source_path": "#/components/schemas/ProcessCheckout/properties/customer_id/example",
+      "value": "MEDKHDTI"
+    },
+    {
+      "source_path": "#/components/schemas/CheckoutSuccess/allOf/1/properties/transaction_code/example",
+      "value": "TEENSK4W2K"
+    },
+    {
+      "source_path": "#/components/schemas/CheckoutSuccess/allOf/1/properties/transaction_id/example",
+      "value": "410fc44a-5956-44e1-b5cc-19c6f8d727a4"
+    },
+    {
+      "source_path": "#/components/schemas/CheckoutSuccess/allOf/1/properties/merchant_name/example",
+      "value": "Sample Merchant"
+    },
+    {
+      "source_path": "#/components/schemas/CheckoutSuccess/allOf/1/properties/redirect_url/example",
+      "value": "https://mysite.com/completed_purchase"
+    },
+    {
+      "source_path": "#/components/schemas/CheckoutSuccess/allOf/1/properties/payment_instrument/properties/token/example",
+      "value": "e76d7e5c-9375-4fac-a7e7-b19dc5302fbc"
+    },
+    {
+      "source_path": "#/components/schemas/CheckoutAccepted/properties/next_step/properties/url/example",
+      "value": "https://dummy-3ds-gateway.com/cap?RID=1233&VAA=A"
+    },
+    {
+      "source_path": "#/components/schemas/CheckoutAccepted/properties/next_step/properties/method/example",
+      "value": "POST"
+    },
+    {
+      "source_path": "#/components/schemas/CheckoutAccepted/properties/next_step/properties/redirect_url/example",
+      "value": "https://mysite.com/completed_purchase"
+    },
+    {
+      "source_path": "#/components/schemas/CheckoutAccepted/properties/next_step/properties/mechanism/example",
+      "value": [
+        "iframe"
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/CheckoutAccepted/properties/next_step/properties/payload/example",
+      "value": {
+        "PaReq": "eJxVUttu2zAM/RXDr4MjyY5dO6BVuE27FZuDZHGG9VGRmMSFb/Wljff1k9KkF0APPCR1eHQouD6WhfWCbZfXVWyzCbUtrGSt8mof25vs3gltq+tFpURRVxjbI3b2NYfs0CLO1yiHFjmk2HVij1auYrsRW1+F0U4qZxfKwJlur4QTYcQcJoIdc+XO2/poc1gmv/GZw3k216MnLpAL1JytPIiq5yDk883Dgk+DwPV9IGcIJbYPc84o1Ye6lHqu5wVA3tJQiRL5eiiHxlqKscSq76xfeZn3qICciiDroerbkYeuvnYBMLQFP/R9MyOkM9cnCoGYJJAPScvBRJ0mOeaKr/6l08XT6jXN7tx0vvHSbOMtsj1dzB9jIKYDlOiRu1omYyy0WDCj0YxFQE55EKWZzj2f6ee9xdCYEcmnwucEaN9bvaeRR1ehFn9BgMdGr0l3aCvfYyAfem9/GENlrz36ufpTBPTv07r8lm3qpPiOo1y/7u+SJImNzacmw5hrX1wt/kRpABBDQ84bJOf16+jLt/gPhUvGGw==",
+        "MD": "b1a536c0-29b9-11eb-adc1-0242ac120002",
+        "TermUrl": "https://api.sumup.com/v0.1/checkouts/e552de3b-1777-4c91-bdb8-756967678572/complete_payment"
+      }
+    },
+    {
+      "source_path": "#/components/schemas/Customer/properties/customer_id/example",
+      "value": "831ff8d4cd5958ab5670"
+    },
+    {
+      "source_path": "#/components/schemas/Error/properties/message/example",
+      "value": "Resource not found"
+    },
+    {
+      "source_path": "#/components/schemas/Error/properties/error_code/example",
+      "value": "NOT_FOUND"
+    },
+    {
+      "source_path": "#/components/schemas/Problem/properties/type/example",
+      "value": "https://developer.sumup.com/problem/not-found"
+    },
+    {
+      "source_path": "#/components/schemas/Problem/properties/title/example",
+      "value": "Requested resource couldn't be found."
+    },
+    {
+      "source_path": "#/components/schemas/Problem/properties/status/example",
+      "value": 404
+    },
+    {
+      "source_path": "#/components/schemas/Problem/properties/detail/example",
+      "value": "The requested resource doesn't exist or does not belong to you."
+    },
+    {
+      "source_path": "#/components/schemas/Problem/properties/instance/example",
+      "value": "https://api.sumup.com/v0.1/checkouts/4e425463-3e1b-431d-83fa-1e51c2925e99"
+    },
+    {
+      "source_path": "#/components/schemas/ErrorExtended/allOf/1/properties/param/example",
+      "value": "card.name"
+    },
+    {
+      "source_path": "#/components/schemas/ErrorForbidden/properties/error_message/example",
+      "value": "request_not_allowed"
+    },
+    {
+      "source_path": "#/components/schemas/ErrorForbidden/properties/error_code/example",
+      "value": "FORBIDDEN"
+    },
+    {
+      "source_path": "#/components/schemas/ErrorForbidden/properties/status_code/example",
+      "value": "403"
+    },
+    {
+      "source_path": "#/components/schemas/DetailsError/properties/title/example",
+      "value": "Bad Request"
+    },
+    {
+      "source_path": "#/components/schemas/DetailsError/properties/details/example",
+      "value": "One or more of the parameters are invalid."
+    },
+    {
+      "source_path": "#/components/schemas/DetailsError/properties/status/example",
+      "value": 400
+    },
+    {
+      "source_path": "#/components/schemas/DetailsError/properties/failed_constraints/example",
+      "value": [
+        {
+          "message": "Currency must also be specified when filtering by amount",
+          "reference": "currency"
+        }
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/DetailsError/properties/failed_constraints/items/properties/message/example",
+      "value": "Currency must also be specified when filtering by amount"
+    },
+    {
+      "source_path": "#/components/schemas/DetailsError/properties/failed_constraints/items/properties/reference/example",
+      "value": "currency"
+    },
+    {
+      "source_path": "#/components/schemas/Event/properties/amount/example",
+      "value": 10.1
+    },
+    {
+      "source_path": "#/components/schemas/Event/properties/timestamp/example",
+      "value": "2020-05-25T10:49:42.784Z"
+    },
+    {
+      "source_path": "#/components/schemas/Event/properties/fee_amount/example",
+      "value": 0.25
+    },
+    {
+      "source_path": "#/components/schemas/Event/properties/installment_number/example",
+      "value": 1
+    },
+    {
+      "source_path": "#/components/schemas/Event/properties/deducted_amount/example",
+      "value": 10.1
+    },
+    {
+      "source_path": "#/components/schemas/Event/properties/deducted_fee_amount/example",
+      "value": 0.25
+    },
+    {
+      "source_path": "#/components/schemas/FinancialPayout/properties/id/example",
+      "value": 123456789
+    },
+    {
+      "source_path": "#/components/schemas/FinancialPayout/properties/type/example",
+      "value": "PAYOUT"
+    },
+    {
+      "source_path": "#/components/schemas/FinancialPayout/properties/amount/example",
+      "value": 132.45
+    },
+    {
+      "source_path": "#/components/schemas/FinancialPayout/properties/date/example",
+      "value": "2024-02-29"
+    },
+    {
+      "source_path": "#/components/schemas/FinancialPayout/properties/currency/example",
+      "value": "EUR"
+    },
+    {
+      "source_path": "#/components/schemas/FinancialPayout/properties/fee/example",
+      "value": 3.12
+    },
+    {
+      "source_path": "#/components/schemas/FinancialPayout/properties/status/example",
+      "value": "SUCCESSFUL"
+    },
+    {
+      "source_path": "#/components/schemas/FinancialPayout/properties/reference/example",
+      "value": "payout-2024-02-29"
+    },
+    {
+      "source_path": "#/components/schemas/FinancialPayout/properties/transaction_code/example",
+      "value": "TEENSK4W2K"
+    },
+    {
+      "source_path": "#/components/schemas/Link/properties/rel/example",
+      "value": "refund"
+    },
+    {
+      "source_path": "#/components/schemas/Link/properties/href/example",
+      "value": "https://api.sumup.com/v1.0/merchants/MH4H92C7/payments/4ffb8dfc-7f2b-413d-a497-2ad00766585e/refunds"
+    },
+    {
+      "source_path": "#/components/schemas/Link/properties/type/example",
+      "value": "application/json"
+    },
+    {
+      "source_path": "#/components/schemas/Link/properties/min_amount/example",
+      "value": 0.01
+    },
+    {
+      "source_path": "#/components/schemas/Link/properties/max_amount/example",
+      "value": 10.1
+    },
+    {
+      "source_path": "#/components/schemas/TransactionsHistoryLink/properties/rel/example",
+      "value": "next"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionsHistoryLink/properties/href/example",
+      "value": "limit=10&oldest_ref=090df9bf-93b7-40f1-8181-fbdb236568a1&order=ascending"
+    },
+    {
+      "source_path": "#/components/schemas/MandatePayload/properties/type/example",
+      "value": "recurrent"
+    },
+    {
+      "source_path": "#/components/schemas/MandatePayload/properties/user_agent/example",
+      "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36"
+    },
+    {
+      "source_path": "#/components/schemas/MandatePayload/properties/user_ip/example",
+      "value": "172.217.169.174"
+    },
+    {
+      "source_path": "#/components/schemas/MandatePayload/example",
+      "value": {
+        "type": "recurrent",
+        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36",
+        "user_ip": "172.217.169.174"
+      }
+    },
+    {
+      "source_path": "#/components/schemas/MandateResponse/properties/type/example",
+      "value": "recurrent"
+    },
+    {
+      "source_path": "#/components/schemas/MandateResponse/properties/status/example",
+      "value": "active"
+    },
+    {
+      "source_path": "#/components/schemas/MandateResponse/properties/merchant_code/example",
+      "value": "MH4H92C7"
+    },
+    {
+      "source_path": "#/components/schemas/MandateResponse/example",
+      "value": {
+        "type": "recurrent",
+        "status": "active",
+        "merchant_code": "MH4H92C7"
+      }
+    },
+    {
+      "source_path": "#/components/schemas/PaymentInstrumentResponse/properties/token/example",
+      "value": "bcfc8e5f-3b47-4cb9-854b-3b7a4cce7be3"
+    },
+    {
+      "source_path": "#/components/schemas/PaymentInstrumentResponse/properties/type/example",
+      "value": "card"
+    },
+    {
+      "source_path": "#/components/schemas/PaymentInstrumentResponse/properties/card/properties/last_4_digits/example",
+      "value": "3456"
+    },
+    {
+      "source_path": "#/components/schemas/PaymentInstrumentResponse/properties/created_at/example",
+      "value": "2021-03-30T10:06:07.000+00:00"
+    },
+    {
+      "source_path": "#/components/schemas/PaymentInstrumentResponse/example",
+      "value": {
+        "token": "bcfc8e5f-3b47-4cb9-854b-3b7a4cce7be3",
+        "active": true,
+        "type": "card",
+        "mandate": {
+          "type": "recurrent",
+          "status": "active",
+          "merchant_code": "MH4H92C7"
+        },
+        "card": {
+          "last_4_digits": "0001",
+          "type": "VISA"
+        },
+        "created_at": "2021-03-30T10:06:07.000+00:00"
+      }
+    },
+    {
+      "source_path": "#/components/schemas/PersonalDetails/properties/first_name/example",
+      "value": "John"
+    },
+    {
+      "source_path": "#/components/schemas/PersonalDetails/properties/last_name/example",
+      "value": "Doe"
+    },
+    {
+      "source_path": "#/components/schemas/PersonalDetails/properties/email/example",
+      "value": "user@example.com"
+    },
+    {
+      "source_path": "#/components/schemas/PersonalDetails/properties/phone/example",
+      "value": "+491635559723"
+    },
+    {
+      "source_path": "#/components/schemas/PersonalDetails/properties/birth_date/example",
+      "value": "1993-12-31"
+    },
+    {
+      "source_path": "#/components/schemas/PersonalDetails/properties/tax_id/example",
+      "value": "423.378.593-47"
+    },
+    {
+      "source_path": "#/components/schemas/Product/properties/name/example",
+      "value": "Purchase reader for merchant with code ME3FCAVF"
+    },
+    {
+      "source_path": "#/components/schemas/Product/properties/price_label/example",
+      "value": "EUR 100.00"
+    },
+    {
+      "source_path": "#/components/schemas/Product/properties/price/example",
+      "value": 100.0
+    },
+    {
+      "source_path": "#/components/schemas/Product/properties/vat_rate/example",
+      "value": 0.19
+    },
+    {
+      "source_path": "#/components/schemas/Product/properties/single_vat_amount/example",
+      "value": 19.0
+    },
+    {
+      "source_path": "#/components/schemas/Product/properties/price_with_vat/example",
+      "value": 119.0
+    },
+    {
+      "source_path": "#/components/schemas/Product/properties/vat_amount/example",
+      "value": 19.0
+    },
+    {
+      "source_path": "#/components/schemas/Product/properties/quantity/example",
+      "value": 1
+    },
+    {
+      "source_path": "#/components/schemas/Product/properties/total_price/example",
+      "value": 100.0
+    },
+    {
+      "source_path": "#/components/schemas/Product/properties/total_with_vat/example",
+      "value": 119.0
+    },
+    {
+      "source_path": "#/components/schemas/Receipt/properties/emv_data/example",
+      "value": {}
+    },
+    {
+      "source_path": "#/components/schemas/Receipt/properties/acquirer_data/example",
+      "value": {
+        "authorization_code": "053201",
+        "return_code": "00"
+      }
+    },
+    {
+      "source_path": "#/components/schemas/Receipt/properties/acquirer_data/properties/tid/example",
+      "value": "12345678"
+    },
+    {
+      "source_path": "#/components/schemas/Receipt/properties/acquirer_data/properties/authorization_code/example",
+      "value": "053201"
+    },
+    {
+      "source_path": "#/components/schemas/Receipt/properties/acquirer_data/properties/return_code/example",
+      "value": "00"
+    },
+    {
+      "source_path": "#/components/schemas/Receipt/properties/acquirer_data/properties/local_time/example",
+      "value": "2020-02-29T11:56:56+01:00"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptEvent/properties/amount/example",
+      "value": "10.10"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptEvent/properties/timestamp/example",
+      "value": "2020-05-25T10:49:42.784Z"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptEvent/properties/receipt_no/example",
+      "value": "123456"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptCard/properties/last_4_digits/example",
+      "value": "3456"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptCard/properties/type/example",
+      "value": "VISA"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptReader/properties/code/example",
+      "value": "U1DT3NA00-CN"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptReader/properties/type/example",
+      "value": "solo"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptMerchantData/properties/merchant_profile/properties/merchant_code/example",
+      "value": "MH4H92C7"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptMerchantData/properties/merchant_profile/properties/business_name/example",
+      "value": "Coffee House"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptMerchantData/properties/merchant_profile/properties/company_registration_number/example",
+      "value": "HRB 123456"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptMerchantData/properties/merchant_profile/properties/vat_id/example",
+      "value": "DE123456789"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptMerchantData/properties/merchant_profile/properties/website/example",
+      "value": "https://example.com"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptMerchantData/properties/merchant_profile/properties/email/example",
+      "value": "merchant@example.com"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptMerchantData/properties/merchant_profile/properties/language/example",
+      "value": "de"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptMerchantData/properties/merchant_profile/properties/address/properties/address_line1/example",
+      "value": "Sample street 1"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptMerchantData/properties/merchant_profile/properties/address/properties/address_line2/example",
+      "value": "Floor 2"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptMerchantData/properties/merchant_profile/properties/address/properties/city/example",
+      "value": "Berlin"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptMerchantData/properties/merchant_profile/properties/address/properties/country/example",
+      "value": "DE"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptMerchantData/properties/merchant_profile/properties/address/properties/country_en_name/example",
+      "value": "Germany"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptMerchantData/properties/merchant_profile/properties/address/properties/country_native_name/example",
+      "value": "Deutschland"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptMerchantData/properties/merchant_profile/properties/address/properties/region_name/example",
+      "value": "Berlin"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptMerchantData/properties/merchant_profile/properties/address/properties/post_code/example",
+      "value": "10115"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptMerchantData/properties/merchant_profile/properties/address/properties/landline/example",
+      "value": "+493012345678"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptMerchantData/properties/locale/example",
+      "value": "de-DE"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/example",
+      "value": {
+        "transaction_code": "TEENSK4W2K",
+        "transaction_id": "410fc44a-5956-44e1-b5cc-19c6f8d727a4",
+        "merchant_code": "MH4H92C7",
+        "amount": "10.10",
+        "vat_amount": "6.00",
+        "tip_amount": "3.00",
+        "currency": "EUR",
+        "timestamp": "2020-02-29T10:56:56.876Z",
+        "status": "SUCCESSFUL",
+        "payment_type": "ECOM",
+        "entry_mode": "CUSTOMER_ENTRY",
+        "installments_count": 1,
+        "process_as": "CREDIT"
+      }
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/transaction_code/example",
+      "value": "TEENSK4W2K"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/merchant_code/example",
+      "value": "MH4H92C7"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/amount/example",
+      "value": "10.10"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/vat_amount/example",
+      "value": "6.00"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/tip_amount/example",
+      "value": "3.00"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/currency/example",
+      "value": "EUR"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/timestamp/example",
+      "value": "2020-02-29T10:56:56.876Z"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/status/example",
+      "value": "SUCCESSFUL"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/payment_type/example",
+      "value": "ECOM"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/entry_mode/example",
+      "value": "CUSTOMER_ENTRY"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/verification_method/example",
+      "value": "none"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/installments_count/example",
+      "value": 1
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/process_as/example",
+      "value": "CREDIT"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/products/items/properties/name/example",
+      "value": "Coffee"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/products/items/properties/description/example",
+      "value": "Cappuccino"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/products/items/properties/price/example",
+      "value": "150.0"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/products/items/properties/vat_rate/example",
+      "value": "0.0"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/products/items/properties/single_vat_amount/example",
+      "value": "0.0"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/products/items/properties/price_with_vat/example",
+      "value": "150.0"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/products/items/properties/vat_amount/example",
+      "value": "0.0"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/products/items/properties/quantity/example",
+      "value": 1
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/products/items/properties/total_price/example",
+      "value": "150.0"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/products/items/properties/total_with_vat/example",
+      "value": "150.0"
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/vat_rates/items/properties/gross/example",
+      "value": 10.1
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/vat_rates/items/properties/net/example",
+      "value": 8.49
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/vat_rates/items/properties/rate/example",
+      "value": 0.19
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/vat_rates/items/properties/vat/example",
+      "value": 1.61
+    },
+    {
+      "source_path": "#/components/schemas/ReceiptTransaction/properties/receipt_no/example",
+      "value": "123456"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionEvent/properties/amount/example",
+      "value": 58.8
+    },
+    {
+      "source_path": "#/components/schemas/TransactionEvent/properties/due_date/example",
+      "value": "2020-05-25"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionEvent/properties/date/example",
+      "value": "2020-05-25"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionEvent/properties/installment_number/example",
+      "value": 1
+    },
+    {
+      "source_path": "#/components/schemas/TransactionEvent/properties/timestamp/example",
+      "value": "2020-05-25T10:49:42.784Z"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionBase/properties/id/example",
+      "value": "6b425463-3e1b-431d-83fa-1e51c2925e99"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionBase/properties/transaction_code/example",
+      "value": "TEENSK4W2K"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionBase/properties/amount/example",
+      "value": 10.1
+    },
+    {
+      "source_path": "#/components/schemas/TransactionBase/properties/timestamp/example",
+      "value": "2020-02-29T10:56:56.876Z"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionBase/properties/installments_count/example",
+      "value": 1
+    },
+    {
+      "source_path": "#/components/schemas/TransactionCheckoutInfo/properties/merchant_code/example",
+      "value": "MH4H92C7"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionCheckoutInfo/properties/vat_amount/example",
+      "value": 6
+    },
+    {
+      "source_path": "#/components/schemas/TransactionCheckoutInfo/properties/tip_amount/example",
+      "value": 3
+    },
+    {
+      "source_path": "#/components/schemas/TransactionCheckoutInfo/properties/auth_code/example",
+      "value": "053201"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionMixinHistory/properties/product_summary/example",
+      "value": "Purchase"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionMixinHistory/properties/payouts_total/example",
+      "value": 1
+    },
+    {
+      "source_path": "#/components/schemas/TransactionMixinHistory/properties/payouts_received/example",
+      "value": 1
+    },
+    {
+      "source_path": "#/components/schemas/TransactionMixinHistory/properties/payout_plan/example",
+      "value": "SINGLE_PAYMENT"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionHistory/allOf/2/properties/client_transaction_id/example",
+      "value": "urn:sumup:pos:sale:MNKKNGST:1D4E3B2D-111D-48D7-9AF0-832DAEF63DD7;2"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionHistory/allOf/2/properties/user/example",
+      "value": "merchant@example.com"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionHistory/allOf/2/properties/type/example",
+      "value": "PAYMENT"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionHistory/allOf/2/properties/payout_date/example",
+      "value": "2019-08-28"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionHistory/allOf/2/properties/payout_type/example",
+      "value": "BANK_ACCOUNT"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionHistory/allOf/2/properties/refunded_amount/example",
+      "value": 0
+    },
+    {
+      "source_path": "#/components/schemas/PaymentType/example",
+      "value": "ECOM"
+    },
+    {
+      "source_path": "#/components/schemas/EntryMode/example",
+      "value": "CUSTOMER_ENTRY"
+    },
+    {
+      "source_path": "#/components/schemas/CardType/example",
+      "value": "VISA"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionFull/allOf/3/properties/foreign_transaction_id/example",
+      "value": "J13253253x1"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionFull/allOf/3/properties/client_transaction_id/example",
+      "value": "urn:sumup:pos:sale:MNKKNGST:1D4E3B2D-111D-48D7-9AF0-832DAEF63DD7;2"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionFull/allOf/3/properties/username/example",
+      "value": "merchant@example.com"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionFull/allOf/3/properties/fee_amount/example",
+      "value": 8.0
+    },
+    {
+      "source_path": "#/components/schemas/TransactionFull/allOf/3/properties/merchant_id/example",
+      "value": 136902
+    },
+    {
+      "source_path": "#/components/schemas/TransactionFull/allOf/3/properties/simple_payment_type/example",
+      "value": "CARD"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionFull/allOf/3/properties/verification_method/example",
+      "value": "none"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionFull/allOf/3/properties/local_time/example",
+      "value": "2020-02-29T11:56:56+01:00"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionFull/allOf/3/properties/payout_date/example",
+      "value": "2019-08-28"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionFull/allOf/3/properties/payout_type/example",
+      "value": "BANK_ACCOUNT"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionFull/allOf/3/properties/process_as/example",
+      "value": "CREDIT"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionFull/allOf/3/properties/vat_rates/items/properties/rate/example",
+      "value": 0.045
+    },
+    {
+      "source_path": "#/components/schemas/TransactionFull/allOf/3/properties/vat_rates/items/properties/net/example",
+      "value": 1.36
+    },
+    {
+      "source_path": "#/components/schemas/TransactionFull/allOf/3/properties/vat_rates/items/properties/vat/example",
+      "value": 0.06
+    },
+    {
+      "source_path": "#/components/schemas/TransactionFull/allOf/3/properties/vat_rates/items/properties/gross/example",
+      "value": 1.42
+    },
+    {
+      "source_path": "#/components/schemas/TransactionFull/allOf/3/properties/simple_status/example",
+      "value": "SUCCESSFUL"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionFull/allOf/3/properties/tax_enabled/example",
+      "value": true
+    },
+    {
+      "source_path": "#/components/schemas/Currency/example",
+      "value": "EUR"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionStatus/example",
+      "value": "SUCCESSFUL"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionEventType/example",
+      "value": "REFUND"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionEventStatus/example",
+      "value": "SUCCESSFUL"
+    },
+    {
+      "source_path": "#/components/schemas/TransactionEventID/example",
+      "value": 9567461191
+    },
+    {
+      "source_path": "#/components/schemas/HorizontalAccuracy/example",
+      "value": 5.0
+    },
+    {
+      "source_path": "#/components/schemas/Lat/example",
+      "value": 52.520008
+    },
+    {
+      "source_path": "#/components/schemas/Lon/example",
+      "value": 13.404954
+    },
+    {
+      "source_path": "#/components/schemas/TransactionID/example",
+      "value": "410fc44a-5956-44e1-b5cc-19c6f8d727a4"
+    },
+    {
+      "source_path": "#/components/schemas/Affiliate/properties/app_id/example",
+      "value": "com.example.app"
+    },
+    {
+      "source_path": "#/components/schemas/Affiliate/properties/key/example",
+      "value": "123e4567-e89b-12d3-a456-426614174000"
+    },
+    {
+      "source_path": "#/components/schemas/Amount/properties/currency/example",
+      "value": "MXN"
+    },
+    {
+      "source_path": "#/components/schemas/Amount/properties/value/example",
+      "value": 1000
+    },
+    {
+      "source_path": "#/components/schemas/ReaderID/example",
+      "value": "rdr_3MSAFM23CK82VSTT4BN6RWSQ65"
+    },
+    {
+      "source_path": "#/components/schemas/ReaderPaymentRequestParams/properties/client_transaction_id/example",
+      "value": "19e12390-72cf-4f9f-80b5-b0c8a67fa43f"
+    },
+    {
+      "source_path": "#/components/schemas/ReaderPaymentRequestParams/properties/tip_amount/example",
+      "value": 100
+    },
+    {
+      "source_path": "#/components/schemas/ReaderPaymentResponseData/properties/client_transaction_id/example",
+      "value": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+    },
+    {
+      "source_path": "#/components/schemas/ReaderPaymentResponseData/properties/transaction_code/example",
+      "value": "TEENSK4W2K"
+    },
+    {
+      "source_path": "#/components/schemas/ResourceType/example",
+      "value": "merchant"
+    },
+    {
+      "source_path": "#/components/schemas/Membership/properties/id/example",
+      "value": "mem_WZsm7QTPhVrompscmPhoGTXXcrd58fr9MOhP"
+    },
+    {
+      "source_path": "#/components/schemas/Membership/properties/resource_id/example",
+      "value": "M2DDT39A"
+    },
+    {
+      "source_path": "#/components/schemas/Membership/properties/roles/example",
+      "value": [
+        "role_admin"
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/Membership/properties/permissions/example",
+      "value": [
+        "members_read",
+        "members_write",
+        "create_moto_payments",
+        "full_transaction_history_view",
+        "refund_transactions",
+        "create_referral",
+        "developer_settings_edit",
+        "developer_settings_access"
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/Membership/properties/created_at/example",
+      "value": "2023-01-20T15:16:17Z"
+    },
+    {
+      "source_path": "#/components/schemas/Membership/properties/updated_at/example",
+      "value": "2023-01-20T15:16:17Z"
+    },
+    {
+      "source_path": "#/components/schemas/MembershipResource/properties/id/example",
+      "value": "M2DDT39A"
+    },
+    {
+      "source_path": "#/components/schemas/MembershipResource/properties/name/example",
+      "value": "Acme Corp"
+    },
+    {
+      "source_path": "#/components/schemas/MembershipResource/properties/logo/example",
+      "value": "https://images.sumup.com/img_2x4y6z8a0b1c2d3e4f5g6h7j8k.png"
+    },
+    {
+      "source_path": "#/components/schemas/MembershipResource/properties/created_at/example",
+      "value": "2023-01-20T15:16:17Z"
+    },
+    {
+      "source_path": "#/components/schemas/MembershipResource/properties/updated_at/example",
+      "value": "2023-01-20T15:16:17Z"
+    },
+    {
+      "source_path": "#/components/schemas/Member/properties/id/example",
+      "value": "mem_WZsm7QTPhVrompscmPhoGTXXcrd58fr9MOhP"
+    },
+    {
+      "source_path": "#/components/schemas/Member/properties/roles/example",
+      "value": [
+        "role_admin"
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/Member/properties/permissions/example",
+      "value": [
+        "members_read",
+        "members_write",
+        "create_moto_payments",
+        "full_transaction_history_view",
+        "refund_transactions",
+        "create_referral",
+        "developer_settings_edit",
+        "developer_settings_access"
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/Member/properties/created_at/example",
+      "value": "2023-01-20T15:16:17Z"
+    },
+    {
+      "source_path": "#/components/schemas/Member/properties/updated_at/example",
+      "value": "2023-01-20T15:16:17Z"
+    },
+    {
+      "source_path": "#/components/schemas/Member/example",
+      "value": {
+        "id": "mem_WZsm7QTPhVrompscmPhoGTXXcrd58fr9MOhP",
+        "roles": [
+          "role_admin",
+          "role_owner"
+        ],
+        "permissions": [
+          "members_read",
+          "members_write",
+          "create_moto_payments",
+          "full_transaction_history_view",
+          "refund_transactions",
+          "create_referral",
+          "developer_settings_edit",
+          "developer_settings_access"
+        ],
+        "created_at": "2023-01-20T15:16:17Z",
+        "updated_at": "2023-02-20T15:16:17Z",
+        "user": {
+          "id": "44ca0f5b-813b-46e1-aee7-e6242010662e",
+          "email": "example@sumup.com",
+          "mfa_on_login_enabled": true,
+          "virtual_user": false,
+          "service_account_user": false
+        },
+        "status": "accepted"
+      }
+    },
+    {
+      "source_path": "#/components/schemas/Invite/properties/email/example",
+      "value": "boaty.mcboatface@sumup.com"
+    },
+    {
+      "source_path": "#/components/schemas/Invite/properties/expires_at/example",
+      "value": "2023-01-20T15:16:17Z"
+    },
+    {
+      "source_path": "#/components/schemas/MembershipUser/properties/id/example",
+      "value": "44ca0f5b-813b-46e1-aee7-e6242010662e"
+    },
+    {
+      "source_path": "#/components/schemas/MembershipUser/properties/email/example",
+      "value": "example@sumup.com"
+    },
+    {
+      "source_path": "#/components/schemas/MembershipUser/properties/mfa_on_login_enabled/example",
+      "value": true
+    },
+    {
+      "source_path": "#/components/schemas/MembershipUser/properties/virtual_user/example",
+      "value": false
+    },
+    {
+      "source_path": "#/components/schemas/MembershipUser/properties/service_account_user/example",
+      "value": false
+    },
+    {
+      "source_path": "#/components/schemas/MembershipUser/properties/nickname/example",
+      "value": "Test User"
+    },
+    {
+      "source_path": "#/components/schemas/MembershipUser/properties/picture/example",
+      "value": "https://usercontent.sumup.com/44ca0f5b-813b-46e1-aee7-e6242010662e.png"
+    },
+    {
+      "source_path": "#/components/schemas/Role/properties/id/example",
+      "value": "role_WZsm7QTPhVrompscmPhoGTXXcrd58fr9MOhP"
+    },
+    {
+      "source_path": "#/components/schemas/Role/properties/name/example",
+      "value": "Senior Shop Manager II"
+    },
+    {
+      "source_path": "#/components/schemas/Role/properties/description/example",
+      "value": "Manges the shop and the employees."
+    },
+    {
+      "source_path": "#/components/schemas/Role/properties/permissions/example",
+      "value": []
+    },
+    {
+      "source_path": "#/components/schemas/Role/properties/is_predefined/example",
+      "value": true
+    },
+    {
+      "source_path": "#/components/schemas/Role/properties/created_at/example",
+      "value": "2023-01-20T15:16:17Z"
+    },
+    {
+      "source_path": "#/components/schemas/Role/properties/updated_at/example",
+      "value": "2023-01-20T15:16:17Z"
+    },
+    {
+      "source_path": "#/components/schemas/UserType/example",
+      "value": "user"
+    },
+    {
+      "source_path": "#/components/schemas/Metadata/example",
+      "value": {}
+    },
+    {
+      "source_path": "#/components/schemas/Attributes/example",
+      "value": {}
+    },
+    {
+      "source_path": "#/components/schemas/Address/properties/street_address/example",
+      "value": [
+        "Paul-Linke-Ufer 39-40",
+        "2. Hinterhof"
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/Address/properties/post_code/example",
+      "value": "10999"
+    },
+    {
+      "source_path": "#/components/schemas/Address/properties/city/example",
+      "value": "Berlin"
+    },
+    {
+      "source_path": "#/components/schemas/Address/properties/province/example",
+      "value": "Berlin"
+    },
+    {
+      "source_path": "#/components/schemas/Address/properties/region/example",
+      "value": "Baden Wuerttemberg"
+    },
+    {
+      "source_path": "#/components/schemas/Address/properties/county/example",
+      "value": "Dublin County"
+    },
+    {
+      "source_path": "#/components/schemas/Address/properties/autonomous_community/example",
+      "value": "Catalonia"
+    },
+    {
+      "source_path": "#/components/schemas/Address/properties/post_town/example",
+      "value": "London"
+    },
+    {
+      "source_path": "#/components/schemas/Address/properties/state/example",
+      "value": "California"
+    },
+    {
+      "source_path": "#/components/schemas/Address/properties/neighborhood/example",
+      "value": "Copacabana"
+    },
+    {
+      "source_path": "#/components/schemas/Address/properties/commune/example",
+      "value": "Providencia"
+    },
+    {
+      "source_path": "#/components/schemas/Address/properties/department/example",
+      "value": "Antioquia"
+    },
+    {
+      "source_path": "#/components/schemas/Address/properties/municipality/example",
+      "value": "Medellín"
+    },
+    {
+      "source_path": "#/components/schemas/Address/properties/district/example",
+      "value": "Lisbon District"
+    },
+    {
+      "source_path": "#/components/schemas/Address/properties/zip_code/example",
+      "value": "94103"
+    },
+    {
+      "source_path": "#/components/schemas/Address/properties/eircode/example",
+      "value": "D02 X285"
+    },
+    {
+      "source_path": "#/components/schemas/Address/example",
+      "value": {
+        "street_address": [
+          "Paul-Linke-Ufer 39-40",
+          "2. Hinterhof"
+        ],
+        "post_code": "10999",
+        "city": "Berlin",
+        "country": "DE"
+      }
+    },
+    {
+      "source_path": "#/components/schemas/CountryCode/example",
+      "value": "BR"
+    },
+    {
+      "source_path": "#/components/schemas/PersonalIdentifiers/example",
+      "value": [
+        {
+          "ref": "br.cpf",
+          "value": "847.060.136-90"
+        }
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/PersonalIdentifier/properties/ref/example",
+      "value": "br.cpf"
+    },
+    {
+      "source_path": "#/components/schemas/PersonalIdentifier/properties/value/example",
+      "value": "847.060.136-90"
+    },
+    {
+      "source_path": "#/components/schemas/PersonalIdentifier/example",
+      "value": {
+        "ref": "br.cpf",
+        "value": "847.060.136-90"
+      }
+    },
+    {
+      "source_path": "#/components/schemas/Merchant/allOf/0/properties/merchant_code/example",
+      "value": "MK01A8C2"
+    },
+    {
+      "source_path": "#/components/schemas/Merchant/allOf/0/properties/organization_id/example",
+      "value": "G0UZPVAX"
+    },
+    {
+      "source_path": "#/components/schemas/Merchant/allOf/0/properties/default_currency/example",
+      "value": "EUR"
+    },
+    {
+      "source_path": "#/components/schemas/Merchant/allOf/0/properties/default_locale/example",
+      "value": "de-DE"
+    },
+    {
+      "source_path": "#/components/schemas/Merchant/allOf/0/properties/sandbox/example",
+      "value": false
+    },
+    {
+      "source_path": "#/components/schemas/Meta/example",
+      "value": {}
+    },
+    {
+      "source_path": "#/components/schemas/BusinessProfile/properties/name/example",
+      "value": "Example Coffee"
+    },
+    {
+      "source_path": "#/components/schemas/BusinessProfile/properties/dynamic_descriptor/example",
+      "value": "Example Coffee"
+    },
+    {
+      "source_path": "#/components/schemas/BusinessProfile/properties/website/example",
+      "value": "https://example.com"
+    },
+    {
+      "source_path": "#/components/schemas/BusinessProfile/properties/email/example",
+      "value": "contact@example.com"
+    },
+    {
+      "source_path": "#/components/schemas/PhoneNumber/example",
+      "value": "+420123456789"
+    },
+    {
+      "source_path": "#/components/schemas/Branding/properties/footer_text/examples",
+      "value": [
+        "Thanks for shopping with us."
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/Branding/properties/primary_color/examples",
+      "value": [
+        "#FF4B3A",
+        "#0072C6",
+        "#F68B20"
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/Branding/properties/primary_color_fg/examples",
+      "value": [
+        "#FF4B3A",
+        "#0072C6",
+        "#F68B20"
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/Branding/properties/secondary_color/examples",
+      "value": [
+        "#FF4B3A",
+        "#0072C6",
+        "#F68B20"
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/Branding/properties/secondary_color_fg/examples",
+      "value": [
+        "#FF4B3A",
+        "#0072C6",
+        "#F68B20"
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/Branding/properties/background_color/examples",
+      "value": [
+        "#FF4B3A",
+        "#0072C6",
+        "#F68B20"
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/LegalType/examples",
+      "value": [
+        "de.freiberufler",
+        "br.ltda",
+        "gb.partnership",
+        "bg.private_limited_company"
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/CompanyIdentifier/properties/ref/examples",
+      "value": [
+        "de.gmbh"
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/CompanyIdentifier/properties/value/examples",
+      "value": [
+        "HRB 123456"
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/CompanyIdentifier/examples",
+      "value": [
+        {
+          "ref": "de.gmbh",
+          "value": "HRB 123456"
+        }
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/Ownership/properties/share/example",
+      "value": 50000
+    },
+    {
+      "source_path": "#/components/schemas/Version/examples",
+      "value": [
+        "chng_01HS0KG3MPVEVWW85E3KNXH55J"
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/BasePerson/properties/id/examples",
+      "value": [
+        "pers_2EGQ057R6C8J791RVCG5NWAEAB"
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/BasePerson/properties/user_id/examples",
+      "value": [
+        "ef263f37-8701-4181-9758-acddbb778ee9"
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/BasePerson/properties/birthdate/example",
+      "value": "1980-01-12"
+    },
+    {
+      "source_path": "#/components/schemas/BasePerson/properties/given_name/example",
+      "value": "James Herrald"
+    },
+    {
+      "source_path": "#/components/schemas/BasePerson/properties/family_name/example",
+      "value": "Bond"
+    },
+    {
+      "source_path": "#/components/schemas/BasePerson/properties/middle_name/example",
+      "value": "Maria Sophie"
+    },
+    {
+      "source_path": "#/components/schemas/BasePerson/properties/relationships/items/examples",
+      "value": [
+        "representative",
+        "owner",
+        "officer"
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/Company/properties/name/example",
+      "value": "Gin & Doughnuts Bar GmbH"
+    },
+    {
+      "source_path": "#/components/schemas/Company/properties/merchant_category_code/example",
+      "value": "1532"
+    },
+    {
+      "source_path": "#/components/schemas/Company/properties/website/examples",
+      "value": [
+        "https://www.sumup.com"
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/ClassicMerchantIdentifiers/properties/id/example",
+      "value": 1234
+    },
+    {
+      "source_path": "#/components/schemas/Timestamps/properties/created_at/examples",
+      "value": [
+        "2021-08-31T12:00:00Z"
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/Timestamps/properties/updated_at/examples",
+      "value": [
+        "2021-08-31T12:00:00Z"
+      ]
+    },
+    {
+      "source_path": "#/components/schemas/Reader/properties/created_at/example",
+      "value": "2023-01-18T15:16:17Z"
+    },
+    {
+      "source_path": "#/components/schemas/Reader/properties/updated_at/example",
+      "value": "2023-01-20T15:16:17Z"
+    },
+    {
+      "source_path": "#/components/schemas/ReaderName/example",
+      "value": "Frontdesk"
+    },
+    {
+      "source_path": "#/components/schemas/ReaderStatus/example",
+      "value": "paired"
+    },
+    {
+      "source_path": "#/components/schemas/ReaderDevice/properties/identifier/example",
+      "value": "U1DT3NA00-CN"
+    },
+    {
+      "source_path": "#/components/schemas/ReaderDevice/properties/model/example",
+      "value": "solo"
+    },
+    {
+      "source_path": "#/components/schemas/ReaderPairingCode/example",
+      "value": "4WLFDSBF"
+    },
+    {
+      "source_path": "#/components/schemas/CreateReaderCheckoutUnprocessableEntity/example",
+      "value": {
+        "DataValidation": {
+          "description": "Validation errors for the informed fields.",
+          "value": {
+            "errors": {
+              "card_type": [
+                "is invalid"
+              ],
+              "installments": [
+                "not allowed"
+              ],
+              "return_url": [
+                "must be a valid URL"
+              ],
+              "tip_rates": [
+                "must be between 0.01 and 0.99"
+              ],
+              "total_amount": [
+                "must be greater than 0"
+              ]
+            }
+          }
+        },
+        "InstallmentsTooLow": {
+          "description": "Error returned when installments is not within the allowed range.",
+          "value": {
+            "errors": {
+              "installments": [
+                "is invalid"
+              ]
+            }
+          }
+        },
+        "ReaderBusy": {
+          "description": "Error returned when a checkout was requested in the last 60 seconds.",
+          "value": {
+            "errors": {
+              "detail": "There is a pending checkout for the device.",
+              "type": "READER_BUSY"
+            }
+          }
+        },
+        "ReaderOffline": {
+          "description": "Error returned when the target device is not online.",
+          "value": {
+            "errors": {
+              "detail": "The device is offline.",
+              "type": "READER_OFFLINE"
+            }
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/components/schemas/GetReaderCheckoutResponse/example",
+      "value": {
+        "data": {
+          "card_type": "credit",
+          "checkout_id": "00e33a36-c99b-4cb2-b635-b90c1455c9c8",
+          "client_transaction_id": "00e33a36-c99b-4cb2-b635-b90c1455c9c8",
+          "created_at": "2026-07-07T20:41:16Z",
+          "installments": 1,
+          "payment_status": "pending",
+          "payment_type": "card",
+          "reader_firmware_version": "3.3.3.21",
+          "reader_serial_number": "1234567890",
+          "status": "pending",
+          "total_amount": {
+            "currency": "EUR",
+            "minor_unit": 2,
+            "value": 10000
+          },
+          "updated_at": "2026-07-07T20:42:18Z",
+          "valid_until": "2026-07-07T20:41:16Z"
+        }
+      }
+    },
+    {
+      "source_path": "#/components/schemas/GetReaderCheckoutResponse/properties/data/properties/total_amount/example",
+      "value": {
+        "currency": "EUR",
+        "minor_unit": 2,
+        "value": 1000
+      }
+    },
+    {
+      "source_path": "#/components/schemas/GetReaderCheckoutResponse/properties/data/properties/total_amount/properties/currency/example",
+      "value": "EUR"
+    },
+    {
+      "source_path": "#/components/schemas/GetReaderCheckoutResponse/properties/data/properties/total_amount/properties/minor_unit/example",
+      "value": 2
+    },
+    {
+      "source_path": "#/components/schemas/GetReaderCheckoutResponse/properties/data/properties/total_amount/properties/value/example",
+      "value": 1000
+    },
+    {
+      "source_path": "#/components/schemas/StatusResponse/example",
+      "value": {
+        "data": {
+          "battery_level": 10.0,
+          "battery_temperature": 35,
+          "connection_type": "Wi-Fi",
+          "firmware_version": "3.3.3.21",
+          "last_activity": "2025-09-25T15:20:00Z",
+          "state": "IDLE",
+          "status": "ONLINE"
+        }
+      }
+    },
+    {
+      "source_path": "#/components/schemas/StatusResponse/properties/data/properties/battery_level/example",
+      "value": 10.5
+    },
+    {
+      "source_path": "#/components/schemas/StatusResponse/properties/data/properties/battery_temperature/example",
+      "value": 35
+    },
+    {
+      "source_path": "#/components/schemas/StatusResponse/properties/data/properties/connection_type/example",
+      "value": "Wi-Fi"
+    },
+    {
+      "source_path": "#/components/schemas/StatusResponse/properties/data/properties/firmware_version/example",
+      "value": "3.3.3.21"
+    },
+    {
+      "source_path": "#/components/schemas/StatusResponse/properties/data/properties/last_activity/example",
+      "value": "2025-09-25T15:20:00Z"
+    },
+    {
+      "source_path": "#/components/schemas/StatusResponse/properties/data/properties/state/example",
+      "value": "IDLE"
+    },
+    {
+      "source_path": "#/components/schemas/StatusResponse/properties/data/properties/status/example",
+      "value": "ONLINE"
+    },
+    {
+      "source_path": "#/components/schemas/CreateReaderTerminateUnprocessableEntity/example",
+      "value": {
+        "ReaderOffline": {
+          "description": "Error returned when the target device is not online.",
+          "value": {
+            "errors": {
+              "detail": "The device is offline.",
+              "type": "READER_OFFLINE"
+            }
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/components/schemas/BadRequest/example",
+      "value": {
+        "errors": {
+          "detail": "Bad request",
+          "type": "INVALID_BEARER_TOKEN"
+        }
+      }
+    },
+    {
+      "source_path": "#/components/schemas/CreateReaderCheckoutResponse/example",
+      "value": {
+        "data": {
+          "checkout_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+          "client_transaction_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+        }
+      }
+    },
+    {
+      "source_path": "#/components/schemas/CreateReaderCheckoutResponse/properties/data/properties/checkout_id/example",
+      "value": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+    },
+    {
+      "source_path": "#/components/schemas/CreateReaderCheckoutResponse/properties/data/properties/client_transaction_id/example",
+      "value": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+    },
+    {
+      "source_path": "#/components/schemas/Unauthorized/example",
+      "value": {
+        "errors": {
+          "detail": "Unauthorized"
+        }
+      }
+    },
+    {
+      "source_path": "#/components/schemas/CreateReaderCheckoutRequest/example",
+      "value": {
+        "aade": {
+          "provider_id": "123",
+          "signature": "QjcxRDdBNTU1MDcyRTNFRTREMkZEM0Y0NTdBMjkxMTU4MzBFNkNCQTs7MjAyNTExMTIyMTQ3MTM7Nzk2OzEwNDs5MDA7OTAwOzU0ODg5MDM5",
+          "signature_data": "B71D7A555072E3EE4D2FD3F457A29115830E6CBA;;20251112214713;796;104;900;900;54889039"
+        },
+        "affiliate": {
+          "app_id": "com.example.app",
+          "foreign_transaction_id": "123456",
+          "key": "ef7b684a-d6f4-4e93-9b1b-6acdd6564a8e",
+          "tags": {}
+        },
+        "card_type": "debit",
+        "description": "This is a description...",
+        "installments": 1,
+        "return_url": "https://webhook.site/e21ddbb0-42c4-4358-a981-f5a95cd86fb5",
+        "tip_rates": [
+          0.05,
+          0.1,
+          0.15
+        ],
+        "tip_timeout": 60,
+        "total_amount": {
+          "currency": "EUR",
+          "minor_unit": 2,
+          "value": 5033
+        }
+      }
+    },
+    {
+      "source_path": "#/components/schemas/CreateReaderCheckoutRequest/properties/aade/properties/provider_id/example",
+      "value": "123"
+    },
+    {
+      "source_path": "#/components/schemas/CreateReaderCheckoutRequest/properties/aade/properties/signature/example",
+      "value": "QjcxRDdBNTU1MDcyRTNFRTREMkZEM0Y0NTdBMjkxMTU4MzBFNkNCQTs7MjAyNTExMTIyMTQ3MTM7Nzk2OzEwNDs5MDA7OTAwOzU0ODg5MDM5"
+    },
+    {
+      "source_path": "#/components/schemas/CreateReaderCheckoutRequest/properties/aade/properties/signature_data/example",
+      "value": "B71D7A555072E3EE4D2FD3F457A29115830E6CBA;;20251112214713;796;104;900;900;54889039"
+    },
+    {
+      "source_path": "#/components/schemas/CreateReaderCheckoutRequest/properties/affiliate/properties/app_id/example",
+      "value": "com.example.app"
+    },
+    {
+      "source_path": "#/components/schemas/CreateReaderCheckoutRequest/properties/affiliate/properties/foreign_transaction_id/example",
+      "value": "19e12390-72cf-4f9f-80b5-b0c8a67fa43f"
+    },
+    {
+      "source_path": "#/components/schemas/CreateReaderCheckoutRequest/properties/affiliate/properties/key/example",
+      "value": "123e4567-e89b-12d3-a456-426614174000"
+    },
+    {
+      "source_path": "#/components/schemas/CreateReaderCheckoutRequest/properties/affiliate/properties/tags/example",
+      "value": {
+        "custom_key_1": "custom_value_1",
+        "custom_key_2": "custom_value_2"
+      }
+    },
+    {
+      "source_path": "#/components/schemas/CreateReaderCheckoutRequest/properties/card_type/example",
+      "value": "credit"
+    },
+    {
+      "source_path": "#/components/schemas/CreateReaderCheckoutRequest/properties/installments/example",
+      "value": 1
+    },
+    {
+      "source_path": "#/components/schemas/CreateReaderCheckoutRequest/properties/return_url/example",
+      "value": "https://www.example.com"
+    },
+    {
+      "source_path": "#/components/schemas/CreateReaderCheckoutRequest/properties/tip_timeout/example",
+      "value": 30
+    },
+    {
+      "source_path": "#/components/schemas/CreateReaderCheckoutRequest/properties/total_amount/example",
+      "value": {
+        "currency": "EUR",
+        "minor_unit": 2,
+        "value": 1000
+      }
+    },
+    {
+      "source_path": "#/components/schemas/CreateReaderCheckoutRequest/properties/total_amount/properties/currency/example",
+      "value": "EUR"
+    },
+    {
+      "source_path": "#/components/schemas/CreateReaderCheckoutRequest/properties/total_amount/properties/minor_unit/example",
+      "value": 2
+    },
+    {
+      "source_path": "#/components/schemas/CreateReaderCheckoutRequest/properties/total_amount/properties/value/example",
+      "value": 1000
+    },
+    {
+      "source_path": "#/components/schemas/ReaderCheckoutStatusChange/properties/event_type/example",
+      "value": "solo.transaction.updated"
+    },
+    {
+      "source_path": "#/components/schemas/ReaderCheckoutStatusChange/properties/id/example",
+      "value": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+    },
+    {
+      "source_path": "#/components/schemas/ReaderCheckoutStatusChange/properties/payload/properties/client_transaction_id/example",
+      "value": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+    },
+    {
+      "source_path": "#/components/schemas/ReaderCheckoutStatusChange/properties/payload/properties/merchant_code/example",
+      "value": "M1234567"
+    },
+    {
+      "source_path": "#/components/schemas/ReaderCheckoutStatusChange/properties/payload/properties/status/example",
+      "value": "successful"
+    },
+    {
+      "source_path": "#/components/schemas/ReaderCheckoutStatusChange/properties/payload/properties/transaction_id/example",
+      "value": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+    },
+    {
+      "source_path": "#/components/schemas/ReaderCheckoutStatusChange/properties/timestamp/example",
+      "value": "2023-10-05T14:48:00Z"
+    },
+    {
+      "source_path": "#/components/schemas/NotFound/example",
+      "value": {
+        "errors": {
+          "detail": "Not Found"
+        }
+      }
+    },
+    {
+      "source_path": "#/components/requestBodies/CheckoutCreate/content/application~1json/examples",
+      "value": {
+        "Checkout": {
+          "description": "Standard request body for creating a checkout",
+          "value": {
+            "checkout_reference": "f00a8f74-b05d-4605-bd73-2a901bae5802",
+            "amount": 10.1,
+            "currency": "EUR",
+            "merchant_code": "MH4H92C7",
+            "description": "Purchase",
+            "valid_until": "2020-02-29T10:56:56+00:00",
+            "redirect_url": "https://sumup.com"
+          }
+        },
+        "Checkout3DS": {
+          "description": "Create a 3DS checkout",
+          "value": {
+            "checkout_reference": "f00a8f74-b05d-4605-bd73-2a901bae5802",
+            "amount": 10.1,
+            "currency": "EUR",
+            "merchant_code": "MH4H92C7",
+            "description": "Purchase",
+            "return_url": "http://example.com/",
+            "customer_id": "831ff8d4cd5958ab5670",
+            "redirect_url": "https://mysite.com/completed_purchase"
+          }
+        },
+        "CheckoutAPM": {
+          "description": "Create an Alternative Payment Method checkout",
+          "value": {
+            "checkout_reference": "f00a8f74-b05d-4605-bd73-2a901bae5802",
+            "amount": 10.1,
+            "currency": "EUR",
+            "merchant_code": "MH4H92C7",
+            "redirect_url": "https://mysite.com/completed_purchase"
+          }
+        },
+        "HostedCheckout": {
+          "description": "Create a checkout with a SumUp-hosted payment page",
+          "x-beta": true,
+          "value": {
+            "checkout_reference": "b50pr914-6k0e-3091-a592-890010285b3d",
+            "amount": 12,
+            "currency": "EUR",
+            "merchant_code": "MCXXXXXX",
+            "description": "A sample checkout",
+            "hosted_checkout": {
+              "enabled": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/components/requestBodies/CheckoutUpdate/content/application~1json/example",
+      "value": {
+        "amount": 12.5,
+        "currency": "EUR",
+        "description": "Updated purchase",
+        "checkout_reference": "f00a8f74-b05d-4605-bd73-2a901bae5802",
+        "valid_until": "2020-02-29T10:56:56+00:00",
+        "customer_id": "831ff8d4cd5958ab5670"
+      }
+    },
+    {
+      "source_path": "#/components/requestBodies/Refund/content/application~1json/example",
+      "value": {
+        "amount": 5
+      }
+    },
+    {
+      "source_path": "#/components/requestBodies/Refund/content/application~1json/schema/properties/amount/example",
+      "value": 5
+    },
+    {
+      "source_path": "#/components/responses/Checkout/content/application~1json/examples",
+      "value": {
+        "Checkout": {
+          "description": "Standard response body for a successfully created checkout",
+          "value": {
+            "checkout_reference": "8ea25ec3-3293-40e9-a165-6d7f3b3073c5",
+            "amount": 10.1,
+            "currency": "EUR",
+            "merchant_code": "MH4H92C7",
+            "merchant_country": "DE",
+            "description": "My Checkout",
+            "return_url": "http://example.com",
+            "id": "88fcf8de-304d-4820-8f1c-ec880290eb92",
+            "status": "PENDING",
+            "date": "2020-02-29T10:56:56+00:00",
+            "valid_until": "2020-02-29T10:56:56+00:00",
+            "customer_id": "831ff8d4cd5958ab5670",
+            "mandate": {
+              "type": "recurrent",
+              "status": "active",
+              "merchant_code": "MH4H92C7"
+            },
+            "transactions": [
+              {
+                "id": "410fc44a-5956-44e1-b5cc-19c6f8d727a4",
+                "transaction_code": "TEENSK4W2K",
+                "amount": 10.1,
+                "currency": "EUR",
+                "timestamp": "2020-02-29T10:56:56.876Z",
+                "status": "SUCCESSFUL",
+                "payment_type": "ECOM",
+                "installments_count": 1,
+                "merchant_code": "MH4H92C7",
+                "vat_amount": 6,
+                "tip_amount": 3,
+                "entry_mode": "CUSTOMER_ENTRY",
+                "auth_code": "012345"
+              }
+            ]
+          }
+        },
+        "Checkout3DS": {
+          "description": "Response body for a successfully created 3DS checkout",
+          "value": {
+            "checkout_reference": "8ea25ec3-3293-40e9-a165-6d7f3b3073c5",
+            "amount": 10.1,
+            "currency": "EUR",
+            "description": "My Checkout",
+            "return_url": "http://example.com",
+            "id": "88fcf8de-304d-4820-8f1c-ec880290eb92",
+            "status": "PENDING",
+            "date": "2020-02-29T10:56:56+00:00",
+            "valid_until": "2020-02-29T10:56:56+00:00",
+            "customer_id": "831ff8d4cd5958ab5670",
+            "redirect_url": "https://mysite.com/completed_purchase",
+            "transactions": [
+              {
+                "id": "410fc44a-5956-44e1-b5cc-19c6f8d727a4",
+                "transaction_code": "TEENSK4W2K",
+                "amount": 10.1,
+                "currency": "EUR",
+                "timestamp": "2020-02-29T10:56:56.876Z",
+                "status": "SUCCESSFUL",
+                "payment_type": "ECOM",
+                "installments_count": 1,
+                "merchant_code": "MH4H92C7",
+                "vat_amount": 6,
+                "tip_amount": 3,
+                "entry_mode": "CUSTOMER_ENTRY",
+                "auth_code": "012345"
+              }
+            ]
+          }
+        },
+        "CheckoutAPM": {
+          "description": "Response body for APMs, including Blik, iDeal, ...",
+          "value": {
+            "checkout_reference": "8ea25ec3-3293-40e9-a165-6d7f3b3073c5",
+            "amount": 10.1,
+            "currency": "EUR",
+            "merchant_code": "MH4H92C7",
+            "description": "My Checkout",
+            "return_url": "http://example.com",
+            "id": "88fcf8de-304d-4820-8f1c-ec880290eb92",
+            "status": "PENDING",
+            "date": "2021-06-29T11:08:36.000+00:00",
+            "merchant_name": "My company",
+            "merchant_country": "DE",
+            "redirect_url": "https://sumup.com",
+            "purpose": "CHECKOUT",
+            "transactions": [
+              {
+                "id": "410fc44a-5956-44e1-b5cc-19c6f8d727a4",
+                "transaction_code": "TEENSK4W2K",
+                "amount": 10.1,
+                "currency": "EUR",
+                "timestamp": "2020-02-29T10:56:56.876Z",
+                "status": "SUCCESSFUL",
+                "payment_type": "ECOM",
+                "installments_count": 1,
+                "merchant_code": "MH4H92C7",
+                "vat_amount": 6,
+                "tip_amount": 3,
+                "entry_mode": "CUSTOMER_ENTRY",
+                "auth_code": "012345"
+              }
+            ]
+          }
+        },
+        "HostedCheckout": {
+          "description": "Response body for a checkout with a SumUp-hosted payment page",
+          "value": {
+            "checkout_reference": "b50pr914-6k0e-3091-a592-890010285b3d",
+            "amount": 12,
+            "currency": "EUR",
+            "merchant_code": "MCXXXXXX",
+            "merchant_country": "DE",
+            "merchant_name": "Sample Shop",
+            "description": "A sample checkout",
+            "id": "64553e20-3f0e-49e4-8af3-fd0eca86ce91",
+            "status": "PENDING",
+            "date": "2000-01-01T12:49:24.899+00:00",
+            "purpose": "CHECKOUT",
+            "hosted_checkout": {
+              "enabled": true
+            },
+            "hosted_checkout_url": "https://checkout.sumup.com/pay/8f9316a3-cda9-42a9-9771-54d534315676",
+            "transactions": []
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/components/responses/CheckoutUpdate/content/application~1json/example",
+      "value": {
+        "checkout_reference": "f00a8f74-b05d-4605-bd73-2a901bae5802",
+        "amount": 12.5,
+        "currency": "EUR",
+        "merchant_code": "MH4H92C7",
+        "merchant_country": "DE",
+        "description": "Updated purchase",
+        "id": "88fcf8de-304d-4820-8f1c-ec880290eb92",
+        "status": "PENDING",
+        "date": "2020-02-29T10:56:56+00:00",
+        "valid_until": "2020-02-29T10:56:56+00:00",
+        "customer_id": "831ff8d4cd5958ab5670",
+        "transactions": []
+      }
+    },
+    {
+      "source_path": "#/components/responses/CheckoutList/content/application~1json/example",
+      "value": [
+        {
+          "checkout_reference": "f00a8f74-b05d-4605-bd73-2a901bae5802",
+          "amount": 10.1,
+          "currency": "EUR",
+          "merchant_code": "MH4H92C7",
+          "description": "Purchase",
+          "id": "4e425463-3e1b-431d-83fa-1e51c2925e99",
+          "status": "PENDING",
+          "date": "2020-02-29T10:56:56+00:00"
+        }
+      ]
+    },
+    {
+      "source_path": "#/components/responses/CheckoutRetrieve/content/application~1json/example",
+      "value": {
+        "checkout_reference": "f00a8f74-b05d-4605-bd73-2a901bae5802",
+        "amount": 10.1,
+        "currency": "EUR",
+        "merchant_code": "MH4H92C7",
+        "description": "Purchase",
+        "id": "4e425463-3e1b-431d-83fa-1e51c2925e99",
+        "status": "PENDING",
+        "date": "2020-02-29T10:56:56+00:00",
+        "transaction_code": "TEENSK4W2K",
+        "transaction_id": "410fc44a-5956-44e1-b5cc-19c6f8d727a4"
+      }
+    },
+    {
+      "source_path": "#/components/responses/Transaction/content/application~1json/example",
+      "value": {
+        "id": "410fc44a-5956-44e1-b5cc-19c6f8d727a4",
+        "transaction_code": "TEENSK4W2K",
+        "amount": 10.1,
+        "currency": "EUR",
+        "timestamp": "2020-02-29T10:56:56.876Z",
+        "status": "SUCCESSFUL",
+        "payment_type": "ECOM",
+        "installments_count": 1,
+        "merchant_code": "MH4H92C7",
+        "vat_amount": 6,
+        "tip_amount": 3,
+        "entry_mode": "CUSTOMER_ENTRY",
+        "auth_code": "053201"
+      }
+    },
+    {
+      "source_path": "#/components/responses/ErrorNotAuthorized/content/application~1json/examples",
+      "value": {
+        "Problem_Details": {
+          "description": "Unauthorized response returned by API gateway.",
+          "value": {
+            "detail": "Unauthorized.",
+            "status": 401,
+            "title": "Unauthorized",
+            "trace_id": "3c77294349d3b5647ea2d990f0d8f017",
+            "type": "https://developer.sumup.com/problem/unauthorized"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/components/responses/ErrorForbidden/content/application~1json/examples",
+      "value": {
+        "Forbidden": {
+          "description": "You do not have required scopes for making this request.",
+          "value": {
+            "error_message": "request_not_allowed",
+            "error_code": "FORBIDDEN",
+            "status_code": "403"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/components/responses/ErrorNotFound/content/application~1json/examples",
+      "value": {
+        "Not_Found": {
+          "description": "The identified resource is not found on the server.",
+          "value": {
+            "error_code": "NOT_FOUND",
+            "message": "Resource not found"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/components/responses/ErrorConflict/content/application~1json/examples",
+      "value": {
+        "Checkout_Processed": {
+          "description": "The identified checkout resource is already processed.",
+          "value": {
+            "error_code": "CHECKOUT_PROCESSED",
+            "message": "Checkout is already processed"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/components/responses/BadRequest/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/bad-request",
+        "title": "Bad Request",
+        "status": 400,
+        "detail": "Request validation failed."
+      }
+    },
+    {
+      "source_path": "#/components/responses/Unauthorized/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/unauthorized",
+        "title": "Unauthorized",
+        "status": 401,
+        "detail": "Authentication credentials are missing or invalid."
+      }
+    },
+    {
+      "source_path": "#/components/responses/NotFound/content/application~1problem+json/example",
+      "value": {
+        "type": "https://developer.sumup.com/problem/not-found",
+        "title": "Requested resource couldn't be found.",
+        "status": 404,
+        "detail": "The requested resource doesn't exist or does not belong to you."
+      }
+    },
+    {
+      "source_path": "#/components/responses/ListMemberships/content/application~1json/schema/properties/total_count/example",
+      "value": 3
+    },
+    {
+      "source_path": "#/components/responses/ListMembers/content/application~1json/schema/properties/total_count/example",
+      "value": 3
+    },
+    {
+      "source_path": "#/components/parameters/CheckoutReference/schema/example",
+      "value": "f00a8f74-b05d-4605-bd73-2a901bae5802"
+    },
+    {
+      "source_path": "#/components/parameters/CheckoutID/schema/example",
+      "value": "4e425463-3e1b-431d-83fa-1e51c2925e99"
+    },
+    {
+      "source_path": "#/components/parameters/CustomerID/schema/example",
+      "value": "831ff8d4cd5958ab5670"
+    },
+    {
+      "source_path": "#/components/parameters/Token/schema/example",
+      "value": "bcfc8e5f-3b47-4cb9-854b-3b7a4cce7be3"
+    },
+    {
+      "source_path": "#/components/parameters/TransactionCode/schema/example",
+      "value": "TEENSK4W2K"
+    },
+    {
+      "source_path": "#/components/parameters/LimitFilter/schema/example",
+      "value": 10
+    },
+    {
+      "source_path": "#/components/parameters/UsersFilter/example",
+      "value": [
+        "merchant@example.com"
+      ]
+    },
+    {
+      "source_path": "#/components/parameters/UsersFilter/schema/example",
+      "value": [
+        "merchant@example.com"
+      ]
+    },
+    {
+      "source_path": "#/components/parameters/StatusesFilter/schema/example",
+      "value": [
+        "SUCCESSFUL",
+        "REFUNDED"
+      ]
+    },
+    {
+      "source_path": "#/components/parameters/PaymentTypesFilter/schema/example",
+      "value": [
+        "ECOM",
+        "POS"
+      ]
+    },
+    {
+      "source_path": "#/components/parameters/EntryModesFilter/schema/example",
+      "value": [
+        "CUSTOMER_ENTRY",
+        "CHIP"
+      ]
+    },
+    {
+      "source_path": "#/components/parameters/TypesFilter/schema/example",
+      "value": [
+        "PAYMENT",
+        "REFUND"
+      ]
+    },
+    {
+      "source_path": "#/components/parameters/ChangesSinceFilter/schema/example",
+      "value": "2019-08-28T09:00:00Z"
+    },
+    {
+      "source_path": "#/components/parameters/NewestTimeFilter/schema/example",
+      "value": "2019-08-29T09:00:00Z"
+    },
+    {
+      "source_path": "#/components/parameters/NewestRefFilter/schema/example",
+      "value": "090df9bf-93b7-40f1-8181-fbdb236568a1"
+    },
+    {
+      "source_path": "#/components/parameters/TransactionID/schema/example",
+      "value": "410fc44a-5956-44e1-b5cc-19c6f8d727a4"
+    },
+    {
+      "source_path": "#/components/examples",
+      "value": {
+        "CreatedReader": {
+          "summary": "A reader that waits for the physical device to acknowledge the pairing.",
+          "value": {
+            "id": "rdr_3MSAFM23CK82VSTT4BN6RWSQ65",
+            "name": "Frontdesk",
+            "status": "processing",
+            "device": {
+              "identifier": "U1DT3NA00-CN",
+              "model": "solo"
+            },
+            "created_at": "2023-05-09T14:50:20.214Z",
+            "updated_at": "2023-05-09T14:52:58.714Z"
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/webhooks/readers.created/post/requestBody/content/application~1json/examples",
+      "value": {
+        "created": {
+          "summary": "A reader created webhook event.",
+          "value": {
+            "id": "evt_reader_123",
+            "type": "readers.created",
+            "created_at": "2023-05-09T14:52:58.714Z",
+            "object": {
+              "id": "rdr_3MSAFM23CK82VSTT4BN6RWSQ65",
+              "type": "reader",
+              "url": "https://api.sumup.com/v0.1/merchants/MC0DE/readers/rdr_3MSAFM23CK82VSTT4BN6RWSQ65"
+            }
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/webhooks/readers.deleted/post/requestBody/content/application~1json/examples",
+      "value": {
+        "deleted": {
+          "summary": "A reader deleted webhook event.",
+          "value": {
+            "id": "evt_reader_456",
+            "type": "readers.deleted",
+            "created_at": "2023-05-10T09:21:33.004Z",
+            "object": {
+              "id": "rdr_3MSAFM23CK82VSTT4BN6RWSQ65",
+              "type": "reader",
+              "url": "https://api.sumup.com/v0.1/merchants/MC0DE/readers/rdr_3MSAFM23CK82VSTT4BN6RWSQ65"
+            }
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/webhooks/members.created/post/requestBody/content/application~1json/examples",
+      "value": {
+        "created": {
+          "summary": "A member created webhook event.",
+          "value": {
+            "id": "evt_membership_123",
+            "type": "members.created",
+            "created_at": "2026-05-14T08:30:00Z",
+            "object": {
+              "id": "mem_123",
+              "type": "member",
+              "url": "https://api.sumup.com/v0.1/merchants/MC0DE/members/mem_123"
+            }
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/webhooks/members.updated/post/requestBody/content/application~1json/examples",
+      "value": {
+        "updated": {
+          "summary": "A member updated webhook event.",
+          "value": {
+            "id": "evt_membership_456",
+            "type": "members.updated",
+            "created_at": "2026-05-14T09:15:00Z",
+            "object": {
+              "id": "mem_123",
+              "type": "member",
+              "url": "https://api.sumup.com/v0.1/merchants/MC0DE/members/mem_123"
+            }
+          }
+        }
+      }
+    },
+    {
+      "source_path": "#/webhooks/members.deleted/post/requestBody/content/application~1json/examples",
+      "value": {
+        "deleted": {
+          "summary": "A member deleted webhook event.",
+          "value": {
+            "id": "evt_membership_789",
+            "type": "members.deleted",
+            "created_at": "2026-05-14T10:45:00Z",
+            "object": {
+              "id": "mem_123",
+              "type": "member",
+              "url": "https://api.sumup.com/v0.1/merchants/MC0DE/members/mem_123"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

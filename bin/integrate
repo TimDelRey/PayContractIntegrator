@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+require_relative "../config/environment"
+
+parser = IntegrationGenerator::Parser.new
+generator = IntegrationGenerator::Generator.new
+worker = IntegrationGenerator::MainWorker.new(parser: parser, generator: generator)
+
+exit worker.call(ARGV)

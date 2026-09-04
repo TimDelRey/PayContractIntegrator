@@ -15,15 +15,24 @@ module IntegrationGeneratorContractHelpers
       provider_key: "novapay",
       provider_class: "NovapayService",
       env_prefix: "NOVAPAY",
-      base_urls: [ "https://sandbox.example.test/v1" ],
-      auth_schemes: [ { type: :api_key, location: :header, name: "X-API-Key" } ],
-      operations: [ operation_ir ],
-      webhooks: [],
-      status_map: { "pending" => "in_progress", "completed" => "approved" },
-      error_map: { "validation_error" => "validation_error" },
-      money_transformations: [ { field: "amount", from: "rub", to: "kopeck", multiplier: 100 } ],
-      configuration: [ "api_key", "base_url" ],
-      source_metadata: { name: "provider_api.yaml", openapi: "3.1.0" }
+      base_urls: deeply_frozen([ "https://sandbox.example.test/v1" ]),
+      auth_schemes: deeply_frozen([ { type: :api_key, location: :header, name: "X-API-Key" } ]),
+      operations: deeply_frozen([ operation_ir ]),
+      webhooks: deeply_frozen([]),
+      status_map: deeply_frozen({ "pending" => "in_progress", "completed" => "approved" }),
+      error_map: deeply_frozen({ "validation_error" => "validation_error" }),
+      money_transformations: deeply_frozen([
+        { field: "amount", from: "rub", to: "kopeck", multiplier: 100, rounding: :exact }
+      ]),
+      idempotency: deeply_frozen({ operation_id: "createPayout", location: :header, name: "Idempotency-Key" }),
+      configuration: deeply_frozen([ "api_key", "base_url" ]),
+      source_metadata: deeply_frozen({
+        name: "provider_api.yaml",
+        openapi: "3.1.0",
+        mapping_name: "integration_mapping.yml",
+        mapping_schema_version: "1.0",
+        adapter_contract_version: "1"
+      })
     )
   end
 
@@ -33,8 +42,8 @@ module IntegrationGeneratorContractHelpers
       role: :create_request,
       method: :post,
       path: "/payouts",
-      parameters: [],
-      request_fields: [
+      parameters: deeply_frozen([]),
+      request_fields: deeply_frozen([
         IntegrationGenerator::FieldIR.new(
           source_name: "amount",
           target_name: "amount",
@@ -42,13 +51,16 @@ module IntegrationGeneratorContractHelpers
           required: true,
           nullable: false,
           type: :integer,
-          format: nil,
+          format: :int64,
           transformation: :rub_to_kopeck,
           default: nil
         )
-      ],
-      responses: [ { status: 201, schema: "Payout", example: { "id" => "np_test", "status" => "pending" } } ],
-      idempotency: { location: :header, name: "Idempotency-Key" }
+      ]),
+      responses: deeply_frozen([
+        { status: 201, schema: "Payout", example: { "id" => "np_test", "status" => "pending" } },
+        { status: 422, schema: "ProviderError", example: { "error" => { "code" => "validation_error" } } }
+      ]),
+      idempotency: deeply_frozen({ location: :header, name: "Idempotency-Key" })
     )
   end
 
@@ -56,7 +68,7 @@ module IntegrationGeneratorContractHelpers
     <<~YAML
       openapi: 3.1.0
       info:
-        title: NovaPay
+        title: Synthetic Payments API
         version: 1.0.0
       servers:
         - url: https://sandbox.example.test/v1
@@ -64,7 +76,6 @@ module IntegrationGeneratorContractHelpers
         /payouts:
           post:
             operationId: createPayout
-            x-integration-role: create_request
             security:
               - ApiKeyAuth: []
             requestBody:
@@ -79,6 +90,8 @@ module IntegrationGeneratorContractHelpers
             responses:
               "201":
                 description: Created
+              "422":
+                description: Invalid request
       components:
         securitySchemes:
           ApiKeyAuth:
@@ -86,5 +99,55 @@ module IntegrationGeneratorContractHelpers
             in: header
             name: X-API-Key
     YAML
+  end
+
+  def minimal_mapping
+    <<~YAML
+      schema_version: "1.0"
+      operations:
+        - operation_id: createPayout
+          role: create_request
+          fields:
+            amount:
+              target: amount
+              required: true
+              nullable: false
+          money:
+            field: amount
+            from: rub
+            to: kopeck
+            multiplier: 100
+            rounding: exact
+          idempotency:
+            location: header
+            name: Idempotency-Key
+      status_map:
+        pending: in_progress
+        completed: approved
+      error_map:
+        validation_error: validation_error
+      configuration:
+        - api_key
+        - base_url
+    YAML
+  end
+
+  def mapping_without_operation_semantics
+    <<~YAML
+      schema_version: "1.0"
+      operations: []
+    YAML
+  end
+
+  private
+
+  def deeply_frozen(value)
+    case value
+    when Hash
+      value.each { |key, nested| deeply_frozen(key); deeply_frozen(nested) }
+    when Array
+      value.each { |nested| deeply_frozen(nested) }
+    end
+    value.freeze
   end
 end

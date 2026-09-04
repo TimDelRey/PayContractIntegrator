@@ -5,35 +5,107 @@ require_relative "support/integration_generator_contract_helpers"
 class CliContractTest < ActiveSupport::TestCase
   include IntegrationGeneratorContractHelpers
 
-  test "CLI exposes one successful generation flow and resulting paths" do
-    stdout = StringIO.new
-    stderr = StringIO.new
-    pipeline = Object.new
-    pipeline.define_singleton_method(:call) { |**| [ :ok, %w[output/novapay_service.rb output/INTEGRATION.md output/fixtures.json] ] }
-    cli = IntegrationGenerator::CLI.new(stdout: stdout, stderr: stderr, pipeline: pipeline)
+  test "CLI exposes a successful flat-layout generation flow" do
+    stdout, stderr, calls, cli = build_cli(
+      result: [ :ok, %w[output/novapay_service.rb output/INTEGRATION.md output/fixtures.json] ]
+    )
 
-    status = cli.call(%w[--spec provider_api.yaml --provider novapay --lang ruby --output output])
+    status = cli.call(base_arguments + %w[--layout flat --output output])
 
     assert_equal 0, status
     assert_empty stderr.string
+    assert_equal 1, calls.size
+    assert_equal "integration_mapping.yml", calls.fetch(0).fetch(:mapping)
+    assert_equal "flat", calls.fetch(0).fetch(:layout)
     assert_match "output/novapay_service.rb", stdout.string
     assert_match "output/INTEGRATION.md", stdout.string
     assert_match "output/fixtures.json", stdout.string
   end
 
-  test "CLI surfaces unsupported constructs and fallback information" do
-    stdout = StringIO.new
-    stderr = StringIO.new
-    pipeline = Object.new
-    pipeline.define_singleton_method(:call) do |**|
-      [ :unsupported, [ "remote_reference_unsupported: no network fallback was used" ] ]
-    end
-    cli = IntegrationGenerator::CLI.new(stdout: stdout, stderr: stderr, pipeline: pipeline)
+  test "CLI publishes the service under the Rails layout" do
+    stdout, stderr, calls, cli = build_cli(
+      result: [ :ok, %w[output/app/services/provider/novapay_service.rb output/INTEGRATION.md output/fixtures.json] ]
+    )
+
+    status = cli.call(base_arguments + %w[--layout rails --output output])
+
+    assert_equal 0, status
+    assert_empty stderr.string
+    assert_equal 1, calls.size
+    assert_equal "rails", calls.fetch(0).fetch(:layout)
+    assert_match "output/app/services/provider/novapay_service.rb", stdout.string
+  end
+
+  test "CLI requires the versioned mapping before invoking the pipeline" do
+    _stdout, stderr, calls, cli = build_cli(result: [ :ok, [] ])
 
     status = cli.call(%w[--spec provider_api.yaml --provider novapay --lang ruby])
 
+    assert_equal 2, status
+    assert_empty calls
+    assert_match(/--mapping/, stderr.string)
+  end
+
+  test "CLI surfaces structured unsupported diagnostics and fallback information" do
+    diagnostic = IntegrationGenerator::Diagnostic.new(
+      severity: :error,
+      code: :remote_reference_unsupported,
+      message: "Remote references are unsupported; no network fallback was used",
+      source_path: "#/paths/~1payouts/post/requestBody/$ref",
+      hint: "Replace the remote reference with a local component"
+    )
+    _stdout, stderr, _calls, cli = build_cli(result: [ :unsupported, [ diagnostic ] ])
+
+    status = cli.call(base_arguments)
+
     assert_equal 3, status
     assert_match "remote_reference_unsupported", stderr.string
+    assert_match diagnostic.source_path, stderr.string
+    assert_match diagnostic.hint, stderr.string
     assert_match "fallback", stderr.string
+  end
+
+  test "CLI maps generation and publication failures to stable exit codes" do
+    _stdout, _stderr, _calls, generation_cli = build_cli(result: [ :generation_failed, [ "verification failed" ] ])
+    _stdout, _stderr, _calls, publication_cli = build_cli(result: [ :publication_failed, [ "output conflict" ] ])
+
+    assert_equal 4, generation_cli.call(base_arguments)
+    assert_equal 5, publication_cli.call(base_arguments + %w[--force])
+  end
+
+  test "CLI help succeeds without invoking the pipeline" do
+    stdout, stderr, calls, cli = build_cli(result: [ :ok, [] ])
+
+    assert_equal 0, cli.call([ "--help" ])
+    assert_empty stderr.string
+    assert_empty calls
+    assert_match "--mapping", stdout.string
+    assert_match "--layout", stdout.string
+    assert_match "--force", stdout.string
+  end
+
+  private
+
+  def base_arguments
+    %w[
+      --spec provider_api.yaml
+      --mapping integration_mapping.yml
+      --provider novapay
+      --lang ruby
+    ]
+  end
+
+  def build_cli(result:)
+    stdout = StringIO.new
+    stderr = StringIO.new
+    calls = []
+    pipeline = Object.new
+    pipeline.define_singleton_method(:call) do |**arguments|
+      calls << arguments
+      result
+    end
+    cli = IntegrationGenerator::CLI.new(stdout: stdout, stderr: stderr, pipeline: pipeline)
+
+    [ stdout, stderr, calls, cli ]
   end
 end

@@ -1,0 +1,47 @@
+---
+version: 1
+retrieved_at: '2026-09-04'
+fixtures:
+  sumup:
+    file: sumup_provider_api.yaml
+    provider: SumUp
+    openapi: 3.0.3
+    upstream_format: yaml
+    repository: https://github.com/sumup/sumup-openapi
+    source: https://raw.githubusercontent.com/sumup/sumup-openapi/d97c26115cb1d2c7e108bd3f79a74f9a3460a761/openapi.yaml
+    commit: d97c26115cb1d2c7e108bd3f79a74f9a3460a761
+    license: Apache-2.0
+    sha256: 5f752211d29897ad2f7f1f533fdc3bfc1a40ebd7c413fd480ddc91eba65a422f
+    role: primary_end_to_end
+    examples_file: sumup_examples.json
+    examples_count: 669
+    examples_sha256: f30cb747198219a5a5aea318a8c553cb63636eca68c2b2823731a2e93d8d9567
+  adyen:
+    file: adyen_provider_api.yaml
+    provider: Adyen Payout Service v64
+    openapi: 3.1.0
+    upstream_format: yaml
+    repository: https://github.com/Adyen/adyen-openapi
+    source: https://raw.githubusercontent.com/Adyen/adyen-openapi/f82d1fe674e536cc2c6b0d7946e0e827873a4fbf/yaml/PayoutService-v64.yaml
+    commit: f82d1fe674e536cc2c6b0d7946e0e827873a4fbf
+    license: MIT
+    sha256: 31807f74faf4bea46d274f6c03d7c11cd6e86328e4a9c23adb56580a07b50ff7
+    role: payout_and_complex_models
+    examples_file: adyen_examples.json
+    examples_count: 15
+    examples_sha256: 19f87037c583892a354724f654e80c39cbd20b5dfde147639bb6de3ba4c01cd8
+  paypal:
+    file: paypal_provider_api.yaml
+    provider: PayPal Payouts Batch v1
+    openapi: 3.0.3
+    upstream_format: json
+    repository: https://github.com/paypal/paypal-rest-api-specifications
+    source: https://raw.githubusercontent.com/paypal/paypal-rest-api-specifications/90e8041ffe02d80c452d2b476bedd59a8d219bdc/openapi/payments_payouts_batch_v1.json
+    commit: 90e8041ffe02d80c452d2b476bedd59a8d219bdc
+    license: Apache-2.0
+    transformation: Parsed with Ruby JSON and serialized with Psych.dump; data structure unchanged.
+    sha256: bbf3de16e22d42c6768dfa0e24424a848eb8445d54d47673d51304a51c708be1
+    role: json_to_yaml_and_payouts
+    examples_file: paypal_examples.json
+    examples_count: 3
+    examples_sha256: 50cec089105e02ac4ebd6be5a025ceec20759f3367b1365a0f409a36e256d1d7

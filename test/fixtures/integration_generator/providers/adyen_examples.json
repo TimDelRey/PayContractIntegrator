@@ -1,0 +1,248 @@
+{
+  "provider": "adyen",
+  "source_file": "adyen_provider_api.yaml",
+  "examples": [
+    {
+      "source_path": "#/paths/~1confirmThirdParty/post/requestBody/content/application~1json/examples",
+      "value": {
+        "confirmThirdParty": {
+          "$ref": "#/components/examples/post-confirmThirdParty-confirmThirdParty"
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1confirmThirdParty/post/responses/200/content/application~1json/examples",
+      "value": {
+        "confirmThirdParty": {
+          "$ref": "#/components/examples/post-confirmThirdParty-confirmThirdParty-200"
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1confirmThirdParty/post/responses/400/content/application~1json/examples",
+      "value": {
+        "generic": {
+          "$ref": "#/components/examples/generic-400"
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1declineThirdParty/post/requestBody/content/application~1json/examples",
+      "value": {
+        "declineThirdParty": {
+          "$ref": "#/components/examples/post-declineThirdParty-declineThirdParty"
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1declineThirdParty/post/responses/200/content/application~1json/examples",
+      "value": {
+        "declineThirdParty": {
+          "$ref": "#/components/examples/post-declineThirdParty-declineThirdParty-200"
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1declineThirdParty/post/responses/400/content/application~1json/examples",
+      "value": {
+        "generic": {
+          "$ref": "#/components/examples/generic-400"
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1payout/post/requestBody/content/application~1json/examples",
+      "value": {
+        "payout-b2c": {
+          "$ref": "#/components/examples/post-payout-payout-b2c"
+        },
+        "payout-p2p": {
+          "$ref": "#/components/examples/post-payout-payout-p2p"
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1payout/post/responses/400/content/application~1json/examples",
+      "value": {
+        "generic": {
+          "$ref": "#/components/examples/generic-400"
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1storeDetail/post/responses/200/content/application~1json/examples",
+      "value": {
+        "storeDetail": {
+          "$ref": "#/components/examples/post-storeDetail-storeDetail-200"
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1storeDetail/post/responses/400/content/application~1json/examples",
+      "value": {
+        "generic": {
+          "$ref": "#/components/examples/generic-400"
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1storeDetailAndSubmitThirdParty/post/responses/400/content/application~1json/examples",
+      "value": {
+        "generic": {
+          "$ref": "#/components/examples/generic-400"
+        }
+      }
+    },
+    {
+      "source_path": "#/paths/~1submitThirdParty/post/responses/400/content/application~1json/examples",
+      "value": {
+        "generic": {
+          "$ref": "#/components/examples/generic-400"
+        }
+      }
+    },
+    {
+      "source_path": "#/components/schemas/ResponseAdditionalDataCommon/properties/cvcResult/example",
+      "value": "1 Matches"
+    },
+    {
+      "source_path": "#/components/schemas/ResponseAdditionalDataCommon/properties/cvcResultRaw/example",
+      "value": "M"
+    },
+    {
+      "source_path": "#/components/examples",
+      "value": {
+        "generic-400": {
+          "summary": "Response code 400. Bad Request.",
+          "value": {
+            "status": 400,
+            "errorCode": "702",
+            "message": "Unexpected input: I",
+            "errorType": "validation"
+          }
+        },
+        "post-confirmThirdParty-confirmThirdParty": {
+          "summary": "Confirm a payout",
+          "description": "Confirm a previously submitted payout",
+          "value": {
+            "merchantAccount": "YOUR_MERCHANT_ACCOUNT",
+            "originalReference": "9913140798220028"
+          }
+        },
+        "post-confirmThirdParty-confirmThirdParty-200": {
+          "summary": "Example response for request 'confirmThirdParty'",
+          "value": {
+            "pspReference": "991617894325358C",
+            "response": "[payout-confirm-received]"
+          }
+        },
+        "post-declineThirdParty-declineThirdParty": {
+          "summary": "Cancel a payout",
+          "description": "Cancel a previously submitted payout",
+          "value": {
+            "merchantAccount": "YOUR_MERCHANT_ACCOUNT",
+            "originalReference": "9913140798220028"
+          }
+        },
+        "post-declineThirdParty-declineThirdParty-200": {
+          "summary": "Example response for request 'declineThirdParty'",
+          "value": {
+            "pspReference": "991617894325360J",
+            "response": "[payout-decline-received]"
+          }
+        },
+        "post-payout-payout-b2c": {
+          "summary": "Instant card payout (B2C)",
+          "description": "Pay out to your sellers, customers, freelancers, etc",
+          "value": {
+            "amount": {
+              "value": 2500,
+              "currency": "USD"
+            },
+            "card": {
+              "number": "4111111111111111",
+              "expiryMonth": "03",
+              "expiryYear": "2030",
+              "holderName": "John Smith"
+            },
+            "billingAddress": {
+              "houseNumberOrName": "121",
+              "street": "Brannan Street",
+              "city": "Beverly Hills",
+              "postalCode": "90210",
+              "stateOrProvince": "CA",
+              "country": "US"
+            },
+            "merchantAccount": "YOUR_MERCHANT_ACCOUNT",
+            "reference": "P9999999999999999",
+            "shopperName": {
+              "firstName": "John",
+              "lastName": "Smith"
+            }
+          }
+        },
+        "post-payout-payout-p2p": {
+          "summary": "Instant card payout (P2P)",
+          "description": "Facilitate the transfer of money between two individuals",
+          "value": {
+            "amount": {
+              "value": 2500,
+              "currency": "USD"
+            },
+            "card": {
+              "number": "4111111111111111",
+              "expiryMonth": "03",
+              "expiryYear": "2030",
+              "holderName": "John Smith"
+            },
+            "billingAddress": {
+              "houseNumberOrName": "121",
+              "street": "Brannan Street",
+              "city": "Beverly Hills",
+              "postalCode": "90210",
+              "stateOrProvince": "CA",
+              "country": "US"
+            },
+            "fundSource": {
+              "additionalData": {
+                "fundingSource": "DEBIT"
+              },
+              "billingAddress": {
+                "houseNumberOrName": "121",
+                "street": "Brannan Street",
+                "city": "Beverly Hills",
+                "postalCode": "90210",
+                "stateOrProvince": "CA",
+                "country": "US"
+              },
+              "card": {
+                "expiryMonth": "03",
+                "expiryYear": "2030",
+                "holderName": "Payer Name",
+                "number": "4400000000000008"
+              },
+              "shopperName": {
+                "firstName": "Payer",
+                "lastName": "Name"
+              }
+            },
+            "merchantAccount": "YOUR_MERCHANT_ACCOUNT",
+            "reference": "P9999999999999999",
+            "shopperName": {
+              "firstName": "John",
+              "lastName": "Smith"
+            }
+          }
+        },
+        "post-storeDetail-storeDetail-200": {
+          "summary": "Example response for request 'storeDetail'",
+          "value": {
+            "pspReference": "991617894326362D",
+            "recurringDetailReference": "9916178936754752",
+            "resultCode": "Success"
+          }
+        }
+      }
+    }
+  ]
+}
