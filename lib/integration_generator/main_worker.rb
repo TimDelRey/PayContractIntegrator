@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module IntegrationGenerator
   class MainWorker
     def initialize(parser:, generator:)

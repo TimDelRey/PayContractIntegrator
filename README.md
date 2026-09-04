@@ -1,24 +1,27 @@
-# README
+# PayContractIntegrator
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Ruby CLI для генерации интеграций платёжных провайдеров из публичных OpenAPI-спецификаций.
 
-Things you may want to cover:
+Проект использует текущую версию Ruby из `.ruby-version` и не зависит от веб-фреймворка, базы данных или веб-сервера.
 
-* Ruby version
+## Подготовка
 
-* System dependencies
+```bash
+bin/setup
+```
 
-* Configuration
+## Запуск
 
-* Database creation
+```bash
+bin/integrate --spec provider_api.yaml --mapping integration_mapping.yml --provider novapay --lang ruby
+```
 
-* Database initialization
+Главный worker выполняет два последовательных этапа: parsing и generation.
 
-* How to run the test suite
+## Проверки
 
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+```bash
+bundle exec rake test
+bundle exec rubocop
+bin/bundler-audit check
+```

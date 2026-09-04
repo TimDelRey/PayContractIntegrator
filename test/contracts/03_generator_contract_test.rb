@@ -2,7 +2,7 @@ require "test_helper"
 require "json"
 require_relative "support/integration_generator_contract_helpers"
 
-class GeneratorContractTest < ActiveSupport::TestCase
+class GeneratorContractTest < Minitest::Test
   include IntegrationGeneratorContractHelpers
 
   test "generator creates a complete deterministic artifact set from IR" do

@@ -1,7 +1,7 @@
 require "test_helper"
 require_relative "support/integration_generator_contract_helpers"
 
-class IrContractTest < ActiveSupport::TestCase
+class IrContractTest < Minitest::Test
   include IntegrationGeneratorContractHelpers
 
   test "IR exposes the frozen boundary between compiler and generator" do

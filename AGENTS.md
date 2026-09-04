@@ -10,7 +10,7 @@ Read `AGENTS.local.md` first when it exists; it wins on conflict. Never create, 
 
 ## Current project context
 
-This Rails repository generates Ruby integrations from public payment-provider API specifications. The current requirement is `thoughts/idea_2.md`. Do not use superseded routing requirements, contracts, tests, or terminology as product requirements.
+This Ruby CLI repository generates Ruby integrations from public payment-provider API specifications. The current requirement is `thoughts/idea_2.md`. Do not use superseded routing requirements, contracts, tests, or terminology as product requirements.
 
 The pipeline safely parses a provider specification, normalizes it into a provider-neutral intermediate representation (IR), validates supported semantics, and generates a `Provider::BaseService` implementation, `INTEGRATION.md`, `fixtures.json`, and a clear CLI result.
 
@@ -23,7 +23,7 @@ When supplied data or repository contracts are missing or ambiguous, research be
 - Prefer supplied case files and validators for project-specific behavior.
 - Use official public provider API documentation for provider behavior.
 - Use the official OpenAPI specification matching the declared document version for API-description semantics.
-- Prefer official Ruby documentation, Rails Guides/API docs, primary payment/security standards, regulator or payment-network guidance.
+- Prefer official Ruby documentation, primary payment/security standards, regulator or payment-network guidance.
 - Treat unresolved review findings as explicit research tasks before implementation.
 - Record source URL, version/access date, conclusion, and affected contract/test in development notes.
 - If research cannot resolve ambiguity, report an unsupported or ambiguous construct to the caller and user. Never invent provider behavior.
@@ -76,7 +76,7 @@ Use Minitest unless the repository convention changes.
 
 ## Dependencies
 
-Prefer Ruby standard library, existing Rails facilities, and existing dependencies. Add only open-source dependencies with a concrete need after checking maintenance, license, and security. Proprietary technology and neural networks inside the project are prohibited.
+Prefer Ruby standard library, and existing dependencies. Add only open-source dependencies with a concrete need after checking maintenance, license, and security. Proprietary technology and neural networks inside the project are prohibited.
 
 ## Change workflow
 

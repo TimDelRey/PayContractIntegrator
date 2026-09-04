@@ -2,7 +2,7 @@ require "test_helper"
 require "stringio"
 require_relative "support/integration_generator_contract_helpers"
 
-class CliContractTest < ActiveSupport::TestCase
+class CliContractTest < Minitest::Test
   include IntegrationGeneratorContractHelpers
 
   test "CLI exposes a successful flat-layout generation flow" do
@@ -10,30 +10,15 @@ class CliContractTest < ActiveSupport::TestCase
       result: [ :ok, %w[output/novapay_service.rb output/INTEGRATION.md output/fixtures.json] ]
     )
 
-    status = cli.call(base_arguments + %w[--layout flat --output output])
+    status = cli.call(base_arguments + %w[--output output])
 
     assert_equal 0, status
     assert_empty stderr.string
     assert_equal 1, calls.size
     assert_equal "integration_mapping.yml", calls.fetch(0).fetch(:mapping)
-    assert_equal "flat", calls.fetch(0).fetch(:layout)
     assert_match "output/novapay_service.rb", stdout.string
     assert_match "output/INTEGRATION.md", stdout.string
     assert_match "output/fixtures.json", stdout.string
-  end
-
-  test "CLI publishes the service under the Rails layout" do
-    stdout, stderr, calls, cli = build_cli(
-      result: [ :ok, %w[output/app/services/provider/novapay_service.rb output/INTEGRATION.md output/fixtures.json] ]
-    )
-
-    status = cli.call(base_arguments + %w[--layout rails --output output])
-
-    assert_equal 0, status
-    assert_empty stderr.string
-    assert_equal 1, calls.size
-    assert_equal "rails", calls.fetch(0).fetch(:layout)
-    assert_match "output/app/services/provider/novapay_service.rb", stdout.string
   end
 
   test "CLI requires the versioned mapping before invoking the pipeline" do
@@ -80,7 +65,6 @@ class CliContractTest < ActiveSupport::TestCase
     assert_empty stderr.string
     assert_empty calls
     assert_match "--mapping", stdout.string
-    assert_match "--layout", stdout.string
     assert_match "--force", stdout.string
   end
 

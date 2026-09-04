@@ -1,6 +1,10 @@
 #!/usr/bin/env ruby
-require_relative "../config/boot"
-require "active_support/continuous_integration"
+# frozen_string_literal: true
 
-CI = ActiveSupport::ContinuousIntegration
-require_relative "../config/ci.rb"
+commands = [
+  %w[bundle exec rake test],
+  %w[bundle exec rubocop],
+  %w[bin/bundler-audit check]
+]
+
+commands.each { |command| system(*command, exception: true) }

@@ -82,7 +82,7 @@ bin/integrate --spec provider_api.yaml --mapping integration_mapping.yml --provi
 
 Exit codes: `0` success, `2` invalid input/spec, `3` unsupported/ambiguous, `4` generation/verification failure, `5` output conflict/publication failure. CLI показывает стадии, endpoints/auth/webhooks, warnings, fallbacks и итоговые пути.
 
-По умолчанию создаётся flat layout из примера задачи: `output/novapay_service.rb`, `output/INTEGRATION.md`, `output/fixtures.json`. `--layout rails` помещает service в `output/app/services/provider/novapay_service.rb`; остальные файлы остаются в корне. Manifest содержит `service_install_path: app/services/provider/novapay_service.rb`, guide объясняет установку flat-файла, оба layout покрыты acceptance tests.
+Создаётся один простой layout: `output/novapay_service.rb`, `output/INTEGRATION.md`, `output/fixtures.json`. Manifest хранит путь установки сервиса, а guide объясняет, куда перенести сгенерированный файл.
 
 Артефакты сначала создаются и проверяются во временной директории, затем публикуются целиком. Existing output не перезаписывается без `--force`; при ошибке старый output не меняется.
 
@@ -220,7 +220,7 @@ Contract tests должны зеленеть строго в порядке `01 
 
 ### B5. CLI
 
-Реализовать один запуск, обязательный `--mapping`, `--layout flat|rails`, `--help`, defaults, exit codes, `--force`, summary и diagnostics с mapping/adapter versions и install path.
+Реализовать один запуск, обязательный `--mapping`, `--help`, defaults, exit codes, `--force`, summary и diagnostics с mapping/adapter versions и install path.
 
 **Тесты:** `cli_test.rb`, `test/integration/generation_pipeline_test.rb`.
 
@@ -267,7 +267,7 @@ Contract tests должны зеленеть строго в порядке `01 
 
 ## 10. Простая документация и запуск
 
-README объясняет назначение, требования, `bin/setup`, одну команду генерации, spec/mapping inputs, flat/Rails outputs, install path, OpenAPI support matrix и adapter assumption, diagnostics/exit codes, `--force`, тесты и проверки:
+README объясняет назначение, требования, `bin/setup`, одну команду генерации, spec/mapping inputs, output и install path, OpenAPI support matrix и adapter assumption, diagnostics/exit codes, `--force`, тесты и проверки:
 
 ```bash
 bin/setup

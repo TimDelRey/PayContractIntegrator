@@ -1,7 +1,7 @@
 require "test_helper"
 require_relative "support/integration_generator_contract_helpers"
 
-class CompilerContractTest < ActiveSupport::TestCase
+class CompilerContractTest < Minitest::Test
   include IntegrationGeneratorContractHelpers
 
   test "compiler converts OpenAPI and versioned mapping into provider-neutral IR" do

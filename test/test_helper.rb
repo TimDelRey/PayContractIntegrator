@@ -1,9 +1,12 @@
-ENV["RAILS_ENV"] ||= "test"
-require_relative "../config/environment"
-require "rails/test_help"
+# frozen_string_literal: true
 
-module ActiveSupport
-  class TestCase
-    parallelize(workers: :number_of_processors)
+require 'minitest/autorun'
+require_relative '../lib/integration_generator'
+
+module Minitest
+  class Test
+    def self.test(name, &)
+      define_method("test_#{name.gsub(/\s+/, '_')}", &)
+    end
   end
 end
