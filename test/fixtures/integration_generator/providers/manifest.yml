@@ -45,3 +45,13 @@ fixtures:
     examples_file: paypal_examples.json
     examples_count: 3
     examples_sha256: 50cec089105e02ac4ebd6be5a025ceec20759f3367b1365a0f409a36e256d1d7
+  novapay:
+    file: novapay_provider_api.yaml
+    provider: NovaPay Payout API (hackathon case brief)
+    openapi: 3.0.3
+    upstream_format: yaml
+    source: описание.docx (Space Payments hackathon case, "Задача 1" worked example)
+    license: n/a (fictional mock API authored for the case brief, not a public provider)
+    sha256: 415f50ee36fb331dfab49ceed0e8ed3b0ebe16053d7e00dbabd32282f4396551
+    role: case_brief_primary_example
+    retrieved_at: '2026-09-05'
