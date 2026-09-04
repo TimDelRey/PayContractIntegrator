@@ -23,6 +23,21 @@ Do not introduce persistence, controllers, jobs, Redis, Sidekiq, external servic
 
 Prefer plain Ruby objects for domain logic that does not require Rails-specific behavior.
 
+## Provider documentation and missing data
+
+When provider behavior, field semantics, limits, statuses, error codes, retry rules, or another integration detail is missing or ambiguous, search official public provider documentation before making an assumption.
+
+* Prefer first-party provider documentation, API references, schemas, changelogs, and status documentation over blogs, aggregators, or examples from third parties.
+* Treat unresolved questions and risks found during code, architecture, or development-plan review as explicit research tasks before implementation. Research the affected providers and validate the proposed behavior against current payment-industry practices.
+* For industry practices, prefer primary and authoritative sources such as published standards, regulator or payment-network guidance, and provider documentation. For language and framework practices, prefer official Ruby documentation, Rails Guides/API documentation, and the conventions already established in this repository.
+* Apply researched practices proportionally to the current task. Do not introduce speculative infrastructure, compliance claims, or complexity that the repository does not require.
+* Record the source URL, document version or access date, and the conclusion that affects implementation or tests.
+* Capture each material research conclusion in the development plan or decision notes, then reflect it in the relevant contract, configuration, and focused tests so the decision remains traceable.
+* Treat repository requirements, supplied case data, samples, and validators as authoritative for this project when they intentionally differ from real provider behavior.
+* If official public documentation does not resolve the ambiguity, state the remaining assumption explicitly in the development notes and encode it in configuration or a focused test where appropriate.
+* Do not invent undocumented provider behavior or silently copy behavior from a different provider.
+* Documentation research is read-only authorization. Never call a live payment API, create provider resources, use credentials, or initiate money movement unless explicitly authorized.
+
 ## Engineering principles
 
 * Prefer the simplest implementation that fully satisfies the requirement.
@@ -103,6 +118,8 @@ Handle expected domain failures explicitly.
 Do not broadly rescue errors just to continue execution.
 
 Never convert unexpected programming errors into valid-looking payment results.
+
+Never hide fallback behavior as an ordinary successful path. Surface fallback usage to the caller and ultimately to the user, including why fallback was required, which prior options were exhausted or rejected, and the resulting status. If fallback itself fails or its behavior is ambiguous, propagate that condition explicitly instead of silently recovering.
 
 Use domain-specific errors or result objects when they make behavior clearer.
 
