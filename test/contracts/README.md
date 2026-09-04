@@ -1,29 +1,19 @@
-# Transitional routing contracts
+# Transitional integration-generator contracts
 
-These tests intentionally describe the agreed boundary before production modules exist. A missing constant or a failing assertion is expected until its milestone is implemented; do not skip, loosen, or delete a contract merely to make CI green.
-
-Run milestones independently:
+These tests freeze the boundary between two developers before production modules exist. They intentionally fail on missing `IntegrationGenerator::*` constants and become green by milestone; do not skip or weaken them to satisfy CI.
 
 ```bash
-bin/rails test test/contracts/01_value_objects_contract_test.rb
-bin/rails test test/contracts/02_eligibility_checker_contract_test.rb
-bin/rails test test/contracts/03_engine_contract_test.rb
-bin/rails test test/contracts/04_routing_io_contract_test.rb
-bin/rails test test/contracts/05_output_contract_test.rb
+bin/rails test test/contracts/01_ir_contract_test.rb
+bin/rails test test/contracts/02_compiler_contract_test.rb
+bin/rails test test/contracts/03_generator_contract_test.rb
+bin/rails test test/contracts/04_cli_contract_test.rb
 ```
 
-Expected progression:
+Progression:
 
-1. `01` becomes green when `Routing` value objects and errors are implemented.
-2. `02` becomes green when all hard constraints and ordered violations are implemented.
-3. `03` becomes green when Engine, cascade, fallback, and state transitions are implemented.
-4. `04` becomes green when input normalization and deterministic simulation are implemented.
-5. `05` becomes green when external projections and analytics are implemented.
+1. Shared contract freeze makes `01` green.
+2. Developer A completes Spec Compiler and makes `02` green.
+3. Developer B completes artifact generation against frozen IR and makes `03` green.
+4. Integration makes `04` green.
 
-The complete contract suite is:
-
-```bash
-bin/rails test test/contracts
-```
-
-Before changing a public field, enum, reason code, or method signature, update the development plan and get agreement from both module owners. Tests for module-internal implementation details belong outside this directory.
+Run all contracts with `bin/rails test test/contracts`. Internal unit tests belong under `test/services/integration_generator`; the end-to-end test belongs at `test/integration/generation_pipeline_test.rb`.
