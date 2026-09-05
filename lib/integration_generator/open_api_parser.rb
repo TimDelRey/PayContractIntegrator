@@ -52,10 +52,8 @@ module IntegrationGenerator
       return if servers.any?
 
       raise_error(
-        code: :missing_servers,
-        message: "#{source_name} does not declare any servers",
-        source_path: '#/servers',
-        hint: 'Add at least one https:// server URL'
+        code: :missing_servers, message: "#{source_name} does not declare any servers",
+        source_path: '#/servers', hint: 'Add at least one https:// server URL'
       )
     end
 
@@ -64,9 +62,8 @@ module IntegrationGenerator
       return url if url.is_a?(String) && url.start_with?('https://')
 
       raise_error(
-        code: :unsafe_server_scheme,
+        code: :unsafe_server_scheme, source_path: "#/servers/#{index}/url",
         message: "#{source_name} server ##{index} does not use a literal https:// URL",
-        source_path: "#/servers/#{index}/url",
         hint: 'Use a literal https:// URL; templated or non-HTTPS servers are not supported'
       )
     end
@@ -103,23 +100,30 @@ module IntegrationGenerator
     end
 
     def build_operation(path, method, operation)
+      base_operation(path, method, operation).merge(
+        request_body_schema: request_body_schema(operation),
+        responses: parse_responses(operation['responses']),
+        extensions: extensions_for(operation)
+      ).freeze
+    end
+
+    def base_operation(path, method, operation)
       {
         id: operation['operationId'], method: method.to_sym, path: path,
         tags: Array(operation['tags']).freeze, summary: operation['summary'],
         description: operation['description'], security: Array(operation['security']).freeze,
-        parameters: Array(operation['parameters']).freeze,
-        request_body_schema: operation.dig('requestBody', 'content', 'application/json', 'schema'),
-        responses: parse_responses(operation['responses'])
-      }.freeze
+        parameters: Array(operation['parameters']).freeze
+      }
     end
+
+    def request_body_schema(operation) = operation.dig('requestBody', 'content', 'application/json', 'schema')
+
+    def extensions_for(operation) = operation.select { |key, _| key.start_with?('x-') }.freeze
 
     def parse_responses(responses)
       Array(responses).map do |status, response|
-        {
-          status: status,
-          schema: response.dig('content', 'application/json', 'schema'),
-          example: response.dig('content', 'application/json', 'example')
-        }.freeze
+        { status: status, schema: response.dig('content', 'application/json', 'schema'),
+          example: response.dig('content', 'application/json', 'example') }.freeze
       end.freeze
     end
 
