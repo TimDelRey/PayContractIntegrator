@@ -1,0 +1,1 @@
+Before making changes, read and follow ./AGENTS.md.

@@ -97,6 +97,12 @@ module Generator
     def initialize(**attributes) = super(**attributes.transform_values { |value| deep_freeze(value) })
   end
 
+  GenerationInput = Data.define(
+    :ir,
+    :output,
+    :force
+  )
+
   GeneratedFile = Data.define(
     :type,
     :relative_path,

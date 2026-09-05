@@ -3,8 +3,9 @@
 require_relative '../lib/integration_generator'
 require_relative '../lib/generator'
 
-parser = IntegrationGenerator::Parser.new
-generator = Generator::Runner.new
-worker = Generator::MainWorker.new(parser:, generator:)
+parser = IntegrationGenerator::Compiler.new
+generator = Generator::Runner
+pipeline = Generator::Pipeline.new(compiler: parser, runner_class: generator)
+cli = Generator::CLI.new(pipeline:)
 
-exit worker.call(ARGV)
+exit cli.call(ARGV)
