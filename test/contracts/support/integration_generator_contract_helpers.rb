@@ -1,6 +1,6 @@
-module IntegrationGeneratorContractHelpers
+module GeneratorContractHelpers
   def diagnostic(severity: :warning, code: :optional_description_missing)
-    IntegrationGenerator::Diagnostic.new(
+    Generator::Diagnostic.new(
       severity: severity,
       code: code,
       message: "Description is missing",
@@ -10,8 +10,8 @@ module IntegrationGeneratorContractHelpers
   end
 
   def integration_ir
-    IntegrationGenerator::IntegrationIR.new(
-      schema_version: "1.0",
+    Generator::IntegrationIR.new(
+      contract_version: "1.0",
       provider_key: "novapay",
       provider_class: "NovapayService",
       env_prefix: "NOVAPAY",
@@ -37,14 +37,14 @@ module IntegrationGeneratorContractHelpers
   end
 
   def operation_ir
-    IntegrationGenerator::OperationIR.new(
+    Generator::OperationIR.new(
       id: "createPayout",
       role: :create_request,
       method: :post,
       path: "/payouts",
       parameters: deeply_frozen([]),
       request_fields: deeply_frozen([
-        IntegrationGenerator::FieldIR.new(
+        Generator::FieldIR.new(
           source_name: "amount",
           target_name: "amount",
           location: :body,

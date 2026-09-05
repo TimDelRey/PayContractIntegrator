@@ -2,7 +2,7 @@
 
 require 'test_helper'
 
-class IntegrationGeneratorMainWorkerTest < Minitest::Test
+class GeneratorMainWorkerTest < Minitest::Test
   test 'runs parsing and then generation' do
     calls = []
     parser = callable do |arguments|
@@ -13,7 +13,7 @@ class IntegrationGeneratorMainWorkerTest < Minitest::Test
       calls << [:generation, input]
       0
     end
-    worker = IntegrationGenerator::MainWorker.new(parser: parser, generator: generator)
+    worker = Generator::MainWorker.new(parser:, generator:)
 
     result = worker.call(['--spec', 'provider.yml'])
 
@@ -27,7 +27,7 @@ class IntegrationGeneratorMainWorkerTest < Minitest::Test
   test 'does not run generation when parsing fails' do
     parser = callable { |_arguments| raise ArgumentError, 'invalid input' }
     generator = callable { |_input| flunk 'generation must not run' }
-    worker = IntegrationGenerator::MainWorker.new(parser: parser, generator: generator)
+    worker = Generator::MainWorker.new(parser:, generator:)
 
     error = assert_raises(ArgumentError) { worker.call([]) }
 

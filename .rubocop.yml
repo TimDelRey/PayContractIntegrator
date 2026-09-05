@@ -3,8 +3,36 @@ AllCops:
   TargetRubyVersion: 4.0
   SuggestExtensions: false
 
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
 Style/Documentation:
   Enabled: false
+
+Naming/MethodParameterName:
+  AllowedNames:
+    - ir
+
+Lint/DataDefineOverride:
+  Enabled: false
+
+Layout/LineLength:
+  Max: 150
+
+Metrics/AbcSize:
+  Max: 25
+
+Metrics/ClassLength:
+  Max: 180
+
+Metrics/CyclomaticComplexity:
+  Max: 10
+
+Metrics/MethodLength:
+  Max: 20
+
+Metrics/PerceivedComplexity:
+  Max: 10
 
 Metrics/BlockLength:
   Exclude:

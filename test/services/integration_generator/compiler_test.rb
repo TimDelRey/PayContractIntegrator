@@ -5,7 +5,7 @@ require_relative '../../contracts/support/integration_generator_contract_helpers
 
 # Cases not already pinned down by the frozen test/contracts/02_compiler_contract_test.rb.
 class IntegrationGeneratorCompilerTest < Minitest::Test
-  include IntegrationGeneratorContractHelpers
+  include GeneratorContractHelpers
 
   test 'a malformed mapping surfaces SpecLoader diagnostics, not a crash' do
     result = compiler.call(

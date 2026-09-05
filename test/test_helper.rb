@@ -2,6 +2,7 @@
 
 require 'minitest/autorun'
 require_relative '../lib/integration_generator'
+require_relative '../lib/generator'
 
 module Minitest
   class Test
