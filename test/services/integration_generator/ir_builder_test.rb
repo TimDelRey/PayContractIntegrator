@@ -11,7 +11,7 @@ class IntegrationGeneratorIrBuilderTest < Minitest::Test
       operations: [].freeze,
       source_metadata: {}.freeze
     )
-    operation = IntegrationGenerator::OperationIR.new(
+    operation = Generator::OperationIR.new(
       id: 'createPayout', role: :create_request, method: :post, path: '/payouts',
       parameters: [].freeze, request_fields: [].freeze,
       responses: [{ status: '201', schema: nil, example: nil }.freeze].freeze,
@@ -51,7 +51,7 @@ class IntegrationGeneratorIrBuilderTest < Minitest::Test
     ir = builder.call(parsed: parsed, resolved: resolved, mapping: nil, provider_key: 'novapay', source_name: 'provider_api.yaml')
 
     assert_equal %w[base_url], ir.configuration
-    assert_nil ir.idempotency
+    assert_empty ir.idempotency
   end
 
   test 'records mapping metadata when a mapping was used' do

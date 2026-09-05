@@ -101,6 +101,8 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
         post:
           operationId: payoutWebhook
           security: []
+          parameters:
+            - { name: X-Signature, in: header, required: true, description: "HMAC-SHA256 signature", schema: { type: string } }
           requestBody:
             content:
               application/json:
@@ -108,8 +110,11 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
           responses: { "200": { description: OK } }
     YAML
 
-    assert_equal ['payoutWebhook'], resolved.fetch(:webhooks).map(&:id)
-    assert_empty resolved.fetch(:operations)
+    assert_equal 1, resolved.fetch(:webhooks).size
+    assert_equal(
+      { 'payoutWebhook' => :process_callback },
+      resolved.fetch(:operations).to_h { |operation| [operation.id, operation.role] }
+    )
   end
 
   test 'an explicit mapping role overrides what the heuristic would have picked' do
@@ -124,7 +129,7 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
     YAML
     mapping = { 'operations' => [{ 'operation_id' => 'cancelPayout', 'role' => 'fetch_status' }] }
 
-    resolved = resolver.call(parsed: parsed, mapping: mapping)
+    resolved = resolver.call(parsed: parsed, mapping: mapping, provider_key: 'novapay')
 
     assert_equal [:fetch_status], resolved.fetch(:operations).map(&:role)
   end
@@ -226,12 +231,64 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
     YAML
     mapping = { 'operations' => [{ 'operation_id' => 'createWidget', 'role' => 'create_request' }] }
 
-    resolved = resolver.call(parsed: parsed, mapping: mapping)
+    resolved = resolver.call(parsed: parsed, mapping: mapping, provider_key: 'novapay')
 
     assert_equal(
       { 'createWidget' => :create_request, 'getWidgetStatus' => :fetch_status },
       resolved.fetch(:operations).to_h { |operation| [operation.id, operation.role] }
     )
+  end
+
+  # -- fields: required_if and identifier normalization -----------------------
+
+  test 'a mapping required_if rule is attached to the field, generic and provider-agnostic' do
+    parsed = parse(spec_with_operations(<<~YAML))
+      /payouts:
+        post:
+          operationId: createPayout
+          security: [ApiKeyAuth: []]
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    bank_code: { type: string }
+                    type: { type: string }
+          responses: { "201": { description: Created } }
+    YAML
+    mapping = {
+      'operations' => [
+        { 'operation_id' => 'createPayout',
+          'fields' => { 'bank_code' => { 'required_if' => { 'field' => 'bank_code', 'condition' => { 'field' => 'type', 'equals' => 'sbp' } } } } }
+      ]
+    }
+
+    resolved = resolver.call(parsed: parsed, mapping: mapping, provider_key: 'novapay')
+
+    field = resolved.fetch(:operations).first.request_fields.find { |f| f.source_name == 'bank_code' }
+    assert_equal({ field: 'bank_code', condition: { field: 'type', equals: 'sbp' } }, field.required_if)
+  end
+
+  test 'normalizes a non-snake_case field name into a valid Ruby identifier' do
+    resolved = resolve(spec_with_operations(<<~YAML))
+      /payouts:
+        post:
+          operationId: createPayout
+          security: [ApiKeyAuth: []]
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    externalId: { type: string }
+          responses: { "201": { description: Created } }
+    YAML
+
+    field = resolved.fetch(:operations).first.request_fields.first
+    assert_equal 'external_id', field.source_name
+    assert_equal 'external_id', field.target_name
   end
 
   # -- money ----------------------------------------------------------------
@@ -303,7 +360,7 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
       ]
     }
 
-    resolved = resolver.call(parsed: parsed, mapping: mapping)
+    resolved = resolver.call(parsed: parsed, mapping: mapping, provider_key: 'novapay')
 
     assert_equal :rub_to_cent, resolved.fetch(:operations).first.request_fields.first.transformation
   end
@@ -405,7 +462,11 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
     YAML
 
     webhook = resolved.fetch(:webhooks).first
-    assert_equal({ header: 'X-Signature', algorithm: :hmac_sha256 }, webhook.signature)
+    assert_equal(
+      { algorithm: :hmac_sha256, encoding: :hex, signed_payload: :raw_body,
+        header: 'X-Signature', secret_env: 'NOVAPAY_CALLBACK_SECRET' },
+      webhook.fetch(:signature)
+    )
   end
 
   test 'drops a webhook with a signature header but an unrecognized algorithm' do
@@ -447,7 +508,7 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
     assert_equal({ location: :header, name: 'Idempotency-Key' }, resolved.fetch(:operations).first.idempotency)
   end
 
-  test 'idempotency is nil when no matching parameter exists' do
+  test 'idempotency is empty when no matching parameter exists' do
     resolved = resolve(spec_with_operations(<<~YAML))
       /payouts:
         post:
@@ -460,7 +521,7 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
           responses: { "201": { description: Created } }
     YAML
 
-    assert_nil resolved.fetch(:operations).first.idempotency
+    assert_empty resolved.fetch(:operations).first.idempotency
   end
 
   private
@@ -470,7 +531,7 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
   end
 
   def resolve(source, mapping: nil)
-    resolver.call(parsed: parse(source), mapping: mapping)
+    resolver.call(parsed: parse(source), mapping: mapping, provider_key: 'novapay')
   end
 
   def parse(source, source_name: 'spec.yaml')

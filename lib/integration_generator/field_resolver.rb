@@ -1,9 +1,12 @@
 # frozen_string_literal: true
 
 module IntegrationGenerator
-  # Builds FieldIR objects for an operation's parameters and request body,
-  # delegating money-unit detection to MoneyResolver. Also spots the
-  # idempotency parameter by name pattern.
+  # Builds the pieces of an OperationIR that describe its fields:
+  # `parameters` (path-template parameters, as plain Hashes -- Generator's
+  # ServiceValidator expects Hash, not FieldIR, there), `request_fields`
+  # (body fields, as FieldIR, delegating money-unit detection to
+  # MoneyResolver), and `idempotency` (spotted by name pattern among the
+  # operation's raw parameters, {} rather than nil when absent).
   class FieldResolver
     IDEMPOTENCY_NAME_PATTERN = /idempotency/i
 
@@ -11,8 +14,13 @@ module IntegrationGenerator
       @money_resolver = money_resolver
     end
 
+    # Only path-location parameters are kept: they are the only ones
+    # Generator::ServiceValidator's check_parameters accepts (matched
+    # against the {..} segments in the path template). Header/query
+    # parameters that matter (idempotency, webhook signature) are captured
+    # through their own dedicated field instead.
     def parameters(raw_parameters)
-      raw_parameters.map { |param| build_parameter_field(param) }
+      raw_parameters.select { |param| param['in'] == 'path' }.map { |param| build_parameter_hash(param) }
     end
 
     def body_fields(operation:, mapping_entry:, diagnostics:, money_transformations:)
@@ -30,23 +38,21 @@ module IntegrationGenerator
       end
     end
 
-    def idempotency(parameters)
-      param = parameters.find { |field| field.source_name.to_s.match?(IDEMPOTENCY_NAME_PATTERN) }
-      return nil unless param
+    def idempotency(raw_parameters)
+      param = raw_parameters.find { |p| p['name'].to_s.match?(IDEMPOTENCY_NAME_PATTERN) }
+      return {}.freeze unless param
 
-      { location: param.location, name: param.source_name }.freeze
+      { location: param['in']&.to_sym, name: param['name'] }.freeze
     end
 
     private
 
-    def build_parameter_field(param)
+    def build_parameter_hash(param)
       schema = param['schema'] || {}
-      FieldIR.new(
-        source_name: param['name'], target_name: param['name'], location: param['in']&.to_sym,
-        required: param['required'] == true, nullable: schema['nullable'] == true,
-        type: schema['type']&.to_sym, format: schema['format']&.to_sym,
-        transformation: nil, default: schema['default']
-      )
+      {
+        name: param['name'], location: :path, required: true,
+        type: schema['type']&.to_sym, format: schema['format']&.to_sym
+      }.freeze
     end
 
     def build_body_field(name, field_schema, override, context)
@@ -64,19 +70,47 @@ module IntegrationGenerator
     end
 
     def build_field_ir(name, field_schema, override, context, money)
-      FieldIR.new(
-        source_name: name, target_name: override&.fetch('target', name) || name, location: :body,
-        required: field_required?(override, context.fetch(:required), name),
+      Generator::FieldIR.new(
+        source_name: normalize_identifier(name), target_name: normalize_identifier(target_name_for(name, override)),
+        location: :body, required: field_required?(override, context.fetch(:required), name),
         nullable: field_schema['nullable'] == true, type: field_schema['type']&.to_sym,
         format: field_schema['format']&.to_sym, transformation: money&.fetch(:transformation),
-        default: field_schema['default']
+        default: field_schema['default'], required_if: build_required_if(override)
       )
+    end
+
+    def target_name_for(name, override)
+      (override && override['target']) || name
     end
 
     def field_required?(override, required, name)
       return override['required'] if override&.key?('required')
 
       required.include?(name)
+    end
+
+    # required_if is purely a mapping-supplied, field-name-agnostic rule --
+    # never inferred, never branching on a provider or field name in code.
+    def build_required_if(override)
+      rule = override && override['required_if']
+      return nil unless rule
+
+      condition = rule['condition'] || {}
+      { field: rule['field'], condition: { field: condition['field'], equals: condition['equals'] } }.freeze
+    end
+
+    # Generator::ServiceValidator requires snake_case Ruby identifiers for
+    # both source_name and target_name. Real specs are not guaranteed to use
+    # them (camelCase, hyphens), so normalize deterministically rather than
+    # rejecting otherwise-usable fields.
+    def normalize_identifier(name)
+      normalized = name.to_s
+                       .gsub(/([a-z0-9])([A-Z])/, '\1_\2')
+                       .gsub(/[^a-zA-Z0-9]+/, '_')
+                       .downcase
+                       .gsub(/\A_+|_+\z/, '')
+      normalized = "_#{normalized}" if normalized.match?(/\A[0-9]/)
+      normalized.empty? ? '_' : normalized
     end
   end
 end

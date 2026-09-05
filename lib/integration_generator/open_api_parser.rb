@@ -78,12 +78,21 @@ module IntegrationGenerator
       when 'apiKey'
         { name: name, type: :api_key, location: scheme['in']&.to_sym, scheme_name: scheme['name'] }.freeze
       when 'http'
-        # The Authorization header is implicit for http auth (RFC 7235) --
-        # OpenAPI's securityScheme has no separate header-name field for it.
-        http_type = :"http_#{scheme['scheme'].to_s.downcase}"
-        { name: name, type: http_type, location: :header, scheme_name: 'Authorization' }.freeze
+        normalize_http_scheme(name, scheme)
       else
         { name: name, type: :unsupported, location: nil, scheme_name: scheme['type'] }.freeze
+      end
+    end
+
+    # Only Bearer is renderable downstream (Generator::ServiceValidator only
+    # accepts :api_key/:bearer); Basic and any other http scheme are
+    # structurally recognized but marked unsupported rather than silently
+    # treated as usable and failing later at generation time.
+    def normalize_http_scheme(name, scheme)
+      if scheme['scheme'].to_s.downcase == 'bearer'
+        { name: name, type: :bearer, location: :header, scheme_name: 'Authorization' }.freeze
+      else
+        { name: name, type: :unsupported, location: nil, scheme_name: "http_#{scheme['scheme']}" }.freeze
       end
     end
 
@@ -131,7 +140,7 @@ module IntegrationGenerator
     end
 
     def raise_error(code:, message:, source_path:, hint:)
-      raise SpecError, Diagnostic.new(
+      raise SpecError, Generator::Diagnostic.new(
         severity: :error, code: code, message: message, source_path: source_path, hint: hint
       )
     end

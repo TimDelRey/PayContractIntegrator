@@ -85,7 +85,7 @@ module IntegrationGenerator
     end
 
     def raise_error(code:, message:, hint:)
-      raise SpecError, Diagnostic.new(severity: :error, code: code, message: message, source_path: '#', hint: hint)
+      raise SpecError, Generator::Diagnostic.new(severity: :error, code: code, message: message, source_path: '#', hint: hint)
     end
   end
 end

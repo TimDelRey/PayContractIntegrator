@@ -23,7 +23,7 @@ module IntegrationGenerator
     def check_schema_version!(mapping, source_name)
       return if mapping['schema_version'] == SUPPORTED_SCHEMA_VERSION
 
-      raise SpecError, Diagnostic.new(
+      raise SpecError, Generator::Diagnostic.new(
         severity: :error,
         code: :unsupported_mapping_version,
         message: "#{source_name} declares unsupported mapping schema_version #{mapping['schema_version'].inspect}",

@@ -33,9 +33,7 @@ module IntegrationGenerator
 
     def error_map(operations, mapping)
       override = (mapping && mapping['error_map']) || {}
-      error_code_values(operations).uniq.each_with_object({}) do |value, map|
-        map[value] = override[value] || value
-      end.freeze
+      error_code_values(operations).uniq.to_h { |value| [value, override[value] || value] }.freeze
     end
 
     def enum_values(operations, property_name)
@@ -58,11 +56,11 @@ module IntegrationGenerator
     def schemas_for(operation)
       schemas = operation[:responses].map { |response| response[:schema] }.compact
       schemas << operation[:request_body_schema] if operation[:request_body_schema]
-      schemas.select { |schema| schema.is_a?(Hash) }
+      schemas.grep(Hash)
     end
 
     def unmapped_diagnostic(value)
-      Diagnostic.new(
+      Generator::Diagnostic.new(
         severity: :warning,
         code: :unmapped_status_value,
         message: "Status value #{value.inspect} has no known Space Payments mapping",

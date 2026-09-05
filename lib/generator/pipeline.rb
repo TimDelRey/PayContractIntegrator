@@ -4,9 +4,8 @@ module Generator
   class Pipeline
     SUPPORTED_LANGUAGES = %w[ruby].freeze
 
-    def initialize(compiler: IntegrationGenerator::Compiler.new, ir_adapter: IrAdapter.new, runner_class: Runner)
+    def initialize(compiler: IntegrationGenerator::Compiler.new, runner_class: Runner)
       @compiler = compiler
-      @ir_adapter = ir_adapter
       @runner_class = runner_class
     end
 
@@ -16,10 +15,7 @@ module Generator
       compiled = compile(spec, mapping, provider)
       return [:unsupported, compiled.diagnostics] if compiled.ir.nil?
 
-      adapted = @ir_adapter.call(ir: compiled.ir)
-      return [:unsupported, adapted.diagnostics] if adapted.ir.nil?
-
-      generate(adapted.ir, output, force)
+      generate(compiled.ir, output, force)
     end
 
     private

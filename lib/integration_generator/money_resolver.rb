@@ -64,7 +64,7 @@ module IntegrationGenerator
     end
 
     def undetermined_diagnostic(field_name, operation_id)
-      Diagnostic.new(
+      Generator::Diagnostic.new(
         severity: :warning,
         code: :money_unit_undetermined,
         message: "Could not determine the money unit for '#{field_name}' on #{operation_id}; " \

@@ -11,14 +11,14 @@ module IntegrationGenerator
     def call(parsed:, resolved:, mapping:, provider_key:, source_name:)
       fields = identity(provider_key).merge(from_resolved(resolved))
       fields.merge!(derived(parsed, resolved, mapping, source_name))
-      IntegrationIR.new(**fields)
+      Generator::IntegrationIR.new(**fields)
     end
 
     private
 
     def identity(provider_key)
       {
-        schema_version: '1.0', provider_key: provider_key,
+        contract_version: '1.0', provider_key: provider_key,
         provider_class: "#{camelize(provider_key)}Service", env_prefix: provider_key.upcase
       }
     end
@@ -45,8 +45,8 @@ module IntegrationGenerator
     end
 
     def resolve_top_level_idempotency(operations)
-      operation = operations.find { |op| op.role == :create_request && op.idempotency }
-      return nil unless operation
+      operation = operations.find { |op| op.role == :create_request && op.idempotency.any? }
+      return {}.freeze unless operation
 
       {
         operation_id: operation.id,

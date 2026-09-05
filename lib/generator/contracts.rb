@@ -45,6 +45,11 @@ module Generator
     def initialize(ir:, diagnostics:) = super(ir:, diagnostics: deep_freeze(diagnostics))
   end
 
+  # required_if: optional {field:, condition: {field:, equals:}} -- a generic
+  # cross-field conditional-requirement rule (e.g. "bank_code required when
+  # type equals sbp"). Never provider-name-branched; comes only from a
+  # mapping override, defaults to nil (unconditionally required/optional as
+  # per `required`).
   FieldIR = Data.define(
     :source_name,
     :target_name,
@@ -54,11 +59,14 @@ module Generator
     :type,
     :format,
     :transformation,
-    :default
+    :default,
+    :required_if
   ) do
     include ImmutableValue
 
-    def initialize(**attributes) = super(**attributes.transform_values { |value| deep_freeze(value) })
+    def initialize(required_if: nil, **attributes)
+      super(required_if: deep_freeze(required_if), **attributes.transform_values { |value| deep_freeze(value) })
+    end
   end
 
   OperationIR = Data.define(

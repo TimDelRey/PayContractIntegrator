@@ -80,7 +80,7 @@ module IntegrationGenerator
 
     def ambiguous_resource_diagnostic(candidates)
       paths = candidates.map { |operation| "#{operation[:method].to_s.upcase} #{operation[:path]}" }.join(', ')
-      Diagnostic.new(
+      Generator::Diagnostic.new(
         severity: :warning,
         code: :ambiguous_payment_resource,
         message: "Multiple candidate create operations found (#{paths}) and none could be prioritized",
@@ -93,7 +93,7 @@ module IntegrationGenerator
 
     def heuristic(operation, context)
       return :cancel if cancel?(operation, context)
-      return :webhook if webhook?(operation)
+      return :process_callback if webhook?(operation)
       return :create_request if create_request?(operation, context)
       return :fetch_status if fetch_status?(operation, context)
 

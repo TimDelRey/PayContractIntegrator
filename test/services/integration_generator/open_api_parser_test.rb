@@ -54,7 +54,6 @@ class IntegrationGeneratorOpenApiParserTest < Minitest::Test
     IntegrationGenerator::OpenApiParser.new
   end
 
-  # rubocop:disable Metrics/MethodLength
   def minimal_document
     {
       'openapi' => '3.0.3',
@@ -75,5 +74,4 @@ class IntegrationGeneratorOpenApiParserTest < Minitest::Test
       }
     }
   end
-  # rubocop:enable Metrics/MethodLength
 end
