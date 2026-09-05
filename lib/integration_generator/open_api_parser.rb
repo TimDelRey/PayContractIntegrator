@@ -78,7 +78,10 @@ module IntegrationGenerator
       when 'apiKey'
         { name: name, type: :api_key, location: scheme['in']&.to_sym, scheme_name: scheme['name'] }.freeze
       when 'http'
-        { name: name, type: :"http_#{scheme['scheme']}", location: nil, scheme_name: nil }.freeze
+        # The Authorization header is implicit for http auth (RFC 7235) --
+        # OpenAPI's securityScheme has no separate header-name field for it.
+        http_type = :"http_#{scheme['scheme'].to_s.downcase}"
+        { name: name, type: http_type, location: :header, scheme_name: 'Authorization' }.freeze
       else
         { name: name, type: :unsupported, location: nil, scheme_name: scheme['type'] }.freeze
       end

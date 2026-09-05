@@ -26,7 +26,7 @@ module IntegrationGenerator
     end
 
     def call(parsed:, mapping:)
-      acc = initial_accumulator(mapping)
+      acc = initial_accumulator(parsed, mapping)
       parsed.operations.each { |operation| resolve_operation(operation, parsed, acc) }
 
       status_error = @status_error_resolver.call(
@@ -37,8 +37,12 @@ module IntegrationGenerator
 
     private
 
-    def initial_accumulator(mapping)
-      { mapping: mapping, diagnostics: [], money_transformations: [], auth_schemes: [], operations: [], webhooks: [] }
+    def initial_accumulator(parsed, mapping)
+      role_context = @role_resolver.build_context(operations: parsed.operations, mapping: mapping)
+      {
+        mapping: mapping, role_context: role_context, diagnostics: role_context.diagnostics.dup,
+        money_transformations: [], auth_schemes: [], operations: [], webhooks: []
+      }
     end
 
     def build_result(acc, status_error)
@@ -52,7 +56,7 @@ module IntegrationGenerator
 
     def resolve_operation(operation, parsed, acc)
       entry = mapping_entry(acc.fetch(:mapping), operation[:id])
-      role = @role_resolver.call(operation: operation, mapping_entry: entry)
+      role = @role_resolver.call(operation: operation, mapping_entry: entry, context: acc.fetch(:role_context))
       return acc.fetch(:diagnostics) << unresolved_role_diagnostic(operation) if role.nil?
       return resolve_webhook(operation, acc) if role == :webhook
 

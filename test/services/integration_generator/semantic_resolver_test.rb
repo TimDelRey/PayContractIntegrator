@@ -3,6 +3,8 @@
 require 'test_helper'
 require 'json'
 
+# rubocop:disable Metrics/ClassLength -- one test class per resolver concern reads better
+# than splitting role/money/status/auth/webhook/idempotency coverage across files.
 class IntegrationGeneratorSemanticResolverTest < Minitest::Test
   # -- role heuristics ------------------------------------------------------
 
@@ -22,8 +24,17 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
     assert_equal [:create_request], resolved.fetch(:operations).map(&:role)
   end
 
-  test 'resolves fetch_status for a GET with an id path parameter' do
+  test 'resolves fetch_status for a GET with an id path parameter under the payment resource' do
     resolved = resolve(spec_with_operations(<<~YAML))
+      /payouts:
+        post:
+          operationId: createPayout
+          security: [ApiKeyAuth: []]
+          requestBody:
+            content:
+              application/json:
+                schema: { type: object, properties: { amount: { type: integer } } }
+          responses: { "201": { description: Created } }
       /payouts/{id}:
         get:
           operationId: getPayoutStatus
@@ -33,11 +44,45 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
           responses: { "200": { description: OK } }
     YAML
 
-    assert_equal [:fetch_status], resolved.fetch(:operations).map(&:role)
+    assert_equal %i[create_request fetch_status], resolved.fetch(:operations).map(&:role)
   end
 
-  test 'resolves cancel for a POST path ending in /cancel' do
+  test 'does not classify an unrelated resource GET-by-id as fetch_status' do
     resolved = resolve(spec_with_operations(<<~YAML))
+      /payouts:
+        post:
+          operationId: createPayout
+          security: [ApiKeyAuth: []]
+          requestBody:
+            content:
+              application/json:
+                schema: { type: object, properties: { amount: { type: integer } } }
+          responses: { "201": { description: Created } }
+      /persons/{id}:
+        get:
+          operationId: getPerson
+          security: [ApiKeyAuth: []]
+          parameters:
+            - { name: id, in: path, required: true, schema: { type: string } }
+          responses: { "200": { description: OK } }
+    YAML
+
+    assert_equal [:create_request], resolved.fetch(:operations).map(&:role)
+    diagnostic = resolved.fetch(:diagnostics).find { |d| d.code == :unresolved_operation_role }
+    refute_nil diagnostic
+  end
+
+  test 'resolves cancel for a POST path ending in /cancel under the payment resource' do
+    resolved = resolve(spec_with_operations(<<~YAML))
+      /payouts:
+        post:
+          operationId: createPayout
+          security: [ApiKeyAuth: []]
+          requestBody:
+            content:
+              application/json:
+                schema: { type: object, properties: { amount: { type: integer } } }
+          responses: { "201": { description: Created } }
       /payouts/{id}/cancel:
         post:
           operationId: cancelPayout
@@ -47,7 +92,7 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
           responses: { "200": { description: OK } }
     YAML
 
-    assert_equal [:cancel], resolved.fetch(:operations).map(&:role)
+    assert_equal %i[create_request cancel], resolved.fetch(:operations).map(&:role)
   end
 
   test 'resolves webhook for a path under /webhooks' do
@@ -99,6 +144,96 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
     assert_equal :warning, diagnostic.severity
   end
 
+  test 'picks the payment-keyword-matching resource among several create candidates' do
+    resolved = resolve(spec_with_operations(<<~YAML))
+      /customers:
+        post:
+          operationId: createCustomer
+          security: [ApiKeyAuth: []]
+          requestBody:
+            content:
+              application/json:
+                schema: { type: object, properties: { name: { type: string } } }
+          responses: { "201": { description: Created } }
+      /payouts:
+        post:
+          operationId: createPayout
+          security: [ApiKeyAuth: []]
+          requestBody:
+            content:
+              application/json:
+                schema: { type: object, properties: { amount: { type: integer } } }
+          responses: { "201": { description: Created } }
+    YAML
+
+    ids = resolved.fetch(:operations).map(&:id)
+    assert_equal ['createPayout'], ids
+  end
+
+  test 'reports an ambiguous payment resource when several create candidates share no keyword signal' do
+    resolved = resolve(spec_with_operations(<<~YAML))
+      /widgets:
+        post:
+          operationId: createWidget
+          security: [ApiKeyAuth: []]
+          requestBody:
+            content:
+              application/json:
+                schema: { type: object, properties: { name: { type: string } } }
+          responses: { "201": { description: Created } }
+      /gadgets:
+        post:
+          operationId: createGadget
+          security: [ApiKeyAuth: []]
+          requestBody:
+            content:
+              application/json:
+                schema: { type: object, properties: { name: { type: string } } }
+          responses: { "201": { description: Created } }
+    YAML
+
+    assert_empty resolved.fetch(:operations)
+    assert_includes resolved.fetch(:diagnostics).map(&:code), :ambiguous_payment_resource
+  end
+
+  test 'a mapping-assigned create_request wins the resource even without a keyword match' do
+    parsed = parse(spec_with_operations(<<~YAML))
+      /widgets:
+        post:
+          operationId: createWidget
+          security: [ApiKeyAuth: []]
+          requestBody:
+            content:
+              application/json:
+                schema: { type: object, properties: { amount: { type: integer } } }
+          responses: { "201": { description: Created } }
+      /gadgets:
+        post:
+          operationId: createGadget
+          security: [ApiKeyAuth: []]
+          requestBody:
+            content:
+              application/json:
+                schema: { type: object, properties: { amount: { type: integer } } }
+          responses: { "201": { description: Created } }
+      /widgets/{id}:
+        get:
+          operationId: getWidgetStatus
+          security: [ApiKeyAuth: []]
+          parameters:
+            - { name: id, in: path, required: true, schema: { type: string } }
+          responses: { "200": { description: OK } }
+    YAML
+    mapping = { 'operations' => [{ 'operation_id' => 'createWidget', 'role' => 'create_request' }] }
+
+    resolved = resolver.call(parsed: parsed, mapping: mapping)
+
+    assert_equal(
+      { 'createWidget' => :create_request, 'getWidgetStatus' => :fetch_status },
+      resolved.fetch(:operations).to_h { |operation| [operation.id, operation.role] }
+    )
+  end
+
   # -- money ----------------------------------------------------------------
 
   test 'detects a money unit from a Russian keyword in the field description' do
@@ -119,7 +254,8 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
 
     field = resolved.fetch(:operations).first.request_fields.first
     assert_equal :rub_to_kopeck, field.transformation
-    assert_equal({ field: 'amount', from: 'rub', to: 'kopeck', multiplier: 100, rounding: :exact }, resolved.fetch(:money_transformations).first)
+    assert_equal({ field: 'amount', from: 'rub', to: 'kopeck', multiplier: 100, rounding: :exact },
+                 resolved.fetch(:money_transformations).first)
   end
 
   test 'warns and passes the field through unconverted when the unit cannot be determined' do
@@ -161,7 +297,9 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
     YAML
     mapping = {
       'operations' => [
-        { 'operation_id' => 'createPayout', 'money' => { 'field' => 'amount', 'from' => 'rub', 'to' => 'cent', 'multiplier' => 100, 'rounding' => 'exact' } }
+        { 'operation_id' => 'createPayout',
+          'money' => { 'field' => 'amount', 'from' => 'rub', 'to' => 'cent', 'multiplier' => 100,
+                       'rounding' => 'exact' } }
       ]
     }
 
@@ -191,7 +329,8 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
   test 'error codes default to an identity mapping' do
     resolved = resolve(spec_with_error_enum(%w[validation_error internal_error]))
 
-    assert_equal({ 'validation_error' => 'validation_error', 'internal_error' => 'internal_error' }, resolved.fetch(:error_map))
+    assert_equal({ 'validation_error' => 'validation_error', 'internal_error' => 'internal_error' },
+                 resolved.fetch(:error_map))
   end
 
   # -- auth -------------------------------------------------------------------
@@ -228,6 +367,24 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
 
     assert_empty resolved.fetch(:operations)
     assert_includes resolved.fetch(:diagnostics).map(&:code), :unsupported_auth_scheme
+  end
+
+  test 'auto-picks the only supported alternative when other alternatives are unsupported' do
+    resolved = resolve(spec_with_operations(<<~YAML, security_schemes: mixed_supported_and_oauth2_schemes))
+      /payouts:
+        post:
+          operationId: createPayout
+          security: [ApiKeyAuth: [], OAuth2: []]
+          requestBody:
+            content:
+              application/json:
+                schema: { type: object, properties: { amount: { type: integer } } }
+          responses: { "201": { description: Created } }
+    YAML
+
+    assert_equal [:create_request], resolved.fetch(:operations).map(&:role)
+    refute_includes resolved.fetch(:diagnostics).map(&:code), :ambiguous_auth_scheme
+    refute_includes resolved.fetch(:diagnostics).map(&:code), :unsupported_auth_scheme
   end
 
   # -- webhook signature --------------------------------------------------------
@@ -324,22 +481,34 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
 
   def two_alternative_schemes
     <<~YAML
-        SchemeA:
-          type: apiKey
-          in: header
-          name: X-Scheme-A
-        SchemeB:
-          type: apiKey
-          in: header
-          name: X-Scheme-B
+      SchemeA:
+        type: apiKey
+        in: header
+        name: X-Scheme-A
+      SchemeB:
+        type: apiKey
+        in: header
+        name: X-Scheme-B
     YAML
   end
 
   def oauth2_scheme
     <<~YAML
-        OAuth2:
-          type: oauth2
-          flows: {}
+      OAuth2:
+        type: oauth2
+        flows: {}
+    YAML
+  end
+
+  def mixed_supported_and_oauth2_schemes
+    <<~YAML
+      ApiKeyAuth:
+        type: apiKey
+        in: header
+        name: X-API-Key
+      OAuth2:
+        type: oauth2
+        flows: {}
     YAML
   end
 
@@ -361,13 +530,14 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
 
   def default_security_schemes
     <<~YAML
-        ApiKeyAuth:
-          type: apiKey
-          in: header
-          name: X-API-Key
+      ApiKeyAuth:
+        type: apiKey
+        in: header
+        name: X-API-Key
     YAML
   end
 
+  # rubocop:disable Metrics/MethodLength
   def spec_with_status_enum(values)
     spec_with_operations(<<~YAML)
       /payouts/{id}:
@@ -411,4 +581,6 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
                       code: { type: string, enum: #{values.to_json} }
     YAML
   end
+  # rubocop:enable Metrics/MethodLength
 end
+# rubocop:enable Metrics/ClassLength
