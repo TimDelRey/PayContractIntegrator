@@ -7,7 +7,7 @@ require_relative "support/integration_generator_contract_helpers"
 # is now an optional override for what SemanticResolver could not safely
 # infer -- it is never required for a compile to succeed.
 class CompilerContractTest < Minitest::Test
-  include IntegrationGeneratorContractHelpers
+  include GeneratorContractHelpers
 
   test "compiler infers role and auth from the spec alone, without any mapping" do
     result = compile

@@ -1,8 +1,7 @@
 # PayContractIntegrator
 
-Ruby CLI для генерации интеграций платёжных провайдеров из публичных OpenAPI-спецификаций.
-
-Проект использует текущую версию Ruby из `.ruby-version` и не зависит от веб-фреймворка, базы данных или веб-сервера.
+Ruby CLI генерирует интеграционные сервисы платёжных провайдеров из provider-neutral `IntegrationIR`.
+Проект использует Ruby из `.ruby-version` и не зависит от веб-фреймворка, базы данных или внешнего сервиса.
 
 ## Подготовка
 
@@ -10,18 +9,18 @@ Ruby CLI для генерации интеграций платёжных пр�
 bin/setup
 ```
 
-## Запуск
+## Pipeline
 
-```bash
-bin/integrate --spec provider_api.yaml --mapping integration_mapping.yml --provider novapay --lang ruby
-```
+`bin/integrate` запускает `MainWorker` с двумя независимыми этапами:
 
-Главный worker выполняет два последовательных этапа: parsing и generation.
+1. parsing — читает CLI/spec/mapping и возвращает immutable IR;
+2. generation — создаёт, проверяет и атомарно публикует артефакты.
 
-## Проверки
+Parsing реализуется отдельно. Второй этап доступен как `Generator::Runner` и принимает объект с `ir`, `output` и `force`.
 
-```bash
-bundle exec rake test
-bundle exec rubocop
-bin/bundler-audit check
-```
+Generation использует закрытый `HandlerFactory` и Template Method `BaseHandler`. Результат содержит:
+
+- `<provider>_service.rb` — дочерний класс `Provider::BaseService`;
+- `INTEGRATION.md`;
+- `examples.json`;
+- внутренний manifest с версиями и SHA-256.
