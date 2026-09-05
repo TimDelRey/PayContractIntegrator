@@ -69,6 +69,20 @@ module Generator
         )
       end
 
+      # TODO(code-review): this always reads operation.public_send(source_name),
+      # but per the platform Q&A only operation.id/operation.amount/
+      # operation.payout_requisite are guaranteed to exist. field.platform_source
+      # (see lib/generator/contracts.rb) tells you which of those applies --
+      # :constant (literal value, don't read from operation at all),
+      # :attribute (operation.public_send(attribute)), :requisite_container
+      # (operation.payout_requisite.dig(requisite_type, key) for each of
+      # known_keys), or :unknown (emit a TODO comment instead of guessing).
+      # Right now every :constant/:requisite_container/:unknown field is
+      # rendered as if it were a same-named attribute, which raises
+      # NoMethodError on the real platform for anything but amount/id.
+      # field.required_if (a generic {field:, condition: {field:, equals:}}
+      # rule from a mapping override) is similarly computed but never
+      # consulted here -- only the plain `required` boolean is used below.
       def render_field(field, ir)
         source = "operation.public_send(#{field.source_name.dump})"
         transformation = ir.money_transformations.find { |item| fetch(item, :field) == field.source_name }
