@@ -55,6 +55,14 @@ class FullCompilePipelineTest < Minitest::Test
     assert_equal({ operation_id: 'createPayout', location: :header, name: 'Idempotency-Key' }, ir.idempotency)
     assert_equal %w[api_key base_url], ir.configuration
 
+    create_payout = ir.operations.find { |operation| operation.id == 'createPayout' }
+    platform_sources = create_payout.request_fields.to_h { |field| [field.source_name, field.platform_source] }
+    assert_equal({ kind: :attribute, attribute: 'amount' }, platform_sources.fetch('amount'))
+    assert_equal({ kind: :constant, value: 'RUB' }, platform_sources.fetch('currency'))
+    assert_equal({ kind: :attribute, attribute: 'id' }, platform_sources.fetch('external_id'))
+    assert_equal :requisite_container, platform_sources.fetch('recipient').fetch(:kind)
+    assert_equal 'sbp', platform_sources.fetch('recipient').fetch(:requisite_type)
+
     diagnostic = result.diagnostics.find { |item| item.code == :unresolved_operation_role }
     refute_nil diagnostic, 'getBalance should be dropped with a diagnostic, not silently ignored'
     assert_equal :warning, diagnostic.severity

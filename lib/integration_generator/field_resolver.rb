@@ -10,8 +10,9 @@ module IntegrationGenerator
   class FieldResolver
     IDEMPOTENCY_NAME_PATTERN = /idempotency/i
 
-    def initialize(money_resolver: MoneyResolver.new)
+    def initialize(money_resolver: MoneyResolver.new, platform_field_resolver: PlatformFieldResolver.new)
       @money_resolver = money_resolver
+      @platform_field_resolver = platform_field_resolver
     end
 
     # Only path-location parameters are kept: they are the only ones
@@ -75,7 +76,8 @@ module IntegrationGenerator
         location: :body, required: field_required?(override, context.fetch(:required), name),
         nullable: field_schema['nullable'] == true, type: field_schema['type']&.to_sym,
         format: field_schema['format']&.to_sym, transformation: money&.fetch(:transformation),
-        default: field_schema['default'], required_if: build_required_if(override)
+        default: field_schema['default'], required_if: build_required_if(override),
+        platform_source: @platform_field_resolver.classify(name, field_schema, money: money)
       )
     end
 
