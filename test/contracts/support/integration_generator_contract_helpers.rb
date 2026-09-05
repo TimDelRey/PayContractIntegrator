@@ -132,10 +132,32 @@ module IntegrationGeneratorContractHelpers
     YAML
   end
 
-  def mapping_without_operation_semantics
+  # A single operation that does not match any of SemanticResolver's role
+  # heuristics (not POST-with-body, not GET-with-id-param, no /cancel
+  # suffix, no webhook signal) -- analogous to NovaPay's real getBalance.
+  def spec_with_unclassifiable_operation
     <<~YAML
-      schema_version: "1.0"
-      operations: []
+      openapi: 3.0.3
+      info:
+        title: Synthetic Payments API
+        version: 1.0.0
+      servers:
+        - url: https://sandbox.example.test/v1
+      paths:
+        /balance:
+          get:
+            operationId: getBalance
+            security:
+              - ApiKeyAuth: []
+            responses:
+              "200":
+                description: OK
+      components:
+        securitySchemes:
+          ApiKeyAuth:
+            type: apiKey
+            in: header
+            name: X-API-Key
     YAML
   end
 

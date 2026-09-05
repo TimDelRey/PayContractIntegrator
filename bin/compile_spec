@@ -1,0 +1,55 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Dev-A milestone script for the full stage 1-4 pipeline (safe load -> local
+# refs -> parse structure -> infer payment semantics). Superseded once
+# bin/integrate (Dev B) wires the real CLI/Generator on top of Compiler.
+
+require_relative '../lib/integration_generator'
+
+path = ARGV.first
+if path.nil?
+  warn 'Usage: bin/compile_spec <path-to-provider_api.yaml> [path-to-integration_mapping.yml]'
+  exit 2
+end
+
+source = File.read(path)
+source_name = File.basename(path)
+mapping_path = ARGV[1]
+
+result = IntegrationGenerator::Compiler.new.call(
+  source: source,
+  source_name: source_name,
+  provider_key: File.basename(path, '.*').split('_').first,
+  mapping_source: mapping_path && File.read(mapping_path),
+  mapping_source_name: mapping_path && File.basename(mapping_path)
+)
+
+result.diagnostics.each do |diagnostic|
+  stream = diagnostic.severity == :error ? $stderr : $stdout
+  stream.puts "#{diagnostic.severity}[#{diagnostic.code}]: #{diagnostic.message} (#{diagnostic.source_path})"
+end
+
+if result.ir.nil?
+  warn 'Compilation failed -- see diagnostics above.'
+  exit 2
+end
+
+ir = result.ir
+puts "Parsing #{source_name}..."
+puts "Found #{ir.operations.size + ir.webhooks.size} relevant operations:"
+ir.operations.each { |op| puts "  #{op.role}: #{op.method.to_s.upcase} #{op.path} (#{op.id})" }
+ir.webhooks.each { |wh| puts "  webhook: #{wh.path} (#{wh.id})" }
+
+auth = ir.auth_schemes.first
+puts "Auth: #{auth[:name]} (#{auth[:type]}, #{auth[:location]})" if auth
+
+webhook = ir.webhooks.first
+if webhook&.signature
+  puts "Webhook signature: #{webhook.signature.fetch(:header)} (#{webhook.signature.fetch(:algorithm)})"
+end
+
+puts "Status map: #{ir.status_map}"
+puts "Money transformations: #{ir.money_transformations}"
+puts "Generating #{ir.provider_class}..."
+puts 'Output: (rendering not implemented yet -- that is Dev B, see dev_plan.md)'
