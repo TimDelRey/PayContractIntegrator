@@ -73,6 +73,21 @@ class IntegrationGeneratorIrBuilderTest < Minitest::Test
     assert_equal '1.0', ir.source_metadata.fetch(:mapping_schema_version)
   end
 
+  test 'camelize does not raise on a provider_key with a doubled or leading separator' do
+    parsed = IntegrationGenerator::ParsedSpec.new(
+      version: '3.0.3', base_urls: ['https://sandbox.example.test/v1'].freeze,
+      security_schemes: [].freeze, operations: [].freeze, source_metadata: {}.freeze
+    )
+    resolved = {
+      operations: [].freeze, webhooks: [].freeze, auth_schemes: [].freeze,
+      status_map: {}.freeze, error_map: {}.freeze, money_transformations: [].freeze
+    }
+
+    ir = builder.call(parsed: parsed, resolved: resolved, mapping: nil, provider_key: 'acme__pay', source_name: 'x.yaml')
+
+    assert_equal 'AcmePayService', ir.provider_class
+  end
+
   private
 
   def builder

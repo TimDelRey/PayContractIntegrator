@@ -66,8 +66,19 @@ module IntegrationGenerator
         field_name: name, field_schema: field_schema, operation_mapping: context.fetch(:mapping_entry),
         diagnostics: context.fetch(:diagnostics), operation_id: context.fetch(:operation_id)
       )
-      context.fetch(:money_transformations) << money.fetch(:entry) if money
+      context.fetch(:money_transformations) << normalized_money_entry(name, money) if money
       money
+    end
+
+    # MoneyResolver keys its entry by the raw OpenAPI field name (matching
+    # how mapping overrides are matched elsewhere), but FieldIR#source_name
+    # is always the normalized identifier -- Generator::ServiceValidator and
+    # the renderer both compare money_transformations[].field against
+    # source_name, so the stored field must use the same normalized form or
+    # a non-snake_case money field (e.g. "Amount") fails validation or gets
+    # silently skipped at render time.
+    def normalized_money_entry(name, money)
+      money.fetch(:entry).merge(field: normalize_identifier(name)).freeze
     end
 
     def build_field_ir(name, field_schema, override, context, money)
@@ -77,7 +88,9 @@ module IntegrationGenerator
         nullable: field_schema['nullable'] == true, type: field_schema['type']&.to_sym,
         format: field_schema['format']&.to_sym, transformation: money&.fetch(:transformation),
         default: field_schema['default'], required_if: build_required_if(override),
-        platform_source: @platform_field_resolver.classify(name, field_schema, money: money)
+        platform_source: @platform_field_resolver.classify(
+          name, field_schema, money: money, diagnostics: context.fetch(:diagnostics)
+        )
       )
     end
 

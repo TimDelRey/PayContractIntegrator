@@ -102,30 +102,43 @@ module IntegrationGenerator
       (document['paths'] || {}).each do |path, path_item|
         next unless path_item.is_a?(Hash)
 
+        shared_parameters = Array(path_item['parameters'])
         HTTP_METHODS.each do |method|
           operation = path_item[method]
-          operations << build_operation(path, method, operation) if operation.is_a?(Hash)
+          operations << build_operation(path, method, operation, shared_parameters) if operation.is_a?(Hash)
         end
       end
 
       operations.freeze
     end
 
-    def build_operation(path, method, operation)
-      base_operation(path, method, operation).merge(
+    def build_operation(path, method, operation, shared_parameters)
+      base_operation(path, method, operation, shared_parameters).merge(
         request_body_schema: request_body_schema(operation),
         responses: parse_responses(operation['responses']),
         extensions: extensions_for(operation)
       ).freeze
     end
 
-    def base_operation(path, method, operation)
+    def base_operation(path, method, operation, shared_parameters)
       {
         id: operation['operationId'], method: method.to_sym, path: path,
         tags: Array(operation['tags']).freeze, summary: operation['summary'],
         description: operation['description'], security: Array(operation['security']).freeze,
-        parameters: Array(operation['parameters']).freeze
+        parameters: merge_parameters(shared_parameters, operation['parameters']).freeze
       }
+    end
+
+    # OpenAPI lets a Path Item Object declare a parameter once for every
+    # method under that path instead of repeating it per operation; an
+    # operation-level parameter with the same (name, in) overrides the
+    # shared one, but a shared parameter the operation does not repeat
+    # still applies.
+    def merge_parameters(shared_parameters, own_parameters)
+      own = Array(own_parameters)
+      own_keys = own.map { |param| [param['name'], param['in']] }
+      inherited = shared_parameters.reject { |param| own_keys.include?([param['name'], param['in']]) }
+      inherited + own
     end
 
     def request_body_schema(operation) = operation.dig('requestBody', 'content', 'application/json', 'schema')

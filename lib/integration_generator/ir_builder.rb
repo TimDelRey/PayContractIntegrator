@@ -41,7 +41,10 @@ module IntegrationGenerator
     end
 
     def camelize(provider_key)
-      provider_key.to_s.split(/[_-]/).map { |part| part[0].upcase + part[1..] }.join
+      # reject(&:empty?): a leading/trailing/doubled separator (e.g.
+      # "acme__pay") otherwise produces an empty element, and part[0] would
+      # be nil -- nil.upcase raises, which Compiler does not rescue.
+      provider_key.to_s.split(/[_-]/).reject(&:empty?).map { |part| part[0].upcase + part[1..] }.join
     end
 
     def resolve_top_level_idempotency(operations)

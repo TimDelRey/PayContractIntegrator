@@ -315,6 +315,27 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
                  resolved.fetch(:money_transformations).first)
   end
 
+  test 'a non-snake_case money field name is normalized consistently in source_name and the transformation entry' do
+    resolved = resolve(spec_with_operations(<<~YAML))
+      /payouts:
+        post:
+          operationId: createPayout
+          security: [ApiKeyAuth: []]
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    Amount: { type: integer, description: "Сумма в копейках" }
+          responses: { "201": { description: Created } }
+    YAML
+
+    field = resolved.fetch(:operations).first.request_fields.first
+    assert_equal 'amount', field.source_name
+    assert_equal 'amount', resolved.fetch(:money_transformations).first.fetch(:field)
+  end
+
   test 'warns and passes the field through unconverted when the unit cannot be determined' do
     resolved = resolve(spec_with_operations(<<~YAML))
       /payouts:
