@@ -48,13 +48,31 @@ class IntegrationGeneratorOpenApiParserTest < Minitest::Test
     assert_equal :unsafe_server_scheme, error.diagnostic.code
   end
 
+  test 'inherits a parameter declared once at the path-item level' do
+    document = minimal_document
+    document['paths']['/payouts']['parameters'] = [{ 'name' => 'id', 'in' => 'path', 'required' => true }]
+
+    operation = parser.call(document: document, source_name: 'spec.yaml').operations.first
+
+    assert_equal [{ 'name' => 'id', 'in' => 'path', 'required' => true }], operation.fetch(:parameters)
+  end
+
+  test 'an operation-level parameter overrides a path-item-level parameter of the same name and location' do
+    document = minimal_document
+    document['paths']['/payouts']['parameters'] = [{ 'name' => 'id', 'in' => 'path', 'required' => false }]
+    document['paths']['/payouts']['post']['parameters'] = [{ 'name' => 'id', 'in' => 'path', 'required' => true }]
+
+    operation = parser.call(document: document, source_name: 'spec.yaml').operations.first
+
+    assert_equal [{ 'name' => 'id', 'in' => 'path', 'required' => true }], operation.fetch(:parameters)
+  end
+
   private
 
   def parser
     IntegrationGenerator::OpenApiParser.new
   end
 
-  # rubocop:disable Metrics/MethodLength
   def minimal_document
     {
       'openapi' => '3.0.3',
@@ -75,5 +93,4 @@ class IntegrationGeneratorOpenApiParserTest < Minitest::Test
       }
     }
   end
-  # rubocop:enable Metrics/MethodLength
 end

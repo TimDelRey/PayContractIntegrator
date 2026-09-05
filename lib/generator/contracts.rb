@@ -45,6 +45,21 @@ module Generator
     def initialize(ir:, diagnostics:) = super(ir:, diagnostics: deep_freeze(diagnostics))
   end
 
+  # required_if: optional {field:, condition: {field:, equals:}} -- a generic
+  # cross-field conditional-requirement rule (e.g. "bank_code required when
+  # type equals sbp"). Never provider-name-branched; comes only from a
+  # mapping override, defaults to nil (unconditionally required/optional as
+  # per `required`).
+  #
+  # platform_source: how generated code must actually read this field's
+  # value off the platform's internal `operation` object (only operation.id/
+  # operation.amount/operation.payout_requisite are guaranteed to exist --
+  # a field name matching the OpenAPI schema is not itself a valid read
+  # path). One of:
+  #   {kind: :constant, value:}                      -- fixed, single-enum value
+  #   {kind: :attribute, attribute:}                  -- "id" or "amount"
+  #   {kind: :requisite_container, requisite_type:, known_keys:, unknown_keys:}
+  #   {kind: :unknown}                                -- default; never guessed
   FieldIR = Data.define(
     :source_name,
     :target_name,
@@ -54,11 +69,18 @@ module Generator
     :type,
     :format,
     :transformation,
-    :default
+    :default,
+    :required_if,
+    :platform_source
   ) do
     include ImmutableValue
 
-    def initialize(**attributes) = super(**attributes.transform_values { |value| deep_freeze(value) })
+    def initialize(required_if: nil, platform_source: { kind: :unknown }.freeze, **attributes)
+      super(
+        required_if: deep_freeze(required_if), platform_source: deep_freeze(platform_source),
+        **attributes.transform_values { |value| deep_freeze(value) }
+      )
+    end
   end
 
   OperationIR = Data.define(

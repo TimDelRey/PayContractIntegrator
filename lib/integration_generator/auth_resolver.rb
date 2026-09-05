@@ -38,7 +38,7 @@ module IntegrationGenerator
     end
 
     def ambiguous!(operation, diagnostics)
-      diagnostics << Diagnostic.new(
+      diagnostics << Generator::Diagnostic.new(
         severity: :warning,
         code: :ambiguous_auth_scheme,
         message: "#{operation[:id]} has multiple possible auth schemes and none was selected",
@@ -49,12 +49,12 @@ module IntegrationGenerator
     end
 
     def unsupported!(operation, diagnostics)
-      diagnostics << Diagnostic.new(
+      diagnostics << Generator::Diagnostic.new(
         severity: :warning,
         code: :unsupported_auth_scheme,
         message: "#{operation[:id]} does not use a supported auth scheme",
         source_path: security_path(operation),
-        hint: 'Only apiKey and http basic/bearer schemes are supported in V1'
+        hint: 'Only apiKey and http Bearer schemes are supported in V1'
       )
       :unresolved
     end

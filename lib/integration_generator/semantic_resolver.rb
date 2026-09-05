@@ -25,8 +25,8 @@ module IntegrationGenerator
       @status_error_resolver = status_error_resolver
     end
 
-    def call(parsed:, mapping:)
-      acc = initial_accumulator(parsed, mapping)
+    def call(parsed:, mapping:, provider_key:)
+      acc = initial_accumulator(parsed, mapping, provider_key)
       parsed.operations.each { |operation| resolve_operation(operation, parsed, acc) }
 
       status_error = @status_error_resolver.call(
@@ -37,10 +37,11 @@ module IntegrationGenerator
 
     private
 
-    def initial_accumulator(parsed, mapping)
+    def initial_accumulator(parsed, mapping, provider_key)
       role_context = @role_resolver.build_context(operations: parsed.operations, mapping: mapping)
       {
-        mapping: mapping, role_context: role_context, diagnostics: role_context.diagnostics.dup,
+        mapping: mapping, provider_key: provider_key, role_context: role_context,
+        diagnostics: role_context.diagnostics.dup,
         money_transformations: [], auth_schemes: [], operations: [], webhooks: []
       }
     end
@@ -58,14 +59,27 @@ module IntegrationGenerator
       entry = mapping_entry(acc.fetch(:mapping), operation[:id])
       role = @role_resolver.call(operation: operation, mapping_entry: entry, context: acc.fetch(:role_context))
       return acc.fetch(:diagnostics) << unresolved_role_diagnostic(operation) if role.nil?
-      return resolve_webhook(operation, acc) if role == :webhook
+      return resolve_webhook(operation, acc) if role == :process_callback
 
       resolve_regular_operation(operation, role, entry, parsed, acc)
     end
 
+    # A webhook becomes both a webhooks-list Hash (signature/event_map, read
+    # by Generator's renderers) and a regular OperationIR with role
+    # :process_callback (read by Generator::ServiceValidator's per-operation
+    # checks) -- Generator::ServiceValidator requires both to be present and
+    # consistent (exactly one of each).
     def resolve_webhook(operation, acc)
-      webhook = @webhook_resolver.call(operation: operation, diagnostics: acc.fetch(:diagnostics))
-      acc.fetch(:webhooks) << webhook if webhook
+      webhook = @webhook_resolver.call(
+        operation: operation, diagnostics: acc.fetch(:diagnostics), provider_key: acc.fetch(:provider_key)
+      )
+      return unless webhook
+
+      acc.fetch(:webhooks) << webhook
+      acc.fetch(:operations) << Generator::OperationIR.new(
+        id: operation[:id], role: :process_callback, method: operation[:method], path: operation[:path],
+        parameters: [].freeze, request_fields: [].freeze, responses: operation[:responses], idempotency: {}.freeze
+      )
     end
 
     def resolve_regular_operation(operation, role, mapping_entry, parsed, acc)
@@ -86,10 +100,10 @@ module IntegrationGenerator
         diagnostics: acc.fetch(:diagnostics), money_transformations: acc.fetch(:money_transformations)
       )
 
-      OperationIR.new(
+      Generator::OperationIR.new(
         id: operation[:id], role: role, method: operation[:method], path: operation[:path],
         parameters: parameters.freeze, request_fields: request_fields.freeze,
-        responses: operation[:responses], idempotency: @field_resolver.idempotency(parameters)
+        responses: operation[:responses], idempotency: @field_resolver.idempotency(operation[:parameters])
       )
     end
 
@@ -100,7 +114,7 @@ module IntegrationGenerator
     end
 
     def unresolved_role_diagnostic(operation)
-      Diagnostic.new(
+      Generator::Diagnostic.new(
         severity: :warning,
         code: :unresolved_operation_role,
         message: "Could not determine the role of #{operation[:method].to_s.upcase} #{operation[:path]}; skipped",

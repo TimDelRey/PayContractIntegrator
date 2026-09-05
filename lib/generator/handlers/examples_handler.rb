@@ -63,6 +63,13 @@ module Generator
       def callback_examples(ir)
         ir.webhooks.map.with_index do |webhook, index|
           event_map = fetch(webhook, :event_map, {})
+          # TODO(code-review): event_map.min on an empty Hash returns nil,
+          # so event/expected silently become nil here (a webhook whose
+          # event values all failed vocabulary matching still passes
+          # ServiceValidator#check_webhook, which only checks event_map is
+          # a Hash of safe scalars, not that it's non-empty). Consider
+          # skipping this example (or failing generation) when event_map
+          # is empty instead of emitting {"event": null, "expected": null}.
           event, expected = event_map.min
           { 'name' => "callback_#{index + 1}", 'payload' => { 'event' => event }, 'expected' => expected }
         end

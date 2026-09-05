@@ -28,17 +28,19 @@ class GenerationPipelineTest < Minitest::Test
     end
   end
 
-  test 'refuses to publish when the spec resolves a webhook the adapter cannot safely translate' do
+  test 'generates a complete file set including the webhook callback, inferred without any mapping overrides' do
     Dir.mktmpdir do |directory|
       spec = File.join(directory, 'provider_api.yaml')
       output = File.join(directory, 'output')
       File.write(spec, File.read(webhook_fixture_path))
 
-      status, diagnostics = Generator::Pipeline.new.call(spec:, mapping: minimal_mapping_path(directory), provider: 'novapay', lang: 'ruby', output:)
+      status, paths = Generator::Pipeline.new.call(spec:, mapping: minimal_mapping_path(directory), provider: 'novapay', lang: 'ruby', output:)
 
-      assert_equal :unsupported, status
-      assert_equal :webhook_contract_unsupported, diagnostics.first.code
-      refute Dir.exist?(output)
+      assert_equal :ok, status
+      service = File.read(paths.find { |path| path.end_with?('_service.rb') })
+      assert_match 'def process_callback', service
+      assert_match 'verify_webhook_signature!', service
+      assert_ruby_compiles(service)
     end
   end
 

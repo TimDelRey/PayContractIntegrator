@@ -11,7 +11,7 @@ class IntegrationGeneratorIrBuilderTest < Minitest::Test
       operations: [].freeze,
       source_metadata: {}.freeze
     )
-    operation = IntegrationGenerator::OperationIR.new(
+    operation = Generator::OperationIR.new(
       id: 'createPayout', role: :create_request, method: :post, path: '/payouts',
       parameters: [].freeze, request_fields: [].freeze,
       responses: [{ status: '201', schema: nil, example: nil }.freeze].freeze,
@@ -51,7 +51,7 @@ class IntegrationGeneratorIrBuilderTest < Minitest::Test
     ir = builder.call(parsed: parsed, resolved: resolved, mapping: nil, provider_key: 'novapay', source_name: 'provider_api.yaml')
 
     assert_equal %w[base_url], ir.configuration
-    assert_nil ir.idempotency
+    assert_empty ir.idempotency
   end
 
   test 'records mapping metadata when a mapping was used' do
@@ -71,6 +71,21 @@ class IntegrationGeneratorIrBuilderTest < Minitest::Test
 
     assert_equal 'integration_mapping.yml', ir.source_metadata.fetch(:mapping_name)
     assert_equal '1.0', ir.source_metadata.fetch(:mapping_schema_version)
+  end
+
+  test 'camelize does not raise on a provider_key with a doubled or leading separator' do
+    parsed = IntegrationGenerator::ParsedSpec.new(
+      version: '3.0.3', base_urls: ['https://sandbox.example.test/v1'].freeze,
+      security_schemes: [].freeze, operations: [].freeze, source_metadata: {}.freeze
+    )
+    resolved = {
+      operations: [].freeze, webhooks: [].freeze, auth_schemes: [].freeze,
+      status_map: {}.freeze, error_map: {}.freeze, money_transformations: [].freeze
+    }
+
+    ir = builder.call(parsed: parsed, resolved: resolved, mapping: nil, provider_key: 'acme__pay', source_name: 'x.yaml')
+
+    assert_equal 'AcmePayService', ir.provider_class
   end
 
   private
