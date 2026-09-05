@@ -1,0 +1,54 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Temporary Dev-A milestone script for pipeline stages 1-3 (safe load ->
+# resolve local refs -> parse OpenAPI structure). Does not infer payment
+# semantics (role, units, statuses) -- that is stage 4+, not implemented yet.
+# Superseded once the full Compiler and bin/integrate CLI (Dev B) exist.
+
+require_relative '../lib/integration_generator'
+
+path = ARGV.first
+if path.nil?
+  warn 'Usage: bin/parse_spec <path-to-provider_api.yaml>'
+  exit 2
+end
+
+source = File.read(path)
+source_name = File.basename(path)
+
+begin
+  document = IntegrationGenerator::SpecLoader.new.call(source: source, source_name: source_name)
+  document = IntegrationGenerator::LocalRefResolver.new.call(document: document, source_name: source_name)
+  parsed = IntegrationGenerator::OpenApiParser.new.call(document: document, source_name: source_name)
+rescue IntegrationGenerator::SpecError => e
+  diagnostic = e.diagnostic
+  warn "error[#{diagnostic.code}]: #{diagnostic.message}"
+  warn "  at #{diagnostic.source_path}"
+  warn "  hint: #{diagnostic.hint}"
+  exit 2
+end
+
+puts "Parsing #{source_name}..."
+puts "OpenAPI version: #{parsed.version}"
+puts "Primary server: #{parsed.base_urls.first}"
+
+alternates = parsed.source_metadata.fetch(:alternate_base_urls)
+puts "Alternate servers: #{alternates.join(', ')}" unless alternates.empty?
+
+puts "Found #{parsed.operations.size} endpoints:"
+parsed.operations.each do |operation|
+  puts "  #{operation.fetch(:method).to_s.upcase} #{operation.fetch(:path)} (#{operation.fetch(:id)})"
+end
+
+if parsed.security_schemes.any?
+  puts 'Security schemes:'
+  parsed.security_schemes.each do |scheme|
+    detail = if scheme.fetch(:type) == :api_key
+               "#{scheme.fetch(:location)}: #{scheme.fetch(:scheme_name)}"
+             else
+               scheme.fetch(:type).to_s
+             end
+    puts "  #{scheme.fetch(:name)} (#{detail})"
+  end
+end

@@ -5,6 +5,10 @@ These pinned specifications come from official provider repositories and are use
 - `sumup_provider_api.yaml`: primary OpenAPI 3.0 end-to-end fixture.
 - `adyen_provider_api.yaml`: payout-focused OpenAPI 3.1 fixture with complex schemas.
 - `paypal_provider_api.yaml`: official OpenAPI 3.0 JSON converted deterministically to YAML.
+- `novapay_provider_api.yaml`: the official worked example from the hackathon case brief
+  (`описание.docx`), not sourced from a public provider repository. Used as the primary
+  end-to-end fixture for stages 1-3 of the Spec Compiler because it is the exact input the
+  case's own demo CLI run and grading rubric are built around.
 
 Each `<provider>_examples.json` contains the upstream OpenAPI `example`/`examples` nodes together with their JSON Pointer `source_path`. These files are extracted data, not hand-written expected generator output.
 
