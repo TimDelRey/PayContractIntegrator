@@ -14,7 +14,7 @@ class ResultWriterTest < Minitest::Test
       assert_equal 3, paths.size
       assert File.file?(File.join(output, 'novapay_service.rb'))
       assert File.file?(File.join(output, 'INTEGRATION.md'))
-      assert File.file?(File.join(output, 'examples.json'))
+      assert File.file?(File.join(output, 'fixtures.json'))
     end
   end
 

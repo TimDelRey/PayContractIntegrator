@@ -7,7 +7,7 @@ class CliContractTest < Minitest::Test
 
   test 'CLI exposes a successful flat-layout generation flow' do
     stdout, stderr, calls, cli = build_cli(
-      result: [:ok, %w[output/novapay_service.rb output/INTEGRATION.md output/examples.json]]
+      result: [:ok, %w[output/novapay_service.rb output/INTEGRATION.md output/fixtures.json]]
     )
 
     status = cli.call(base_arguments + %w[--output output])
@@ -18,17 +18,30 @@ class CliContractTest < Minitest::Test
     assert_equal 'integration_mapping.yml', calls.fetch(0).fetch(:mapping)
     assert_match 'output/novapay_service.rb', stdout.string
     assert_match 'output/INTEGRATION.md', stdout.string
-    assert_match 'output/examples.json', stdout.string
+    assert_match 'output/fixtures.json', stdout.string
   end
 
-  test 'CLI requires the versioned mapping before invoking the pipeline' do
+  # Matches the case brief's own demo command, which never passes --mapping:
+  # `./integrate --spec provider_api.yaml --provider novapay --lang ruby`.
+  test 'CLI runs without --mapping, matching the brief demo command' do
     _stdout, stderr, calls, cli = build_cli(result: [:ok, []])
 
     status = cli.call(%w[--spec provider_api.yaml --provider novapay --lang ruby])
 
+    assert_equal 0, status
+    assert_empty stderr.string
+    assert_equal 1, calls.size
+    assert_nil calls.fetch(0).fetch(:mapping)
+  end
+
+  test 'CLI still requires --spec, --provider and --lang' do
+    _stdout, stderr, calls, cli = build_cli(result: [:ok, []])
+
+    status = cli.call(%w[--provider novapay --lang ruby])
+
     assert_equal 2, status
     assert_empty calls
-    assert_match(/--mapping/, stderr.string)
+    assert_match(/--spec/, stderr.string)
   end
 
   test 'CLI surfaces structured unsupported diagnostics and fallback information' do

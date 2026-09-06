@@ -51,7 +51,7 @@ module Generator
       end
 
       def render_create(operation, ir)
-        fields = operation.request_fields.map { |field| render_field(field, ir) }.join("\n")
+        fields = operation.request_fields.map { |field| render_field(field, operation.request_fields, ir) }.join("\n")
         idempotency = render_idempotency(operation)
         request = format(
           '  response = client.public_send(%<method>s, BASE_URL + build_path(%<path>s, operation), json: payload, headers:)',
@@ -69,29 +69,9 @@ module Generator
         )
       end
 
-      # TODO(code-review): this always reads operation.public_send(source_name),
-      # but per the platform Q&A only operation.id/operation.amount/
-      # operation.payout_requisite are guaranteed to exist. field.platform_source
-      # (see lib/generator/contracts.rb) tells you which of those applies --
-      # :constant (literal value, don't read from operation at all),
-      # :attribute (operation.public_send(attribute)), :requisite_container
-      # (operation.payout_requisite.dig(requisite_type, key) for each of
-      # known_keys), or :unknown (emit a TODO comment instead of guessing).
-      # Right now every :constant/:requisite_container/:unknown field is
-      # rendered as if it were a same-named attribute, which raises
-      # NoMethodError on the real platform for anything but amount/id.
-      # field.required_if (a generic {field:, condition: {field:, equals:}}
-      # rule from a mapping override) is similarly computed but never
-      # consulted here -- only the plain `required` boolean is used below.
-      def render_field(field, ir)
-        source = "operation.public_send(#{field.source_name.dump})"
-        transformation = ir.money_transformations.find { |item| fetch(item, :field) == field.source_name }
-        expression = transformation ? money_expression(source, transformation) : source
-        assignment = "payload[#{field.target_name.dump}] = #{expression}"
-        return "  #{assignment}" if field.required
+      def render_field(field, fields, ir) = field_renderer.render(field, fields, ir)
 
-        "  #{assignment} if operation.respond_to?(#{field.source_name.dump}) && !#{source}.nil?"
-      end
+      def field_renderer = @field_renderer ||= FieldRenderer.new
 
       def render_status(operation)
         request = format(
@@ -198,10 +178,6 @@ module Generator
 
         name = fetch(operation.idempotency, :name)
         "  headers[#{name.dump}] = operation.idempotency_key"
-      end
-
-      def money_expression(expression, transformation)
-        "Integer(#{expression}) * #{fetch(transformation, :multiplier)}"
       end
 
       def env_name(ir, suffix) = "#{ir.env_prefix}_#{suffix}"

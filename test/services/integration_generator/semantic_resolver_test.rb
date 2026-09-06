@@ -270,6 +270,58 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
     assert_equal({ field: 'bank_code', condition: { field: 'type', equals: 'sbp' } }, field.required_if)
   end
 
+  test 'a mapping platform_source override replaces inference for a field with no structural signal' do
+    parsed = parse(spec_with_operations(<<~YAML))
+      /checkouts:
+        post:
+          operationId: createCheckout
+          security: [ApiKeyAuth: []]
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  type: object
+                  required: [merchant_code]
+                  properties:
+                    merchant_code: { type: string }
+          responses: { "201": { description: Created } }
+    YAML
+    mapping = {
+      'operations' => [
+        { 'operation_id' => 'createCheckout',
+          'fields' => { 'merchant_code' => { 'platform_source' => { 'kind' => 'attribute', 'attribute' => 'id' } } } }
+      ]
+    }
+
+    resolved = resolver.call(parsed: parsed, mapping: mapping, provider_key: 'novapay')
+
+    field = resolved.fetch(:operations).first.request_fields.find { |f| f.source_name == 'merchant_code' }
+    assert_equal({ kind: :attribute, attribute: 'id' }, field.platform_source)
+  end
+
+  test 'without a platform_source override, a required field with no structural signal stays :unknown' do
+    parsed = parse(spec_with_operations(<<~YAML))
+      /checkouts:
+        post:
+          operationId: createCheckout
+          security: [ApiKeyAuth: []]
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  type: object
+                  required: [merchant_code]
+                  properties:
+                    merchant_code: { type: string }
+          responses: { "201": { description: Created } }
+    YAML
+
+    resolved = resolver.call(parsed: parsed, mapping: nil, provider_key: 'novapay')
+
+    field = resolved.fetch(:operations).first.request_fields.find { |f| f.source_name == 'merchant_code' }
+    assert_equal({ kind: :unknown }, field.platform_source)
+  end
+
   test 'normalizes a non-snake_case field name into a valid Ruby identifier' do
     resolved = resolve(spec_with_operations(<<~YAML))
       /payouts:
