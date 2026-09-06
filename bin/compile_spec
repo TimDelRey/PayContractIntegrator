@@ -1,10 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# Dev-A milestone script for the full stage 1-4 pipeline (safe load -> local
-# refs -> parse structure -> infer payment semantics). Superseded once
-# bin/integrate (Dev B) wires the real CLI/Generator on top of Compiler.
-
 require_relative '../lib/integration_generator'
 
 path = ARGV.first

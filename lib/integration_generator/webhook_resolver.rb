@@ -1,13 +1,6 @@
 # frozen_string_literal: true
 
 module IntegrationGenerator
-  # Builds the webhook contract Hash (signature + event_map) for an operation
-  # already classified with role :process_callback. Generator::ServiceValidator
-  # only ever accepts one signature shape -- HMAC-SHA256, hex-encoded, over
-  # raw_body -- so that is the only one built; anything else (no signature
-  # header at all, or a header with an unrecognized/unsupported algorithm)
-  # drops the webhook with a :warning rather than generating an unverifiable
-  # or unrenderable callback.
   class WebhookResolver
     SIGNATURE_NAME_PATTERN = /signature|подпис/i
     SIGNATURE_ALGORITHMS = {

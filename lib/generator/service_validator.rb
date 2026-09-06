@@ -5,9 +5,6 @@ module Generator
     PROVIDER_KEY = /\A[a-z][a-z0-9_]*\z/
     ENV_NAME = /\A[A-Z][A-Z0-9_]*\z/
     HEADER_NAME = /\A[A-Za-z0-9!#$%&'*+.^_`|~-]+\z/
-    # Matches IntegrationGenerator::OpenApiParser::HTTP_METHODS -- the parser
-    # never even sees options/head/trace operations, so this list is the
-    # single source of truth for which HTTP methods a payment operation may use.
     HTTP_METHODS = %i[get post put patch delete].freeze
 
     def call(ir)

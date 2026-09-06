@@ -1,11 +1,6 @@
 # frozen_string_literal: true
 
 module IntegrationGenerator
-  # Determines a numeric field's money unit and the conversion needed to
-  # reach it from the internal Space Payments unit (rubles) -- mapping
-  # override first, then a keyword scan of the field's own description.
-  # Never guesses: an undetermined unit is a :warning, and the field is
-  # passed through unconverted rather than silently assuming a value.
   class MoneyResolver
     FIELD_NAMES = %w[amount sum value].freeze
     UNIT_KEYWORDS = {

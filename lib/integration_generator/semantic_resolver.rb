@@ -1,17 +1,6 @@
 # frozen_string_literal: true
 
 module IntegrationGenerator
-  # Stage 4 orchestrator: turns a structurally-parsed spec into payment
-  # semantics by delegating to RoleResolver, FieldResolver, AuthResolver,
-  # WebhookResolver and StatusErrorResolver. Inference is the default source
-  # of truth; an optional mapping only overrides what a resolver could not
-  # safely decide on its own.
-  #
-  # Design principle: a gap at the single field/operation level never blocks
-  # the whole compile. It degrades -- the operation or field is dropped with
-  # a :warning diagnostic -- rather than failing the entire IR. The only
-  # thing the aggregate compile step (Compiler) treats as fatal is ending up
-  # with nothing left to generate at all.
   class SemanticResolver
     def initialize(
       role_resolver: RoleResolver.new, field_resolver: FieldResolver.new,
@@ -64,11 +53,6 @@ module IntegrationGenerator
       resolve_regular_operation(operation, role, entry, parsed, acc)
     end
 
-    # A webhook becomes both a webhooks-list Hash (signature/event_map, read
-    # by Generator's renderers) and a regular OperationIR with role
-    # :process_callback (read by Generator::ServiceValidator's per-operation
-    # checks) -- Generator::ServiceValidator requires both to be present and
-    # consistent (exactly one of each).
     def resolve_webhook(operation, acc)
       webhook = @webhook_resolver.call(
         operation: operation, diagnostics: acc.fetch(:diagnostics), provider_key: acc.fetch(:provider_key)

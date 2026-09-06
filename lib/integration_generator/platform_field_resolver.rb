@@ -1,14 +1,6 @@
 # frozen_string_literal: true
 
 module IntegrationGenerator
-  # Classifies how generated code must read a request-body field's value
-  # from the platform's internal `operation` object. Per the platform
-  # team's clarification (hackathon Q&A), only operation.id, operation.amount
-  # and operation.payout_requisite are guaranteed to exist -- everything
-  # else is either a fixed constant (a single-value enum), an id alias, a
-  # payout_requisite container, or genuinely unknown. An unknown field is
-  # never silently guessed; it stays tagged :unknown so the renderer can
-  # leave a TODO instead of inventing a read path.
   class PlatformFieldResolver
     ID_ALIAS_PATTERN = /\A(external_id|merchant_reference|client_reference|reference)\z/i
     REQUISITE_KEYS = %w[phone bank_code bank_name card_number iban account_number].freeze
@@ -29,13 +21,6 @@ module IntegrationGenerator
       field_schema['type'] == 'object' && requisite_keys_present(field_schema).any?
     end
 
-    # Only the first alternative of the sibling type-selector enum is
-    # resolved (matching the case brief's own reference implementation,
-    # which only implements the SBP path) -- picking among several
-    # requisite types at runtime is a rendering/branching decision for the
-    # Artifact Generator to make, not something to guess here. When more
-    # than one alternative exists, that choice is surfaced as a diagnostic
-    # rather than made silently.
     def requisite_container(name, field_schema, diagnostics)
       properties = field_schema['properties'] || {}
       types = Array(properties.dig(TYPE_SELECTOR, 'enum'))

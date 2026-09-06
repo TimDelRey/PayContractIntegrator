@@ -1,16 +1,6 @@
 # frozen_string_literal: true
 
 module IntegrationGenerator
-  # Determines an operation's BaseService role: a mapping override, then an
-  # x-space-payments-role extension, then a structural heuristic.
-  #
-  # The heuristic first picks *one* resource -- the create_request candidate
-  # -- out of possibly many unrelated POST endpoints in a multi-resource API
-  # (a merchant platform exposes checkouts, customers, readers... only one
-  # of those is the payment flow we care about). It then scopes
-  # fetch_status/cancel to operations under that same resource path. A bare
-  # "GET with an id param" is not enough on its own -- that matches almost
-  # any REST "get by id" endpoint, payment-related or not.
   class RoleResolver
     PAYMENT_KEYWORDS = /payout|payment|disburs|transfer|payin|checkout|charge|withdraw/i
     SIGNATURE_NAME_PATTERN = /signature|подпис/i
@@ -34,8 +24,6 @@ module IntegrationGenerator
     end
 
     private
-
-    # -- resource selection (which endpoint family is "the" payment flow) --
 
     def create_candidates(operations)
       operations.select { |operation| create_shaped?(operation) }
@@ -62,11 +50,6 @@ module IntegrationGenerator
       matches.size == 1 ? matches.first : nil
     end
 
-    # Deliberately excludes the free-text description: real specs routinely
-    # mention "payment" in passing on unrelated resources (e.g. a customer
-    # endpoint that talks about "payment instruments"), which produced false
-    # matches. Path/summary/tags are short, curated fields where the word
-    # actually names what the resource is.
     def payment_keyword?(operation)
       haystack = [operation[:path], operation[:summary], *operation[:tags]].compact.join(' ')
       haystack.match?(PAYMENT_KEYWORDS)
@@ -88,8 +71,6 @@ module IntegrationGenerator
         hint: 'Add an operation entry with role: create_request in integration_mapping.yml to pick one'
       )
     end
-
-    # -- per-operation role heuristic --
 
     def heuristic(operation, context)
       return :cancel if cancel?(operation, context)

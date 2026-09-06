@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
 module IntegrationGenerator
-  # Assembles the frozen IntegrationIR from a ParsedSpec plus SemanticResolver's
-  # output. Pure assembly -- all the actual decisions were already made by
-  # SemanticResolver; this class only shapes the result into the contract B
-  # depends on.
   class IrBuilder
     ADAPTER_CONTRACT_VERSION = '1'
 
@@ -41,9 +37,6 @@ module IntegrationGenerator
     end
 
     def camelize(provider_key)
-      # reject(&:empty?): a leading/trailing/doubled separator (e.g.
-      # "acme__pay") otherwise produces an empty element, and part[0] would
-      # be nil -- nil.upcase raises, which Compiler does not rescue.
       provider_key.to_s.split(/[_-]/).reject(&:empty?).map { |part| part[0].upcase + part[1..] }.join
     end
 

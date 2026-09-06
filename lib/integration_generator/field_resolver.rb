@@ -1,12 +1,6 @@
 # frozen_string_literal: true
 
 module IntegrationGenerator
-  # Builds the pieces of an OperationIR that describe its fields:
-  # `parameters` (path-template parameters, as plain Hashes -- Generator's
-  # ServiceValidator expects Hash, not FieldIR, there), `request_fields`
-  # (body fields, as FieldIR, delegating money-unit detection to
-  # MoneyResolver), and `idempotency` (spotted by name pattern among the
-  # operation's raw parameters, {} rather than nil when absent).
   class FieldResolver
     IDEMPOTENCY_NAME_PATTERN = /idempotency/i
 
@@ -15,11 +9,6 @@ module IntegrationGenerator
       @platform_field_resolver = platform_field_resolver
     end
 
-    # Only path-location parameters are kept: they are the only ones
-    # Generator::ServiceValidator's check_parameters accepts (matched
-    # against the {..} segments in the path template). Header/query
-    # parameters that matter (idempotency, webhook signature) are captured
-    # through their own dedicated field instead.
     def parameters(raw_parameters)
       raw_parameters.select { |param| param['in'] == 'path' }.map { |param| build_parameter_hash(param) }
     end
@@ -70,13 +59,6 @@ module IntegrationGenerator
       money
     end
 
-    # MoneyResolver keys its entry by the raw OpenAPI field name (matching
-    # how mapping overrides are matched elsewhere), but FieldIR#source_name
-    # is always the normalized identifier -- Generator::ServiceValidator and
-    # the renderer both compare money_transformations[].field against
-    # source_name, so the stored field must use the same normalized form or
-    # a non-snake_case money field (e.g. "Amount") fails validation or gets
-    # silently skipped at render time.
     def normalized_money_entry(name, money)
       money.fetch(:entry).merge(field: normalize_identifier(name)).freeze
     end
@@ -92,12 +74,6 @@ module IntegrationGenerator
       )
     end
 
-    # platform_source is normally inferred purely from the OpenAPI schema
-    # (PlatformFieldResolver) -- but some real fields (an opaque merchant
-    # code, a free-text reference) have no structural signal to infer from
-    # at all and would stay :unknown forever, permanently blocking
-    # generation if the field is required. A mapping override lets the
-    # integrator state the read path explicitly instead of being stuck.
     def build_platform_source(name, field_schema, override, money, context)
       raw = override && override['platform_source']
       return normalize_platform_source(raw) if raw
@@ -122,8 +98,6 @@ module IntegrationGenerator
       required.include?(name)
     end
 
-    # required_if is purely a mapping-supplied, field-name-agnostic rule --
-    # never inferred, never branching on a provider or field name in code.
     def build_required_if(override)
       rule = override && override['required_if']
       return nil unless rule
@@ -132,10 +106,6 @@ module IntegrationGenerator
       { field: rule['field'], condition: { field: condition['field'], equals: condition['equals'] } }.freeze
     end
 
-    # Generator::ServiceValidator requires snake_case Ruby identifiers for
-    # both source_name and target_name. Real specs are not guaranteed to use
-    # them (camelCase, hyphens), so normalize deterministically rather than
-    # rejecting otherwise-usable fields.
     def normalize_identifier(name)
       normalized = name.to_s
                        .gsub(/([a-z0-9])([A-Z])/, '\1_\2')

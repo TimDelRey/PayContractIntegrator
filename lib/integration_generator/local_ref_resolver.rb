@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 module IntegrationGenerator
-  # Stage 2: dereferences local ("#/...") JSON Pointer $refs in place and
-  # rejects remote references outright (no network fetch, no SSRF surface).
-  # Detects reference cycles instead of recursing forever.
   class LocalRefResolver
     MAX_REF_DEPTH = 32
 

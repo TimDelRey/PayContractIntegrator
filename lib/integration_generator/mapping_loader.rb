@@ -1,12 +1,6 @@
 # frozen_string_literal: true
 
 module IntegrationGenerator
-  # Loads the optional integration_mapping.yml. Mapping is never required --
-  # it exists only to override what SemanticResolver could not safely infer,
-  # or to disambiguate something inference got wrong. A mapping that IS
-  # given must be well-formed and on a supported schema_version; unlike a
-  # spec's own missing semantics (which degrade gracefully), a broken
-  # user-provided override is a hard error -- we cannot trust it partially.
   class MappingLoader
     SUPPORTED_SCHEMA_VERSION = '1.0'
 

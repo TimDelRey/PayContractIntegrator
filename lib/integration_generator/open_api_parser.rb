@@ -1,20 +1,10 @@
 # frozen_string_literal: true
 
 module IntegrationGenerator
-  # Provisional, internal parsed-spec shape produced by stage 3. Not yet the
-  # frozen IntegrationIR/OperationIR contract from dev_plan.md -- that needs
-  # role/mapping resolution (stage 4+), which is out of scope here.
   ParsedSpec = Data.define(:version, :base_urls, :security_schemes, :operations, :source_metadata)
 
-  # Stage 3: extracts version, servers, security schemes and operations from
-  # an already safe-loaded and $ref-resolved OpenAPI document. Purely
-  # structural -- it never infers payment semantics (role, units, statuses).
   class OpenApiParser
     SUPPORTED_VERSION_PATTERN = /\A3\.[01]\./
-    # Matches Generator::ServiceValidator::HTTP_METHODS -- options/head/trace
-    # are not payment-relevant, so parsing them would only let an operation
-    # role resolve to one and fail late, at generation time, on
-    # :invalid_http_method instead of never entering the pipeline.
     HTTP_METHODS = %w[get put post delete patch].freeze
 
     def call(document:, source_name:)
@@ -88,10 +78,6 @@ module IntegrationGenerator
       end
     end
 
-    # Only Bearer is renderable downstream (Generator::ServiceValidator only
-    # accepts :api_key/:bearer); Basic and any other http scheme are
-    # structurally recognized but marked unsupported rather than silently
-    # treated as usable and failing later at generation time.
     def normalize_http_scheme(name, scheme)
       if scheme['scheme'].to_s.downcase == 'bearer'
         { name: name, type: :bearer, location: :header, scheme_name: 'Authorization' }.freeze
@@ -133,11 +119,6 @@ module IntegrationGenerator
       }
     end
 
-    # OpenAPI lets a Path Item Object declare a parameter once for every
-    # method under that path instead of repeating it per operation; an
-    # operation-level parameter with the same (name, in) overrides the
-    # shared one, but a shared parameter the operation does not repeat
-    # still applies.
     def merge_parameters(shared_parameters, own_parameters)
       own = Array(own_parameters)
       own_keys = own.map { |param| [param['name'], param['in']] }

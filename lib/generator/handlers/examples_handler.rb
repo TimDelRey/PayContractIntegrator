@@ -60,12 +60,6 @@ module Generator
         end
       end
 
-      # A webhook whose event values all failed vocabulary matching still
-      # passes ServiceValidator#check_webhook (which only checks event_map is
-      # a Hash of safe scalars, not that it's non-empty); emitting
-      # {"event": null, "expected": null} from event_map.min on an empty Hash
-      # would document a callback example that can never actually occur, so
-      # that webhook is skipped instead.
       def callback_examples(ir)
         ir.webhooks.map.with_index do |webhook, index|
           event_map = fetch(webhook, :event_map, {})

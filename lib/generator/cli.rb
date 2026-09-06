@@ -2,10 +2,6 @@ require 'optparse'
 
 module Generator
   class CLI
-    # --mapping is an optional override, not a requirement -- the brief's
-    # own demo command (`./integrate --spec ... --provider ... --lang ...`)
-    # never passes it, and IntegrationGenerator::Compiler already works
-    # from inference alone.
     REQUIRED_FLAGS = %i[spec provider lang].freeze
 
     def initialize(stdout: $stdout, stderr: $stderr, pipeline: Pipeline.new)

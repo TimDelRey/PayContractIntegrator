@@ -3,9 +3,6 @@
 require 'psych'
 
 module IntegrationGenerator
-  # Stage 1: safely turns raw YAML text into a plain Hash/Array tree.
-  # Never deserializes arbitrary Ruby objects or resolves YAML aliases,
-  # and bounds input size and nesting depth against untrusted specs.
   class SpecLoader
     MAX_BYTESIZE = 2 * 1024 * 1024
     MAX_NESTING_DEPTH = 64

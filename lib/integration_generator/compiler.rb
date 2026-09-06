@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
 module IntegrationGenerator
-  # Top-level entry point for Dev A's pipeline: safe load -> resolve local
-  # refs -> parse structure -> (optional) load mapping -> resolve semantics
-  # -> build IR. Never raises -- every failure becomes a CompileResult with
-  # ir: nil and a structured diagnostic explaining why.
   class Compiler
     def call(source:, source_name:, provider_key:, mapping_source: nil, mapping_source_name: nil)
       parsed = parse_structure(source, source_name)

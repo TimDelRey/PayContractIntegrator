@@ -9,7 +9,6 @@ module Generator
   WEBHOOK_SIGNATURE_FIELDS = %i[algorithm encoding header secret_env signed_payload].freeze
   OPERATION_ROLE_NAMES = OPERATION_ROLES.map(&:to_s).freeze
 
-  # Shared between PlatformFieldResolver (producer) and PlatformSourceValidator (consumer).
   PLATFORM_ATTRIBUTE_ID = 'id'.freeze
   PLATFORM_ATTRIBUTE_AMOUNT = 'amount'.freeze
   PLATFORM_ATTRIBUTES = [PLATFORM_ATTRIBUTE_ID, PLATFORM_ATTRIBUTE_AMOUNT].freeze
@@ -50,21 +49,6 @@ module Generator
     def initialize(ir:, diagnostics:) = super(ir:, diagnostics: deep_freeze(diagnostics))
   end
 
-  # required_if: optional {field:, condition: {field:, equals:}} -- a generic
-  # cross-field conditional-requirement rule (e.g. "bank_code required when
-  # type equals sbp"). Never provider-name-branched; comes only from a
-  # mapping override, defaults to nil (unconditionally required/optional as
-  # per `required`).
-  #
-  # platform_source: how generated code must actually read this field's
-  # value off the platform's internal `operation` object (only operation.id/
-  # operation.amount/operation.payout_requisite are guaranteed to exist --
-  # a field name matching the OpenAPI schema is not itself a valid read
-  # path). One of:
-  #   {kind: :constant, value:}                      -- fixed, single-enum value
-  #   {kind: :attribute, attribute:}                  -- "id" or "amount"
-  #   {kind: :requisite_container, requisite_type:, known_keys:, unknown_keys:}
-  #   {kind: :unknown}                                -- default; never guessed
   FieldIR = Data.define(
     :source_name,
     :target_name,

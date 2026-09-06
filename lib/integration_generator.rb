@@ -3,9 +3,6 @@
 module IntegrationGenerator
 end
 
-# Shared frozen contract (Diagnostic, CompileResult, IntegrationIR,
-# OperationIR, FieldIR) lives in Generator::contracts -- required first so
-# there is exactly one definition of each, not a duplicate per namespace.
 require_relative 'generator/contracts'
 require_relative 'integration_generator/contracts'
 require_relative 'integration_generator/errors'

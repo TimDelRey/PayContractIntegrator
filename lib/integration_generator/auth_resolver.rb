@@ -1,12 +1,6 @@
 # frozen_string_literal: true
 
 module IntegrationGenerator
-  # Resolves which security scheme an operation actually uses. Real specs
-  # routinely offer alternatives where only one is actually supported (e.g.
-  # "apiKey or oauth2") -- that is not ambiguous, since only one candidate
-  # could ever be chosen. Genuine ambiguity is when 2+ *supported* schemes
-  # remain and nothing picks between them; that needs a mapping override
-  # rather than an arbitrary guess at which header to send.
   class AuthResolver
     def call(operation:, security_schemes:, mapping:, diagnostics:)
       return nil if operation[:security].empty?

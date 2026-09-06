@@ -74,10 +74,6 @@ module Generator
         ir.webhooks.map { |webhook| "- signature: #{inline_hash(value(webhook, :signature, {}), WEBHOOK_SIGNATURE_FIELDS)}" }.join("\n")
       end
 
-      # Explicit place to point at (per the platform Q&A: "no blind guessing --
-      # a TODO comment plus an explicit mapping spot in INTEGRATION.md") for
-      # every field the generator could not map to a known platform read path,
-      # so it isn't just a source comment nobody reads.
       def unresolved_fields(ir)
         lines = ir.operations.flat_map { |operation| unresolved_operation_fields(operation) }
         lines.empty? ? 'None.' : lines.join("\n")

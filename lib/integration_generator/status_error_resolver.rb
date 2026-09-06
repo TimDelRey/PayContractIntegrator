@@ -1,13 +1,6 @@
 # frozen_string_literal: true
 
 module IntegrationGenerator
-  # Builds status_map and error_map across every parsed operation (not just
-  # the ones that survived role resolution -- a status enum can live on an
-  # operation that got dropped for an unrelated reason). Statuses go through
-  # a built-in vocabulary of common payment-status words, since that
-  # vocabulary is genuinely shared across providers; errors default to an
-  # identity mapping, since provider error codes have no such shared
-  # vocabulary to fall back on.
   class StatusErrorResolver
     VOCABULARY = {
       'pending' => 'in_progress', 'processing' => 'in_progress', 'created' => 'in_progress',

@@ -1,12 +1,4 @@
 module Generator
-  # Structural checks for FieldIR#platform_source and FieldIR#required_if,
-  # split out of ServiceValidator to keep that class under the shared
-  # Metrics/ClassLength budget. Both values get embedded literally into the
-  # generated service by Handlers::FieldRenderer, so this is a security
-  # boundary, not just a shape check: every kind's payload data and
-  # required_if.condition.equals must be safe scalars, never an arbitrary
-  # object whose #inspect could inject code into the rendered source
-  # (mirrors ServiceValidator#check_map's guard for status_map/error_map).
   class PlatformSourceValidator
     KINDS = %i[constant attribute requisite_container unknown].freeze
 
@@ -44,10 +36,6 @@ module Generator
       fail!(:invalid_platform_source, 'A :constant platform_source value must be a safe scalar')
     end
 
-    # A required field with no resolved read path would ship a payload
-    # silently missing that field -- AGENTS.md forbids emitting plausible
-    # incomplete code for unresolved required payment semantics, so this is
-    # a generation error, not a warning.
     def check_unknown(field)
       return unless field.required
 
@@ -64,13 +52,6 @@ module Generator
 
     def safe_string_array?(value) = value.is_a?(Array) && value.all?(String)
 
-    # required_if only makes sense on an :attribute field: it guards
-    # whether that field's own value (read via operation.public_send) is
-    # present, so a field with no computable read expression (:unknown,
-    # :constant, :requisite_container) or one that's already unconditionally
-    # required can't carry it. condition.field must also name a sibling
-    # :attribute field, since FieldRenderer renders the guard as
-    # operation.public_send(that sibling's platform attribute).
     def check_required_if(field, fields_by_name)
       rule = field.required_if
       return if rule.nil?
