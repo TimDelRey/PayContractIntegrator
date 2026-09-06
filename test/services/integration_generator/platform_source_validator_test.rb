@@ -11,7 +11,7 @@ class PlatformSourceValidatorTest < Minitest::Test
   end
 
   test 'accepts an optional field with a well-formed platform_source of each kind' do
-    %i[constant attribute requisite_container unknown].each do |kind|
+    %i[constant attribute requisite_container configuration money_container unknown].each do |kind|
       field = base_field.with(required: false, platform_source: sample_platform_source(kind))
 
       assert_nil call(field, fields_by_name(field))
@@ -48,6 +48,30 @@ class PlatformSourceValidatorTest < Minitest::Test
     field = base_field.with(required: false, platform_source: { kind: :unknown })
 
     assert_nil call(field, fields_by_name(field))
+  end
+
+  test 'rejects a :configuration platform_source whose name is not a safe SCREAMING_SNAKE_CASE env variable' do
+    field = base_field.with(platform_source: { kind: :configuration, name: 'merchant code; system("id")' })
+
+    assert_equal :invalid_platform_source, call(field, fields_by_name(field))
+  end
+
+  test 'rejects a :money_container whose currency is not a safe scalar, before it can be rendered as executable Ruby' do
+    malicious = Object.new
+    malicious.define_singleton_method(:inspect) { 'system("id")' }
+    field = base_field.with(
+      platform_source: { kind: :money_container, value_key: 'value', currency_key: 'currency', currency: malicious }
+    )
+
+    assert_equal :invalid_platform_source, call(field, fields_by_name(field))
+  end
+
+  test 'rejects a :money_container whose value_key or currency_key is not a String' do
+    field = base_field.with(
+      platform_source: { kind: :money_container, value_key: :value, currency_key: 'currency', currency: 'EUR' }
+    )
+
+    assert_equal :invalid_platform_source, call(field, fields_by_name(field))
   end
 
   test 'rejects a :requisite_container whose key lists are not safe String arrays' do
@@ -139,6 +163,8 @@ class PlatformSourceValidatorTest < Minitest::Test
     when :constant then { kind: :constant, value: 'RUB' }
     when :attribute then { kind: :attribute, attribute: 'amount' }
     when :requisite_container then { kind: :requisite_container, requisite_type: 'sbp', known_keys: ['phone'], unknown_keys: [] }
+    when :configuration then { kind: :configuration, name: 'MERCHANT_CODE' }
+    when :money_container then { kind: :money_container, value_key: 'value', currency_key: 'currency', currency: 'EUR' }
     else { kind: :unknown }
     end
   end

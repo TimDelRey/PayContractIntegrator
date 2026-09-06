@@ -6,11 +6,31 @@ module Generator
         when :unknown then render_unknown_field(field)
         when :constant then render_constant_field(field)
         when :requisite_container then render_requisite_field(field)
+        when :configuration then render_configuration_field(field, ir)
+        when :money_container then render_money_container_field(field, ir)
         else render_attribute_field(field, fields, ir)
         end
       end
 
       private
+
+      def render_configuration_field(field, ir)
+        name = field.platform_source.fetch(:name)
+        "  payload[#{field.target_name.dump}] = ENV.fetch(#{env_name(ir, name).dump})"
+      end
+
+      def render_money_container_field(field, ir)
+        source = field.platform_source
+        transformation = ir.money_transformations.find { |item| fetch(item, :field) == field.source_name }
+        expression = transformation ? money_expression('value', transformation) : 'value'
+        join_lines(
+          '  value = operation.public_send("amount")',
+          "  payload[#{field.target_name.dump}] = { #{fetch(source, :value_key).dump} => #{expression}, " \
+          "#{fetch(source, :currency_key).dump} => #{fetch(source, :currency).inspect} }"
+        )
+      end
+
+      def env_name(ir, name) = "#{ir.env_prefix}_#{name}"
 
       def render_unknown_field(field)
         "  # TODO: '#{field.target_name}' has no known platform read path -- " \

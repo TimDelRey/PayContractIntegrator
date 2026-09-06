@@ -101,7 +101,7 @@ Exit code `0` — генерация прошла и артефакты опуб
 | 6 | Генерация сервиса — входящие уведомления, настройка подключения | `ruby_service_handler.rb` (`render_callback`, `verify_webhook_signature!`) | ENV-конфиг, HMAC constant-time compare |
 | 7 | Преобразование данных — сопоставление полей запросов/ответов/статусов | `lib/generator/contracts.rb` (`FieldIR#platform_source`), `lib/integration_generator/platform_field_resolver.rb` | id/amount/payout_requisite, requisite_container |
 | 8 | Преобразование данных — форматы, обязательные/необязательные поля | `lib/integration_generator/field_resolver.rb`, `lib/generator/platform_source_validator.rb` | required/required_if/nullable |
-| 9 | Универсальность — работает с разными спеками | `test/fixtures/integration_generator/providers/*.yaml`, `lib/integration_generator/semantic_resolver.rb` | NovaPay/SumUp/Adyen/PayPal-фикстуры |
+| 9 | Универсальность — работает с разными спеками | `test/integration/real_provider_fixtures_test.rb` | реальные NovaPay/SumUp/Adyen/PayPal спеки гоняются через компилятор: SumUp резолвится в IR, Adyen/PayPal корректно возвращают diagnostics вместо угадывания |
 | 10 | Универсальность — логика не привязана к провайдеру | `test/services/integration_generator/generator_robustness_test.rb` | тест на отсутствие имён провайдеров в generation-коде |
 | 11 | Универсальность — новые правила / необрабатываемые элементы | `integration_mapping.yml` overrides (`required_if`, `platform_source`), `Generator::Diagnostic` | mapping — explicit escape hatch, не хардкод в коде |
 | 12 | Понятность использования — однокомандный процесс | `bin/integrate`, `lib/generator/cli.rb` | один вызов, стабильные exit codes 0/2/3/4/5 |

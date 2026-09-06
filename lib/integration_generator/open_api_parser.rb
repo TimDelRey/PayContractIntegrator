@@ -73,6 +73,8 @@ module IntegrationGenerator
         { name: name, type: :api_key, location: scheme['in']&.to_sym, scheme_name: scheme['name'] }.freeze
       when 'http'
         normalize_http_scheme(name, scheme)
+      when 'oauth2'
+        { name: name, type: :bearer, location: :header, scheme_name: 'Authorization' }.freeze
       else
         { name: name, type: :unsupported, location: nil, scheme_name: scheme['type'] }.freeze
       end

@@ -281,21 +281,21 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
               application/json:
                 schema:
                   type: object
-                  required: [merchant_code]
+                  required: [promo_code]
                   properties:
-                    merchant_code: { type: string }
+                    promo_code: { type: string }
           responses: { "201": { description: Created } }
     YAML
     mapping = {
       'operations' => [
         { 'operation_id' => 'createCheckout',
-          'fields' => { 'merchant_code' => { 'platform_source' => { 'kind' => 'attribute', 'attribute' => 'id' } } } }
+          'fields' => { 'promo_code' => { 'platform_source' => { 'kind' => 'attribute', 'attribute' => 'id' } } } }
       ]
     }
 
     resolved = resolver.call(parsed: parsed, mapping: mapping, provider_key: 'novapay')
 
-    field = resolved.fetch(:operations).first.request_fields.find { |f| f.source_name == 'merchant_code' }
+    field = resolved.fetch(:operations).first.request_fields.find { |f| f.source_name == 'promo_code' }
     assert_equal({ kind: :attribute, attribute: 'id' }, field.platform_source)
   end
 
@@ -310,16 +310,61 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
               application/json:
                 schema:
                   type: object
-                  required: [merchant_code]
+                  required: [promo_code]
                   properties:
-                    merchant_code: { type: string }
+                    promo_code: { type: string }
           responses: { "201": { description: Created } }
     YAML
 
     resolved = resolver.call(parsed: parsed, mapping: nil, provider_key: 'novapay')
 
-    field = resolved.fetch(:operations).first.request_fields.find { |f| f.source_name == 'merchant_code' }
+    field = resolved.fetch(:operations).first.request_fields.find { |f| f.source_name == 'promo_code' }
     assert_equal({ kind: :unknown }, field.platform_source)
+  end
+
+  test 'a mapping money_container platform_source override resolves a nested {value, currency} amount object' do
+    parsed = parse(spec_with_operations(<<~YAML))
+      /payouts:
+        post:
+          operationId: createPayout
+          security: [ApiKeyAuth: []]
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  type: object
+                  required: [amount]
+                  properties:
+                    amount:
+                      type: object
+                      required: [value, currency]
+                      properties:
+                        value: { type: integer, description: "The amount, in minor units." }
+                        currency: { type: string }
+          responses: { "201": { description: Created } }
+    YAML
+    mapping = {
+      'operations' => [
+        { 'operation_id' => 'createPayout',
+          'fields' => {
+            'amount' => {
+              'platform_source' => {
+                'kind' => 'money_container', 'value_key' => 'value', 'currency_key' => 'currency', 'currency' => 'EUR'
+              }
+            }
+          } }
+      ]
+    }
+
+    resolved = resolver.call(parsed: parsed, mapping: mapping, provider_key: 'adyen')
+
+    field = resolved.fetch(:operations).first.request_fields.find { |f| f.source_name == 'amount' }
+    assert_equal(
+      { kind: :money_container, value_key: 'value', currency_key: 'currency', currency: 'EUR' },
+      field.platform_source
+    )
+    assert_equal({ field: 'amount', from: 'rub', to: 'cent', multiplier: 100, rounding: :exact },
+                 resolved.fetch(:money_transformations).first)
   end
 
   test 'normalizes a non-snake_case field name into a valid Ruby identifier' do
@@ -364,6 +409,28 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
     field = resolved.fetch(:operations).first.request_fields.first
     assert_equal :rub_to_kopeck, field.transformation
     assert_equal({ field: 'amount', from: 'rub', to: 'kopeck', multiplier: 100, rounding: :exact },
+                 resolved.fetch(:money_transformations).first)
+  end
+
+  test 'detects a major-unit money field as an identity conversion, never using Float' do
+    resolved = resolve(spec_with_operations(<<~YAML))
+      /payouts:
+        post:
+          operationId: createPayout
+          security: [ApiKeyAuth: []]
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    amount: { type: number, description: "Amount, expressed in major units." }
+          responses: { "201": { description: Created } }
+    YAML
+
+    field = resolved.fetch(:operations).first.request_fields.first
+    assert_equal :rub_to_major, field.transformation
+    assert_equal({ field: 'amount', from: 'rub', to: 'major', multiplier: 1, rounding: :exact },
                  resolved.fetch(:money_transformations).first)
   end
 
@@ -483,11 +550,11 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
   end
 
   test 'drops an operation using an unsupported auth scheme type' do
-    resolved = resolve(spec_with_operations(<<~YAML, security_schemes: oauth2_scheme))
+    resolved = resolve(spec_with_operations(<<~YAML, security_schemes: unsupported_scheme))
       /payouts:
         post:
           operationId: createPayout
-          security: [OAuth2: []]
+          security: [OpenIdAuth: []]
           requestBody:
             content:
               application/json:
@@ -500,11 +567,11 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
   end
 
   test 'auto-picks the only supported alternative when other alternatives are unsupported' do
-    resolved = resolve(spec_with_operations(<<~YAML, security_schemes: mixed_supported_and_oauth2_schemes))
+    resolved = resolve(spec_with_operations(<<~YAML, security_schemes: mixed_supported_and_unsupported_schemes))
       /payouts:
         post:
           operationId: createPayout
-          security: [ApiKeyAuth: [], OAuth2: []]
+          security: [ApiKeyAuth: [], OpenIdAuth: []]
           requestBody:
             content:
               application/json:
@@ -626,23 +693,23 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
     YAML
   end
 
-  def oauth2_scheme
+  def unsupported_scheme
     <<~YAML
-      OAuth2:
-        type: oauth2
-        flows: {}
+      OpenIdAuth:
+        type: openIdConnect
+        openIdConnectUrl: https://example.test/.well-known/openid-configuration
     YAML
   end
 
-  def mixed_supported_and_oauth2_schemes
+  def mixed_supported_and_unsupported_schemes
     <<~YAML
       ApiKeyAuth:
         type: apiKey
         in: header
         name: X-API-Key
-      OAuth2:
-        type: oauth2
-        flows: {}
+      OpenIdAuth:
+        type: openIdConnect
+        openIdConnectUrl: https://example.test/.well-known/openid-configuration
     YAML
   end
 

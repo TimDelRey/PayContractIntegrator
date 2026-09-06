@@ -52,11 +52,17 @@ module IntegrationGenerator
 
     def resolve_field_money(name, field_schema, context)
       money = @money_resolver.call(
-        field_name: name, field_schema: field_schema, operation_mapping: context.fetch(:mapping_entry),
+        field_name: name, field_schema: money_schema_for(field_schema), operation_mapping: context.fetch(:mapping_entry),
         diagnostics: context.fetch(:diagnostics), operation_id: context.fetch(:operation_id)
       )
       context.fetch(:money_transformations) << normalized_money_entry(name, money) if money
       money
+    end
+
+    def money_schema_for(field_schema)
+      return field_schema unless @platform_field_resolver.money_container_shaped?(field_schema)
+
+      @platform_field_resolver.money_container_value_schema(field_schema)
     end
 
     def normalized_money_entry(name, money)
@@ -84,7 +90,8 @@ module IntegrationGenerator
     def normalize_platform_source(raw)
       {
         kind: raw['kind']&.to_sym, attribute: raw['attribute'], value: raw['value'],
-        requisite_type: raw['requisite_type'], known_keys: raw['known_keys'], unknown_keys: raw['unknown_keys']
+        requisite_type: raw['requisite_type'], known_keys: raw['known_keys'], unknown_keys: raw['unknown_keys'],
+        name: raw['name'], value_key: raw['value_key'], currency_key: raw['currency_key'], currency: raw['currency']
       }.compact.freeze
     end
 

@@ -24,6 +24,22 @@ class IntegrationGeneratorOpenApiParserTest < Minitest::Test
     assert_equal 'X-API-Key', scheme.fetch(:scheme_name)
   end
 
+  test 'normalizes an oauth2 security scheme the same way as an http bearer scheme, since both send Authorization: Bearer <token>' do
+    document = minimal_document
+    document['paths']['/payouts']['post']['security'] = [{ 'Oauth2' => ['payouts'] }]
+    document['components']['securitySchemes'] = {
+      'Oauth2' => { 'type' => 'oauth2', 'flows' => { 'clientCredentials' => { 'tokenUrl' => '/oauth2/token', 'scopes' => {} } } }
+    }
+
+    parsed = parser.call(document: document, source_name: 'spec.yaml')
+
+    assert_equal 1, parsed.security_schemes.size
+    scheme = parsed.security_schemes.first
+    assert_equal :bearer, scheme.fetch(:type)
+    assert_equal :header, scheme.fetch(:location)
+    assert_equal 'Authorization', scheme.fetch(:scheme_name)
+  end
+
   test 'rejects unsupported OpenAPI versions' do
     document = minimal_document.merge('openapi' => '2.0')
 

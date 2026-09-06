@@ -1,6 +1,7 @@
 module Generator
   class PlatformSourceValidator
-    KINDS = %i[constant attribute requisite_container unknown].freeze
+    KINDS = %i[constant attribute requisite_container configuration money_container unknown].freeze
+    ENV_NAME_PATTERN = /\A[A-Z][A-Z0-9_]*\z/
 
     def call(field, fields_by_name, &fail_with)
       @fail_with = fail_with
@@ -18,6 +19,8 @@ module Generator
       when :attribute then check_attribute(source)
       when :requisite_container then check_requisite_container(source)
       when :constant then check_constant(source)
+      when :configuration then check_configuration(source)
+      when :money_container then check_money_container(source)
       when :unknown then check_unknown(field)
       end
     end
@@ -34,6 +37,19 @@ module Generator
       return if safe_scalar?(source[:value])
 
       fail!(:invalid_platform_source, 'A :constant platform_source value must be a safe scalar')
+    end
+
+    def check_configuration(source)
+      return if source[:name].is_a?(String) && ENV_NAME_PATTERN.match?(source[:name])
+
+      fail!(:invalid_platform_source, 'A :configuration platform_source must name a safe SCREAMING_SNAKE_CASE env variable')
+    end
+
+    def check_money_container(source)
+      valid = source[:value_key].is_a?(String) && source[:currency_key].is_a?(String) && safe_scalar?(source[:currency])
+      return if valid
+
+      fail!(:invalid_platform_source, 'A :money_container platform_source requires String value_key/currency_key and a safe scalar currency')
     end
 
     def check_unknown(field)

@@ -1,0 +1,11 @@
+schema_version: "1.0"
+operations:
+  - operation_id: post-payout
+    role: create_request
+    fields:
+      amount:
+        platform_source:
+          kind: money_container
+          value_key: value
+          currency_key: currency
+          currency: EUR

@@ -5,9 +5,10 @@ module IntegrationGenerator
     FIELD_NAMES = %w[amount sum value].freeze
     UNIT_KEYWORDS = {
       /(копе[йе]к|kopeck)/i => 'kopeck',
-      /(цент|\bcent\b)/i => 'cent'
+      /(цент|\bcent\b|minor\s+units?)/i => 'cent',
+      /major\s+units?/i => 'major'
     }.freeze
-    UNIT_MULTIPLIER = { 'kopeck' => 100, 'cent' => 100 }.freeze
+    UNIT_MULTIPLIER = { 'kopeck' => 100, 'cent' => 100, 'major' => 1 }.freeze
     INTERNAL_UNIT = 'rub'
 
     def call(field_name:, field_schema:, operation_mapping:, diagnostics:, operation_id:)

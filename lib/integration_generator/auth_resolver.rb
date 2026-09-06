@@ -7,7 +7,7 @@ module IntegrationGenerator
 
       supported = supported_schemes(operation, security_schemes)
       return unsupported!(operation, diagnostics) if supported.empty?
-      return build(supported.first) if supported.size == 1
+      return build(supported.first) if supported.size == 1 || equivalent?(supported)
 
       chosen = pick(supported, mapping)
       return ambiguous!(operation, diagnostics) unless chosen
@@ -20,6 +20,10 @@ module IntegrationGenerator
     def supported_schemes(operation, security_schemes)
       scheme_names = operation[:security].flat_map(&:keys)
       security_schemes.select { |scheme| scheme_names.include?(scheme[:name]) && scheme[:type] != :unsupported }
+    end
+
+    def equivalent?(supported)
+      supported.map { |scheme| build(scheme) }.uniq.size == 1
     end
 
     def pick(supported, mapping)

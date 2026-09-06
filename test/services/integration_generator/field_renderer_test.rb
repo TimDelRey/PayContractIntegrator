@@ -41,6 +41,31 @@ class FieldRendererTest < Minitest::Test
     assert_equal '  payload["currency"] = "RUB"', @renderer.render(field, [field], integration_ir)
   end
 
+  test 'renders a :configuration field from ENV using the provider env_prefix, never reading the operation' do
+    field = base_field.with(
+      source_name: 'merchant_code', target_name: 'merchant_code',
+      platform_source: { kind: :configuration, name: 'MERCHANT_CODE' }
+    )
+
+    rendered = @renderer.render(field, [field], integration_ir.with(env_prefix: 'SUMUP'))
+
+    assert_equal '  payload["merchant_code"] = ENV.fetch("SUMUP_MERCHANT_CODE")', rendered
+  end
+
+  test 'renders a :money_container field as a nested {value, currency} Hash, applying the money transformation to value only' do
+    field = base_field.with(
+      source_name: 'amount', target_name: 'amount',
+      platform_source: { kind: :money_container, value_key: 'value', currency_key: 'currency', currency: 'EUR' }
+    )
+
+    expected = [
+      '  value = operation.public_send("amount")',
+      '  payload["amount"] = { "value" => Integer(value) * 100, "currency" => "EUR" }'
+    ].join("\n")
+
+    assert_equal expected, @renderer.render(field, [field], integration_ir)
+  end
+
   test 'renders an :unknown field as a TODO comment, never guessing a read path' do
     field = base_field.with(source_name: 'mystery', target_name: 'mystery', platform_source: { kind: :unknown })
 

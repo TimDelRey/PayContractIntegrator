@@ -2,8 +2,11 @@
 
 module IntegrationGenerator
   class PlatformFieldResolver
-    ID_ALIAS_PATTERN = /\A(external_id|merchant_reference|client_reference|reference)\z/i
+    ID_ALIAS_PATTERN = /\A(external_id|reference|\w+_reference)\z/i
+    ACCOUNT_ALIAS_PATTERN = /\A(merchant_?(code|id|account)|account_?id|store_?id)\z/i
     REQUISITE_KEYS = %w[phone bank_code bank_name card_number iban account_number].freeze
+    MONEY_CONTAINER_VALUE_KEYS = %w[value amount].freeze
+    MONEY_CONTAINER_CURRENCY_KEY = 'currency'
     TYPE_SELECTOR = 'type'
 
     def classify(name, field_schema, money:, diagnostics:)
@@ -11,11 +14,34 @@ module IntegrationGenerator
       return constant(field_schema) if single_value_enum?(field_schema)
       return { kind: :attribute, attribute: Generator::PLATFORM_ATTRIBUTE_AMOUNT }.freeze if money
       return { kind: :attribute, attribute: Generator::PLATFORM_ATTRIBUTE_ID }.freeze if name.to_s.match?(ID_ALIAS_PATTERN)
+      return { kind: :configuration, name: env_variable_name(name) }.freeze if name.to_s.match?(ACCOUNT_ALIAS_PATTERN)
 
       { kind: :unknown }.freeze
     end
 
+    def money_container_shaped?(field_schema)
+      !money_container_value_key(field_schema).nil?
+    end
+
+    def money_container_value_schema(field_schema)
+      key = money_container_value_key(field_schema)
+      field_schema.dig('properties', key)
+    end
+
     private
+
+    def env_variable_name(name)
+      name.to_s.gsub(/([a-z0-9])([A-Z])/, '\1_\2').upcase
+    end
+
+    def money_container_value_key(field_schema)
+      return nil unless field_schema['type'] == 'object'
+
+      properties = field_schema['properties'] || {}
+      return nil unless properties.key?(MONEY_CONTAINER_CURRENCY_KEY)
+
+      MONEY_CONTAINER_VALUE_KEYS.find { |key| %w[integer number].include?(properties.dig(key, 'type')) }
+    end
 
     def requisite_shaped?(field_schema)
       field_schema['type'] == 'object' && requisite_keys_present(field_schema).any?

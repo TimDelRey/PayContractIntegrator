@@ -43,7 +43,16 @@ module Generator
       def configuration(ir)
         variables = ["#{ir.env_prefix}_BASE_URL", auth_variable(ir)]
         variables.concat(ir.webhooks.map { |webhook| value(value(webhook, :signature, {}), :secret_env, nil) })
+        variables.concat(configuration_field_variables(ir))
         variables.compact.uniq.sort.map { |name| "- `#{name}`" }.join("\n")
+      end
+
+      def configuration_field_variables(ir)
+        ir.operations.flat_map(&:request_fields).filter_map do |field|
+          next unless field.platform_source[:kind] == :configuration
+
+          "#{ir.env_prefix}_#{field.platform_source.fetch(:name)}"
+        end
       end
 
       def auth_variable(ir)

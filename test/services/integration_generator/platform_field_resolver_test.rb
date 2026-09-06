@@ -21,6 +21,37 @@ class IntegrationGeneratorPlatformFieldResolverTest < Minitest::Test
     assert_equal({ kind: :attribute, attribute: 'id' }, result)
   end
 
+  test 'any field name ending in _reference is classified as the id attribute, not just the enumerated aliases' do
+    result = classify('checkout_reference', { 'type' => 'string' })
+
+    assert_equal({ kind: :attribute, attribute: 'id' }, result)
+  end
+
+  test 'a merchant/account-scoped field name is classified as provider account configuration, not a per-operation attribute' do
+    result = classify('merchant_code', { 'type' => 'string' })
+
+    assert_equal({ kind: :configuration, name: 'MERCHANT_CODE' }, result)
+  end
+
+  test 'a camelCase account-scoped field name is recognized and its env name is snake_cased before upcasing' do
+    result = classify('merchantAccount', { 'type' => 'string' })
+
+    assert_equal({ kind: :configuration, name: 'MERCHANT_ACCOUNT' }, result)
+  end
+
+  test 'an object with a currency sibling and a numeric value property is a money container' do
+    schema = { 'type' => 'object', 'properties' => { 'value' => { 'type' => 'integer' }, 'currency' => { 'type' => 'string' } } }
+
+    assert resolver.money_container_shaped?(schema)
+    assert_equal({ 'type' => 'integer' }, resolver.money_container_value_schema(schema))
+  end
+
+  test 'an object with a currency sibling but no numeric value-like property is not a money container' do
+    schema = { 'type' => 'object', 'properties' => { 'label' => { 'type' => 'string' }, 'currency' => { 'type' => 'string' } } }
+
+    refute resolver.money_container_shaped?(schema)
+  end
+
   test 'an object with known requisite keys is classified as a requisite container' do
     schema = recipient_schema(%w[sbp card])
 
