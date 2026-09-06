@@ -105,6 +105,24 @@ class GeneratedServiceValidationTest < Minitest::Test
     assert_equal :ambiguous_operation_role, error.diagnostic.code
   end
 
+  test 'rejects a field whose platform_source has an unknown kind' do
+    field = operation_ir.request_fields.first.with(platform_source: { kind: :guessed })
+    error = assert_raises(Generator::GenerationError) do
+      generate(integration_ir.with(operations: [operation_ir.with(request_fields: [field])]))
+    end
+    assert_equal :invalid_platform_source, error.diagnostic.code
+  end
+
+  test 'rejects a required_if rule whose condition field is not a sibling field' do
+    field = operation_ir.request_fields.first.with(
+      required_if: { field: 'amount', condition: { field: 'ghost', equals: 'x' } }
+    )
+    error = assert_raises(Generator::GenerationError) do
+      generate(integration_ir.with(operations: [operation_ir.with(request_fields: [field])]))
+    end
+    assert_equal :invalid_required_if, error.diagnostic.code
+  end
+
   test 'rejects duplicate money rules for one field' do
     money = integration_ir.money_transformations.first
     error = assert_raises(Generator::GenerationError) do

@@ -20,7 +20,7 @@ class GenerationPipelineTest < Minitest::Test
       assert_equal [
         File.join(output, 'novapay_service.rb'),
         File.join(output, 'INTEGRATION.md'),
-        File.join(output, 'examples.json')
+        File.join(output, 'fixtures.json')
       ], paths
 
       assert_ruby_compiles(File.read(paths[0]))

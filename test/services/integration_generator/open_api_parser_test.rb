@@ -67,6 +67,16 @@ class IntegrationGeneratorOpenApiParserTest < Minitest::Test
     assert_equal [{ 'name' => 'id', 'in' => 'path', 'required' => true }], operation.fetch(:parameters)
   end
 
+  test 'does not parse options/head/trace operations -- Generator::ServiceValidator never accepts those methods' do
+    document = minimal_document
+    document['paths']['/payouts']['options'] = { 'operationId' => 'preflightPayouts', 'responses' => { '204' => { 'description' => 'No Content' } } }
+
+    parsed = parser.call(document: document, source_name: 'spec.yaml')
+
+    assert_equal 1, parsed.operations.size
+    refute_includes parsed.operations.map { |operation| operation.fetch(:id) }, 'preflightPayouts'
+  end
+
   private
 
   def parser

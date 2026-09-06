@@ -67,7 +67,7 @@ module Generator
       valid = examples.is_a?(Hash) && examples['contract_version'] == EXAMPLES_CONTRACT_VERSION &&
               examples['provider'].is_a?(String) && examples['operations'].is_a?(Array) &&
               examples['callbacks'].is_a?(Array)
-      fail_verification(:invalid_examples_contract, "examples.json does not match contract version #{EXAMPLES_CONTRACT_VERSION}") unless valid
+      fail_verification(:invalid_examples_contract, "#{EXAMPLES_PATH} does not match contract version #{EXAMPLES_CONTRACT_VERSION}") unless valid
     end
 
     def contents(result, service_path)

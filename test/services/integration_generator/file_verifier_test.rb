@@ -30,7 +30,7 @@ class FileVerifierTest < Minitest::Test
     examples = "{}\n"
     checksum = Digest::SHA256.hexdigest(examples)
     checksums = result.manifest.fetch('checksums').dup
-    checksums['examples.json'] = checksum
+    checksums['fixtures.json'] = checksum
     modified = result.with(examples:, manifest: result.manifest.merge('checksums' => checksums))
 
     error = assert_raises(Generator::GenerationError) do
