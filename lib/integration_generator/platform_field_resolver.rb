@@ -17,8 +17,8 @@ module IntegrationGenerator
     def classify(name, field_schema, money:, diagnostics:)
       return requisite_container(name, field_schema, diagnostics) if requisite_shaped?(field_schema)
       return constant(field_schema) if single_value_enum?(field_schema)
-      return { kind: :attribute, attribute: 'amount' }.freeze if money
-      return { kind: :attribute, attribute: 'id' }.freeze if name.to_s.match?(ID_ALIAS_PATTERN)
+      return { kind: :attribute, attribute: Generator::PLATFORM_ATTRIBUTE_AMOUNT }.freeze if money
+      return { kind: :attribute, attribute: Generator::PLATFORM_ATTRIBUTE_ID }.freeze if name.to_s.match?(ID_ALIAS_PATTERN)
 
       { kind: :unknown }.freeze
     end

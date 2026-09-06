@@ -2,7 +2,11 @@ require 'optparse'
 
 module Generator
   class CLI
-    REQUIRED_FLAGS = %i[spec mapping provider lang].freeze
+    # --mapping is an optional override, not a requirement -- the brief's
+    # own demo command (`./integrate --spec ... --provider ... --lang ...`)
+    # never passes it, and IntegrationGenerator::Compiler already works
+    # from inference alone.
+    REQUIRED_FLAGS = %i[spec provider lang].freeze
 
     def initialize(stdout: $stdout, stderr: $stderr, pipeline: Pipeline.new)
       @stdout = stdout
@@ -31,9 +35,9 @@ module Generator
 
     def build_parser(options)
       OptionParser.new do |parser|
-        parser.banner = 'Usage: bin/integrate --spec FILE --mapping FILE --provider NAME --lang LANG [options]'
+        parser.banner = 'Usage: bin/integrate --spec FILE --provider NAME --lang LANG [--mapping FILE] [options]'
         parser.on('--spec FILE', 'OpenAPI specification path') { |value| options[:spec] = value }
-        parser.on('--mapping FILE', 'Mapping override path') { |value| options[:mapping] = value }
+        parser.on('--mapping FILE', 'Optional mapping override path') { |value| options[:mapping] = value }
         parser.on('--provider NAME', 'Provider key') { |value| options[:provider] = value }
         parser.on('--lang LANG', 'Target language (ruby)') { |value| options[:lang] = value }
         parser.on('--output DIR', 'Output directory (default: output)') { |value| options[:output] = value }
@@ -49,7 +53,7 @@ module Generator
 
     def run(options)
       status, payload = @pipeline.call(
-        spec: options.fetch(:spec), mapping: options.fetch(:mapping),
+        spec: options.fetch(:spec), mapping: options[:mapping],
         provider: options.fetch(:provider), lang: options.fetch(:lang),
         output: options.fetch(:output), force: options.fetch(:force)
       )

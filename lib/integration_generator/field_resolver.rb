@@ -88,10 +88,28 @@ module IntegrationGenerator
         nullable: field_schema['nullable'] == true, type: field_schema['type']&.to_sym,
         format: field_schema['format']&.to_sym, transformation: money&.fetch(:transformation),
         default: field_schema['default'], required_if: build_required_if(override),
-        platform_source: @platform_field_resolver.classify(
-          name, field_schema, money: money, diagnostics: context.fetch(:diagnostics)
-        )
+        platform_source: build_platform_source(name, field_schema, override, money, context)
       )
+    end
+
+    # platform_source is normally inferred purely from the OpenAPI schema
+    # (PlatformFieldResolver) -- but some real fields (an opaque merchant
+    # code, a free-text reference) have no structural signal to infer from
+    # at all and would stay :unknown forever, permanently blocking
+    # generation if the field is required. A mapping override lets the
+    # integrator state the read path explicitly instead of being stuck.
+    def build_platform_source(name, field_schema, override, money, context)
+      raw = override && override['platform_source']
+      return normalize_platform_source(raw) if raw
+
+      @platform_field_resolver.classify(name, field_schema, money: money, diagnostics: context.fetch(:diagnostics))
+    end
+
+    def normalize_platform_source(raw)
+      {
+        kind: raw['kind']&.to_sym, attribute: raw['attribute'], value: raw['value'],
+        requisite_type: raw['requisite_type'], known_keys: raw['known_keys'], unknown_keys: raw['unknown_keys']
+      }.compact.freeze
     end
 
     def target_name_for(name, override)

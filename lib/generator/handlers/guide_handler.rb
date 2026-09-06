@@ -22,6 +22,7 @@ module Generator
           section('Status mapping', mapping_table(ir.status_map)),
           section('Error mapping', mapping_table(ir.error_map)),
           section('Webhooks', webhooks(ir)),
+          section('Unresolved fields', unresolved_fields(ir)),
           '**Warning:** generated against fallback adapter contract because the host contract was unavailable.',
           "Adapter contract version: `#{ir.source_metadata.fetch(:adapter_contract_version)}`."
         ]
@@ -71,6 +72,32 @@ module Generator
         return 'Not configured.' if ir.webhooks.empty?
 
         ir.webhooks.map { |webhook| "- signature: #{inline_hash(value(webhook, :signature, {}), WEBHOOK_SIGNATURE_FIELDS)}" }.join("\n")
+      end
+
+      # Explicit place to point at (per the platform Q&A: "no blind guessing --
+      # a TODO comment plus an explicit mapping spot in INTEGRATION.md") for
+      # every field the generator could not map to a known platform read path,
+      # so it isn't just a source comment nobody reads.
+      def unresolved_fields(ir)
+        lines = ir.operations.flat_map { |operation| unresolved_operation_fields(operation) }
+        lines.empty? ? 'None.' : lines.join("\n")
+      end
+
+      def unresolved_operation_fields(operation)
+        operation.request_fields.flat_map { |field| unresolved_field_lines(operation, field) }
+      end
+
+      def unresolved_field_lines(operation, field)
+        case field.platform_source[:kind]
+        when :unknown
+          ["- `#{operation.id}`: `#{field.target_name}` -- add an override in `integration_mapping.yml`"]
+        when :requisite_container
+          Array(field.platform_source[:unknown_keys]).map do |key|
+            "- `#{operation.id}`: `#{field.target_name}.#{key}` -- add an override in `integration_mapping.yml`"
+          end
+        else
+          []
+        end
       end
 
       def value(hash, key, default) = hash.fetch(key) { hash.fetch(key.to_s, default) }

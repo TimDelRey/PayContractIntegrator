@@ -3,11 +3,16 @@ module Generator
   RESULT_CONTRACT_VERSION = '1.0'.freeze
   EXAMPLES_CONTRACT_VERSION = '1.0'.freeze
   GUIDE_PATH = 'INTEGRATION.md'.freeze
-  EXAMPLES_PATH = 'examples.json'.freeze
+  EXAMPLES_PATH = 'fixtures.json'.freeze
   FILE_TYPES = %i[service guide examples].freeze
   OPERATION_ROLES = %i[check_conditions create_request fetch_status process_callback cancel].freeze
   WEBHOOK_SIGNATURE_FIELDS = %i[algorithm encoding header secret_env signed_payload].freeze
   OPERATION_ROLE_NAMES = OPERATION_ROLES.map(&:to_s).freeze
+
+  # Shared between PlatformFieldResolver (producer) and PlatformSourceValidator (consumer).
+  PLATFORM_ATTRIBUTE_ID = 'id'.freeze
+  PLATFORM_ATTRIBUTE_AMOUNT = 'amount'.freeze
+  PLATFORM_ATTRIBUTES = [PLATFORM_ATTRIBUTE_ID, PLATFORM_ATTRIBUTE_AMOUNT].freeze
 
   module ImmutableValue
     private

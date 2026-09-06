@@ -5,13 +5,9 @@ module Generator
     PROVIDER_KEY = /\A[a-z][a-z0-9_]*\z/
     ENV_NAME = /\A[A-Z][A-Z0-9_]*\z/
     HEADER_NAME = /\A[A-Za-z0-9!#$%&'*+.^_`|~-]+\z/
-    # TODO(code-review): OpenApiParser (Spec Compiler side) recognizes
-    # %w[get put post delete options head patch trace] -- this list is
-    # narrower (missing options/head/trace). A role assigned to one of
-    # those methods via a mapping/x-space-payments-role override passes
-    # every earlier pipeline stage and only fails here, late, with
-    # :invalid_http_method. Worth reconciling the two lists (or deciding
-    # options/head/trace are out of scope and rejecting them earlier).
+    # Matches IntegrationGenerator::OpenApiParser::HTTP_METHODS -- the parser
+    # never even sees options/head/trace operations, so this list is the
+    # single source of truth for which HTTP methods a payment operation may use.
     HTTP_METHODS = %i[get post put patch delete].freeze
 
     def call(ir)
@@ -171,17 +167,17 @@ module Generator
       end
     end
 
-    # TODO(code-review): neither field.platform_source nor field.required_if
-    # is inspected here at all -- see the same TODO in
-    # RubyServiceHandler#render_field for what they mean and why it matters
-    # (an :unknown/:requisite_container field currently sails through this
-    # check and gets rendered as a plain attribute read).
     def check_fields(operation)
+      fields_by_name = operation.request_fields.to_h { |field| [field.source_name, field] }
       operation.request_fields.each do |field|
         valid = string_matches?(field.source_name, METHOD_NAME) && string_matches?(field.target_name, METHOD_NAME)
         fail!(:invalid_field_identifier, 'Invalid generated field identifier') unless valid
+
+        platform_source_validator.call(field, fields_by_name) { |code, message| fail!(code, message) }
       end
     end
+
+    def platform_source_validator = @platform_source_validator ||= PlatformSourceValidator.new
 
     def check_idempotency(settings)
       return if settings.empty?

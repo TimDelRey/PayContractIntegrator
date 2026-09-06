@@ -11,7 +11,11 @@ module IntegrationGenerator
   # structural -- it never infers payment semantics (role, units, statuses).
   class OpenApiParser
     SUPPORTED_VERSION_PATTERN = /\A3\.[01]\./
-    HTTP_METHODS = %w[get put post delete options head patch trace].freeze
+    # Matches Generator::ServiceValidator::HTTP_METHODS -- options/head/trace
+    # are not payment-relevant, so parsing them would only let an operation
+    # role resolve to one and fail late, at generation time, on
+    # :invalid_http_method instead of never entering the pipeline.
+    HTTP_METHODS = %w[get put post delete patch].freeze
 
     def call(document:, source_name:)
       version = parse_version(document, source_name)

@@ -24,7 +24,7 @@ class GeneratorContractTest < Minitest::Test
     assert_equal '1.0', first.manifest.fetch('ir_contract_version')
     assert_equal '1.0', first.manifest.fetch('mapping_schema_version')
     assert_equal '1', first.manifest.fetch('adapter_contract_version')
-    assert_equal %w[INTEGRATION.md examples.json novapay_service.rb], first.manifest.fetch('checksums').keys.sort
+    assert_equal %w[INTEGRATION.md fixtures.json novapay_service.rb], first.manifest.fetch('checksums').keys.sort
     first.manifest.fetch('checksums').each_value do |checksum|
       assert_match(/^[0-9a-f]{64}$/, checksum)
     end

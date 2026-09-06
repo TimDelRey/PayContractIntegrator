@@ -53,7 +53,8 @@ module GeneratorContractHelpers
           type: :integer,
           format: :int64,
           transformation: :rub_to_kopeck,
-          default: nil
+          default: nil,
+          platform_source: { kind: :attribute, attribute: "amount" }
         )
       ]),
       responses: deeply_frozen([

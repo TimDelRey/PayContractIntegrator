@@ -9,7 +9,7 @@ module Generator
       @runner_class = runner_class
     end
 
-    def call(spec:, mapping:, provider:, lang:, output: 'output', force: false)
+    def call(spec:, provider:, lang:, mapping: nil, output: 'output', force: false)
       return [:unsupported, [unsupported_language_diagnostic(lang)]] unless SUPPORTED_LANGUAGES.include?(lang)
 
       compiled = compile(spec, mapping, provider)
@@ -31,7 +31,7 @@ module Generator
     def compile(spec, mapping, provider)
       @compiler.call(
         source: File.read(spec), source_name: spec, provider_key: provider,
-        mapping_source: File.read(mapping), mapping_source_name: mapping
+        mapping_source: mapping && File.read(mapping), mapping_source_name: mapping
       )
     end
 
