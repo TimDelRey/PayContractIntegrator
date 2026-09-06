@@ -1,5 +1,7 @@
 module Generator
   class ServiceValidator
+    include SymbolOrStringFetch
+
     CLASS_NAME = /\A[A-Z][A-Za-z0-9]*\z/
     METHOD_NAME = /\A[a-z_][a-z0-9_]*\z/
     PROVIDER_KEY = /\A[a-z][a-z0-9_]*\z/
@@ -50,9 +52,9 @@ module Generator
     end
 
     def check_auth(scheme)
-      case read(scheme, :type)
+      case fetch(scheme, :type)
       when :api_key
-        valid = read(scheme, :location) == :header && string_matches?(read(scheme, :name), HEADER_NAME)
+        valid = fetch(scheme, :location) == :header && string_matches?(fetch(scheme, :name), HEADER_NAME)
         fail!(:unsupported_auth_scheme, 'Only named header API keys are supported') unless valid
       when :bearer
         nil
@@ -67,23 +69,23 @@ module Generator
     end
 
     def check_money_rules(transformations)
-      fields = transformations.map { |transformation| read(transformation, :field) }
+      fields = transformations.map { |transformation| fetch(transformation, :field) }
       fail!(:ambiguous_money_transformation, 'Money transformations must have unique fields') unless fields.uniq == fields
 
       transformations.each { |transformation| check_money_rule(transformation) }
     end
 
     def check_money_rule(transformation)
-      multiplier = read(transformation, :multiplier)
-      valid = string_matches?(read(transformation, :field), METHOD_NAME) && multiplier.is_a?(Integer) && multiplier.positive?
+      multiplier = fetch(transformation, :multiplier)
+      valid = string_matches?(fetch(transformation, :field), METHOD_NAME) && multiplier.is_a?(Integer) && multiplier.positive?
       fail!(:unsupported_money_transformation, 'Money field and positive Integer multiplier are required') unless valid
-      fail!(:unsupported_money_rounding, 'Only exact money conversion is supported') unless read(transformation, :rounding) == :exact
+      fail!(:unsupported_money_rounding, 'Only exact money conversion is supported') unless fetch(transformation, :rounding) == :exact
     end
 
     def check_money_fields(ir)
       fields = ir.operations.flat_map(&:request_fields).map(&:source_name)
       ir.money_transformations.each do |transformation|
-        field = read(transformation, :field)
+        field = fetch(transformation, :field)
         next if fields.include?(field)
 
         fail!(:unknown_money_field, "Unknown money field #{field}")
@@ -97,9 +99,9 @@ module Generator
       fail!(:ambiguous_webhook_contract, 'Exactly one webhook is required for process_callback') unless callback && ir.webhooks.one?
 
       webhook = ir.webhooks.first
-      signature = read(webhook, :signature)
+      signature = fetch(webhook, :signature)
       check_webhook_signature(signature)
-      check_map(read(webhook, :event_map), :invalid_webhook_mapping)
+      check_map(fetch(webhook, :event_map), :invalid_webhook_mapping)
     end
 
     def check_webhook_signature(signature)
@@ -112,10 +114,10 @@ module Generator
     end
 
     def supported_webhook_signature?(signature)
-      read(signature, :algorithm) == :hmac_sha256 && read(signature, :encoding) == :hex &&
-        read(signature, :signed_payload) == :raw_body &&
-        string_matches?(read(signature, :header), HEADER_NAME) &&
-        string_matches?(read(signature, :secret_env), ENV_NAME)
+      fetch(signature, :algorithm) == :hmac_sha256 && fetch(signature, :encoding) == :hex &&
+        fetch(signature, :signed_payload) == :raw_body &&
+        string_matches?(fetch(signature, :header), HEADER_NAME) &&
+        string_matches?(fetch(signature, :secret_env), ENV_NAME)
     end
 
     def check_provider(ir)
@@ -156,8 +158,8 @@ module Generator
       names = operation.path.scan(/\{([^}]+)\}/).flatten
       fail!(:invalid_operation_path, 'Invalid path parameter identifier') unless names.all? { |name| METHOD_NAME.match?(name) }
       operation.parameters.each do |parameter|
-        location = read(parameter, :location)
-        name = read(parameter, :name)
+        location = fetch(parameter, :location)
+        name = fetch(parameter, :name)
         next if location == :path && names.include?(name)
 
         fail!(:unsupported_operation_parameter, "Unsupported #{location} parameter: #{name}")
@@ -179,7 +181,7 @@ module Generator
     def check_idempotency(settings)
       return if settings.empty?
 
-      valid = read(settings, :location) == :header && string_matches?(read(settings, :name), HEADER_NAME)
+      valid = fetch(settings, :location) == :header && string_matches?(fetch(settings, :name), HEADER_NAME)
       fail!(:unsupported_idempotency, 'Only named idempotency headers are supported') unless valid
     end
 
@@ -191,7 +193,6 @@ module Generator
     end
 
     def string_matches?(value, pattern) = value.is_a?(String) && pattern.match?(value)
-    def read(hash, key) = hash.fetch(key) { hash.fetch(key.to_s) }
 
     def fail!(code, message)
       raise GenerationError, Diagnostic.new(severity: :error, code:, message:, source_path: nil, hint: nil)

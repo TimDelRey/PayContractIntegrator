@@ -1,8 +1,8 @@
 module GeneratorContractHelpers
   def diagnostic(severity: :warning, code: :optional_description_missing)
     Generator::Diagnostic.new(
-      severity: severity,
-      code: code,
+      severity:,
+      code:,
       message: "Description is missing",
       source_path: "#/paths/~1payouts/post",
       hint: "Add description"
@@ -133,9 +133,6 @@ module GeneratorContractHelpers
     YAML
   end
 
-  # A single operation that does not match any of SemanticResolver's role
-  # heuristics (not POST-with-body, not GET-with-id-param, no /cancel
-  # suffix, no webhook signal) -- analogous to NovaPay's real getBalance.
   def spec_with_unclassifiable_operation
     <<~YAML
       openapi: 3.0.3

@@ -1,6 +1,8 @@
 module Generator
   module Handlers
     class FieldRenderer
+      include RenderSupport
+
       def render(field, fields, ir)
         case field.platform_source.fetch(:kind)
         when :unknown then render_unknown_field(field)
@@ -29,8 +31,6 @@ module Generator
           "#{fetch(source, :currency_key).dump} => #{fetch(source, :currency).inspect} }"
         )
       end
-
-      def env_name(ir, name) = "#{ir.env_prefix}_#{name}"
 
       def render_unknown_field(field)
         "  # TODO: '#{field.target_name}' has no known platform read path -- " \
@@ -98,13 +98,6 @@ module Generator
       def requisite_todo(field, key)
         "  # TODO: '#{field.target_name}.#{key}' has no known platform read path -- add an override or fill this in manually"
       end
-
-      def money_expression(expression, transformation)
-        "Integer(#{expression}) * #{fetch(transformation, :multiplier)}"
-      end
-
-      def join_lines(*lines) = lines.join("\n")
-      def fetch(hash, key) = hash.fetch(key) { hash.fetch(key.to_s) }
     end
   end
 end

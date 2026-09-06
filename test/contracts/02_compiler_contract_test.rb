@@ -1,11 +1,6 @@
 require 'test_helper'
 require_relative 'support/integration_generator_contract_helpers'
 
-# Inference-first pivot (agreed with the colleague after reviewing the
-# hackathon case brief): the case's own demo CLI run has no --mapping flag,
-# and the grading rubric scores parsing the spec on its own. So a mapping
-# is now an optional override for what SemanticResolver could not safely
-# infer -- it is never required for a compile to succeed.
 class CompilerContractTest < Minitest::Test
   include GeneratorContractHelpers
 
@@ -54,7 +49,7 @@ class CompilerContractTest < Minitest::Test
 
   test 'compiler rejects remote references with a structured diagnostic' do
     source = minimal_spec.sub('type: object', '$ref: https://example.test/schemas.yaml#/Payout')
-    result = compile(source: source, source_name: 'remote-ref.yaml')
+    result = compile(source:, source_name: 'remote-ref.yaml')
 
     assert_nil result.ir
     diagnostic = result.diagnostics.find { |item| item.code == :remote_reference_unsupported }
@@ -67,9 +62,9 @@ class CompilerContractTest < Minitest::Test
 
   def compile(source: minimal_spec, source_name: 'provider_api.yaml', mapping_source: nil)
     IntegrationGenerator::Compiler.new.call(
-      source: source,
-      source_name: source_name,
-      mapping_source: mapping_source,
+      source:,
+      source_name:,
+      mapping_source:,
       mapping_source_name: mapping_source && 'integration_mapping.yml',
       provider_key: 'novapay'
     )

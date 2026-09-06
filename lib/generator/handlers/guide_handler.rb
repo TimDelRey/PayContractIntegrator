@@ -42,7 +42,7 @@ module Generator
 
       def configuration(ir)
         variables = ["#{ir.env_prefix}_BASE_URL", auth_variable(ir)]
-        variables.concat(ir.webhooks.map { |webhook| value(value(webhook, :signature, {}), :secret_env, nil) })
+        variables.concat(ir.webhooks.map { |webhook| fetch_or(fetch_or(webhook, :signature, {}), :secret_env, nil) })
         variables.concat(configuration_field_variables(ir))
         variables.compact.uniq.sort.map { |name| "- `#{name}`" }.join("\n")
       end
@@ -56,7 +56,7 @@ module Generator
       end
 
       def auth_variable(ir)
-        suffix = value(ir.auth_schemes.first, :type, nil) == :bearer ? 'TOKEN' : 'API_KEY'
+        suffix = fetch_or(ir.auth_schemes.first, :type, nil) == :bearer ? 'TOKEN' : 'API_KEY'
         "#{ir.env_prefix}_#{suffix}"
       end
 
@@ -80,7 +80,7 @@ module Generator
       def webhooks(ir)
         return 'Not configured.' if ir.webhooks.empty?
 
-        ir.webhooks.map { |webhook| "- signature: #{inline_hash(value(webhook, :signature, {}), WEBHOOK_SIGNATURE_FIELDS)}" }.join("\n")
+        ir.webhooks.map { |webhook| "- signature: #{inline_hash(fetch_or(webhook, :signature, {}), WEBHOOK_SIGNATURE_FIELDS)}" }.join("\n")
       end
 
       def unresolved_fields(ir)
@@ -104,8 +104,6 @@ module Generator
           []
         end
       end
-
-      def value(hash, key, default) = hash.fetch(key) { hash.fetch(key.to_s, default) }
 
       def inline_hash(value, fields = value.keys)
         value = fields.to_h { |key| [key, value[key] || value[key.to_s]] }.compact

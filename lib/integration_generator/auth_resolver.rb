@@ -57,12 +57,6 @@ module IntegrationGenerator
       :unresolved
     end
 
-    def security_path(operation)
-      "#/paths/#{escape(operation[:path])}/#{operation[:method]}/security"
-    end
-
-    def escape(path)
-      path.to_s.gsub('~', '~0').gsub('/', '~1')
-    end
+    def security_path(operation) = "#{JsonPointer.operation_path(operation)}/security"
   end
 end

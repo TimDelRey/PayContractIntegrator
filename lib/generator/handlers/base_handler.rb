@@ -3,6 +3,8 @@ require 'digest'
 module Generator
   module Handlers
     class BaseHandler
+      include RenderSupport
+
       def call(ir:)
         content = render(ir)
         verify_content!(content)
@@ -14,8 +16,6 @@ module Generator
       def render(*) = raise NotImplementedError
       def file_type = raise NotImplementedError
       def relative_path(*) = raise NotImplementedError
-
-      def join_lines(*lines) = lines.join("\n")
 
       def verify_content!(content)
         return if content.is_a?(String) && !content.empty?

@@ -12,7 +12,7 @@ module IntegrationGenerator
       base_urls, alternate_base_urls = parse_servers(document, source_name)
 
       ParsedSpec.new(
-        version: version,
+        version:,
         base_urls: base_urls.freeze,
         security_schemes: parse_security_schemes(document),
         operations: parse_operations(document),
@@ -70,21 +70,21 @@ module IntegrationGenerator
     def normalize_security_scheme(name, scheme)
       case scheme['type']
       when 'apiKey'
-        { name: name, type: :api_key, location: scheme['in']&.to_sym, scheme_name: scheme['name'] }.freeze
+        { name:, type: :api_key, location: scheme['in']&.to_sym, scheme_name: scheme['name'] }.freeze
       when 'http'
         normalize_http_scheme(name, scheme)
       when 'oauth2'
-        { name: name, type: :bearer, location: :header, scheme_name: 'Authorization' }.freeze
+        { name:, type: :bearer, location: :header, scheme_name: 'Authorization' }.freeze
       else
-        { name: name, type: :unsupported, location: nil, scheme_name: scheme['type'] }.freeze
+        { name:, type: :unsupported, location: nil, scheme_name: scheme['type'] }.freeze
       end
     end
 
     def normalize_http_scheme(name, scheme)
       if scheme['scheme'].to_s.downcase == 'bearer'
-        { name: name, type: :bearer, location: :header, scheme_name: 'Authorization' }.freeze
+        { name:, type: :bearer, location: :header, scheme_name: 'Authorization' }.freeze
       else
-        { name: name, type: :unsupported, location: nil, scheme_name: "http_#{scheme['scheme']}" }.freeze
+        { name:, type: :unsupported, location: nil, scheme_name: "http_#{scheme['scheme']}" }.freeze
       end
     end
 
@@ -114,7 +114,7 @@ module IntegrationGenerator
 
     def base_operation(path, method, operation, shared_parameters)
       {
-        id: operation['operationId'], method: method.to_sym, path: path,
+        id: operation['operationId'], method: method.to_sym, path:,
         tags: Array(operation['tags']).freeze, summary: operation['summary'],
         description: operation['description'], security: Array(operation['security']).freeze,
         parameters: merge_parameters(shared_parameters, operation['parameters']).freeze
@@ -134,14 +134,14 @@ module IntegrationGenerator
 
     def parse_responses(responses)
       Array(responses).map do |status, response|
-        { status: status, schema: response.dig('content', 'application/json', 'schema'),
+        { status:, schema: response.dig('content', 'application/json', 'schema'),
           example: response.dig('content', 'application/json', 'example') }.freeze
       end.freeze
     end
 
     def raise_error(code:, message:, source_path:, hint:)
       raise SpecError, Generator::Diagnostic.new(
-        severity: :error, code: code, message: message, source_path: source_path, hint: hint
+        severity: :error, code:, message:, source_path:, hint:
       )
     end
   end

@@ -5,7 +5,7 @@ module IntegrationGenerator
     def call(source:, source_name:, provider_key:, mapping_source: nil, mapping_source_name: nil)
       parsed = parse_structure(source, source_name)
       mapping = MappingLoader.new.call(source: mapping_source, source_name: mapping_source_name)
-      resolved = SemanticResolver.new.call(parsed: parsed, mapping: mapping, provider_key: provider_key)
+      resolved = SemanticResolver.new.call(parsed:, mapping:, provider_key:)
 
       build_result(parsed, resolved, mapping, provider_key, source_name)
     rescue SpecError => e
@@ -15,9 +15,9 @@ module IntegrationGenerator
     private
 
     def parse_structure(source, source_name)
-      document = SpecLoader.new.call(source: source, source_name: source_name)
-      document = LocalRefResolver.new.call(document: document, source_name: source_name)
-      OpenApiParser.new.call(document: document, source_name: source_name)
+      document = SpecLoader.new.call(source:, source_name:)
+      document = LocalRefResolver.new.call(document:, source_name:)
+      OpenApiParser.new.call(document:, source_name:)
     end
 
     def build_result(parsed, resolved, mapping, provider_key, source_name)
@@ -29,10 +29,10 @@ module IntegrationGenerator
       end
 
       ir = IrBuilder.new.call(
-        parsed: parsed, resolved: resolved, mapping: mapping,
-        provider_key: provider_key, source_name: source_name
+        parsed:, resolved:, mapping:,
+        provider_key:, source_name:
       )
-      Generator::CompileResult.new(ir: ir, diagnostics: diagnostics.freeze)
+      Generator::CompileResult.new(ir:, diagnostics: diagnostics.freeze)
     end
 
     def no_operations_resolved_diagnostic

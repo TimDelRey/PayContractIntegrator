@@ -28,6 +28,12 @@ module Generator
     end
   end
 
+  module SymbolOrStringFetch
+    private
+
+    def fetch(hash, key) = hash.fetch(key) { hash.fetch(key.to_s) }
+  end
+
   Diagnostic = Data.define(
     :severity,
     :code,

@@ -25,12 +25,12 @@ Metrics/AbcSize:
 Metrics/ClassLength:
   Max: 180
 
-# contracts.rb is a pure shared constants/Data.define file (no branching
-# complexity), and grows with every jointly-owned IR field -- length alone
-# isn't a complexity signal there the way it is for a class with logic.
 Metrics/ModuleLength:
   Exclude:
     - "lib/generator/contracts.rb"
+
+Style/HashSyntax:
+  EnforcedShorthandSyntax: always
 
 Metrics/CyclomaticComplexity:
   Max: 10

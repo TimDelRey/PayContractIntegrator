@@ -66,7 +66,7 @@ class IntegrationGeneratorPlatformFieldResolverTest < Minitest::Test
   test 'a requisite container with more than one possible type reports it instead of choosing silently' do
     diagnostics = []
 
-    classify('recipient', recipient_schema(%w[sbp card]), diagnostics: diagnostics)
+    classify('recipient', recipient_schema(%w[sbp card]), diagnostics:)
 
     diagnostic = diagnostics.find { |item| item.code == :ambiguous_requisite_type }
     refute_nil diagnostic
@@ -76,7 +76,7 @@ class IntegrationGeneratorPlatformFieldResolverTest < Minitest::Test
   test 'a requisite container with a single possible type reports nothing' do
     diagnostics = []
 
-    classify('recipient', recipient_schema(['sbp']), diagnostics: diagnostics)
+    classify('recipient', recipient_schema(['sbp']), diagnostics:)
 
     assert_empty diagnostics
   end
@@ -102,7 +102,7 @@ class IntegrationGeneratorPlatformFieldResolverTest < Minitest::Test
   end
 
   def classify(name, schema, money: nil, diagnostics: [])
-    resolver.classify(name, schema, money: money, diagnostics: diagnostics)
+    resolver.classify(name, schema, money:, diagnostics:)
   end
 
   def recipient_schema(types)

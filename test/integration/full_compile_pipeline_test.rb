@@ -11,7 +11,7 @@ class FullCompilePipelineTest < Minitest::Test
     source = File.read(FIXTURE_PATH)
 
     result = IntegrationGenerator::Compiler.new.call(
-      source: source, source_name: 'novapay_provider_api.yaml', provider_key: 'novapay'
+      source:, source_name: 'novapay_provider_api.yaml', provider_key: 'novapay'
     )
 
     refute_nil result.ir

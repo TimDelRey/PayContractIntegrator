@@ -3,11 +3,8 @@
 require 'test_helper'
 require 'json'
 
-# rubocop:disable Metrics/ClassLength -- one test class per resolver concern reads better
-# than splitting role/money/status/auth/webhook/idempotency coverage across files.
+# rubocop:disable-next Metrics/ClassLength
 class IntegrationGeneratorSemanticResolverTest < Minitest::Test
-  # -- role heuristics ------------------------------------------------------
-
   test 'resolves create_request for a POST with a body and no id param' do
     resolved = resolve(spec_with_operations(<<~YAML))
       /payouts:
@@ -129,7 +126,7 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
     YAML
     mapping = { 'operations' => [{ 'operation_id' => 'cancelPayout', 'role' => 'fetch_status' }] }
 
-    resolved = resolver.call(parsed: parsed, mapping: mapping, provider_key: 'novapay')
+    resolved = resolver.call(parsed:, mapping:, provider_key: 'novapay')
 
     assert_equal [:fetch_status], resolved.fetch(:operations).map(&:role)
   end
@@ -231,15 +228,13 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
     YAML
     mapping = { 'operations' => [{ 'operation_id' => 'createWidget', 'role' => 'create_request' }] }
 
-    resolved = resolver.call(parsed: parsed, mapping: mapping, provider_key: 'novapay')
+    resolved = resolver.call(parsed:, mapping:, provider_key: 'novapay')
 
     assert_equal(
       { 'createWidget' => :create_request, 'getWidgetStatus' => :fetch_status },
       resolved.fetch(:operations).to_h { |operation| [operation.id, operation.role] }
     )
   end
-
-  # -- fields: required_if and identifier normalization -----------------------
 
   test 'a mapping required_if rule is attached to the field, generic and provider-agnostic' do
     parsed = parse(spec_with_operations(<<~YAML))
@@ -264,7 +259,7 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
       ]
     }
 
-    resolved = resolver.call(parsed: parsed, mapping: mapping, provider_key: 'novapay')
+    resolved = resolver.call(parsed:, mapping:, provider_key: 'novapay')
 
     field = resolved.fetch(:operations).first.request_fields.find { |f| f.source_name == 'bank_code' }
     assert_equal({ field: 'bank_code', condition: { field: 'type', equals: 'sbp' } }, field.required_if)
@@ -293,7 +288,7 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
       ]
     }
 
-    resolved = resolver.call(parsed: parsed, mapping: mapping, provider_key: 'novapay')
+    resolved = resolver.call(parsed:, mapping:, provider_key: 'novapay')
 
     field = resolved.fetch(:operations).first.request_fields.find { |f| f.source_name == 'promo_code' }
     assert_equal({ kind: :attribute, attribute: 'id' }, field.platform_source)
@@ -316,7 +311,7 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
           responses: { "201": { description: Created } }
     YAML
 
-    resolved = resolver.call(parsed: parsed, mapping: nil, provider_key: 'novapay')
+    resolved = resolver.call(parsed:, mapping: nil, provider_key: 'novapay')
 
     field = resolved.fetch(:operations).first.request_fields.find { |f| f.source_name == 'promo_code' }
     assert_equal({ kind: :unknown }, field.platform_source)
@@ -356,7 +351,7 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
       ]
     }
 
-    resolved = resolver.call(parsed: parsed, mapping: mapping, provider_key: 'adyen')
+    resolved = resolver.call(parsed:, mapping:, provider_key: 'adyen')
 
     field = resolved.fetch(:operations).first.request_fields.find { |f| f.source_name == 'amount' }
     assert_equal(
@@ -387,8 +382,6 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
     assert_equal 'external_id', field.source_name
     assert_equal 'external_id', field.target_name
   end
-
-  # -- money ----------------------------------------------------------------
 
   test 'detects a money unit from a Russian keyword in the field description' do
     resolved = resolve(spec_with_operations(<<~YAML))
@@ -500,12 +493,10 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
       ]
     }
 
-    resolved = resolver.call(parsed: parsed, mapping: mapping, provider_key: 'novapay')
+    resolved = resolver.call(parsed:, mapping:, provider_key: 'novapay')
 
     assert_equal :rub_to_cent, resolved.fetch(:operations).first.request_fields.first.transformation
   end
-
-  # -- status / error vocabulary ---------------------------------------------
 
   test 'maps known status words through the built-in vocabulary' do
     resolved = resolve(spec_with_status_enum(%w[pending completed failed]))
@@ -529,8 +520,6 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
     assert_equal({ 'validation_error' => 'validation_error', 'internal_error' => 'internal_error' },
                  resolved.fetch(:error_map))
   end
-
-  # -- auth -------------------------------------------------------------------
 
   test 'drops an operation when its auth scheme is ambiguous and unresolved' do
     resolved = resolve(spec_with_operations(<<~YAML, security_schemes: two_alternative_schemes))
@@ -584,8 +573,6 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
     refute_includes resolved.fetch(:diagnostics).map(&:code), :unsupported_auth_scheme
   end
 
-  # -- webhook signature --------------------------------------------------------
-
   test 'recognizes a known webhook signature algorithm' do
     resolved = resolve(spec_with_operations(<<~YAML))
       /webhooks/payout:
@@ -628,8 +615,6 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
     assert_includes resolved.fetch(:diagnostics).map(&:code), :webhook_signature_unverifiable
   end
 
-  # -- idempotency ---------------------------------------------------------------
-
   test 'finds an idempotency parameter by name pattern' do
     resolved = resolve(spec_with_operations(<<~YAML))
       /payouts:
@@ -671,13 +656,13 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
   end
 
   def resolve(source, mapping: nil)
-    resolver.call(parsed: parse(source), mapping: mapping, provider_key: 'novapay')
+    resolver.call(parsed: parse(source), mapping:, provider_key: 'novapay')
   end
 
   def parse(source, source_name: 'spec.yaml')
-    document = IntegrationGenerator::SpecLoader.new.call(source: source, source_name: source_name)
-    document = IntegrationGenerator::LocalRefResolver.new.call(document: document, source_name: source_name)
-    IntegrationGenerator::OpenApiParser.new.call(document: document, source_name: source_name)
+    document = IntegrationGenerator::SpecLoader.new.call(source:, source_name:)
+    document = IntegrationGenerator::LocalRefResolver.new.call(document:, source_name:)
+    IntegrationGenerator::OpenApiParser.new.call(document:, source_name:)
   end
 
   def two_alternative_schemes
@@ -784,4 +769,3 @@ class IntegrationGeneratorSemanticResolverTest < Minitest::Test
   end
   # rubocop:enable Metrics/MethodLength
 end
-# rubocop:enable Metrics/ClassLength

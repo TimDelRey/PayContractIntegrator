@@ -14,7 +14,7 @@ module IntegrationGenerator
 
     def identity(provider_key)
       {
-        contract_version: '1.0', provider_key: provider_key,
+        contract_version: '1.0', provider_key:,
         provider_class: "#{camelize(provider_key)}Service", env_prefix: provider_key.upcase
       }
     end

@@ -19,7 +19,7 @@ module IntegrationGenerator
       parsed.operations.each { |operation| resolve_operation(operation, parsed, acc) }
 
       status_error = @status_error_resolver.call(
-        operations: parsed.operations, mapping: mapping, diagnostics: acc.fetch(:diagnostics)
+        operations: parsed.operations, mapping:, diagnostics: acc.fetch(:diagnostics)
       )
       build_result(acc, status_error)
     end
@@ -27,9 +27,9 @@ module IntegrationGenerator
     private
 
     def initial_accumulator(parsed, mapping, provider_key)
-      role_context = @role_resolver.build_context(operations: parsed.operations, mapping: mapping)
+      role_context = @role_resolver.build_context(operations: parsed.operations, mapping:)
       {
-        mapping: mapping, provider_key: provider_key, role_context: role_context,
+        mapping:, provider_key:, role_context:,
         diagnostics: role_context.diagnostics.dup,
         money_transformations: [], auth_schemes: [], operations: [], webhooks: []
       }
@@ -46,7 +46,7 @@ module IntegrationGenerator
 
     def resolve_operation(operation, parsed, acc)
       entry = mapping_entry(acc.fetch(:mapping), operation[:id])
-      role = @role_resolver.call(operation: operation, mapping_entry: entry, context: acc.fetch(:role_context))
+      role = @role_resolver.call(operation:, mapping_entry: entry, context: acc.fetch(:role_context))
       return acc.fetch(:diagnostics) << unresolved_role_diagnostic(operation) if role.nil?
       return resolve_webhook(operation, acc) if role == :process_callback
 
@@ -55,7 +55,7 @@ module IntegrationGenerator
 
     def resolve_webhook(operation, acc)
       webhook = @webhook_resolver.call(
-        operation: operation, diagnostics: acc.fetch(:diagnostics), provider_key: acc.fetch(:provider_key)
+        operation:, diagnostics: acc.fetch(:diagnostics), provider_key: acc.fetch(:provider_key)
       )
       return unless webhook
 
@@ -68,7 +68,7 @@ module IntegrationGenerator
 
     def resolve_regular_operation(operation, role, mapping_entry, parsed, acc)
       auth = @auth_resolver.call(
-        operation: operation, security_schemes: parsed.security_schemes,
+        operation:, security_schemes: parsed.security_schemes,
         mapping: acc.fetch(:mapping), diagnostics: acc.fetch(:diagnostics)
       )
       return if auth == :unresolved
@@ -80,12 +80,12 @@ module IntegrationGenerator
     def build_operation(operation, role, mapping_entry, acc)
       parameters = @field_resolver.parameters(operation[:parameters])
       request_fields = @field_resolver.body_fields(
-        operation: operation, mapping_entry: mapping_entry,
+        operation:, mapping_entry:,
         diagnostics: acc.fetch(:diagnostics), money_transformations: acc.fetch(:money_transformations)
       )
 
       Generator::OperationIR.new(
-        id: operation[:id], role: role, method: operation[:method], path: operation[:path],
+        id: operation[:id], role:, method: operation[:method], path: operation[:path],
         parameters: parameters.freeze, request_fields: request_fields.freeze,
         responses: operation[:responses], idempotency: @field_resolver.idempotency(operation[:parameters])
       )
@@ -102,7 +102,7 @@ module IntegrationGenerator
         severity: :warning,
         code: :unresolved_operation_role,
         message: "Could not determine the role of #{operation[:method].to_s.upcase} #{operation[:path]}; skipped",
-        source_path: "#/paths/#{operation[:path]}/#{operation[:method]}",
+        source_path: JsonPointer.operation_path(operation),
         hint: 'Add an operation entry with an explicit role in integration_mapping.yml'
       )
     end

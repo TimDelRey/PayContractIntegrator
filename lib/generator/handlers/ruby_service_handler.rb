@@ -180,9 +180,6 @@ module Generator
         "  headers[#{name.dump}] = operation.idempotency_key"
       end
 
-      def env_name(ir, suffix) = "#{ir.env_prefix}_#{suffix}"
-      def fetch(hash, key) = hash.fetch(key) { hash.fetch(key.to_s) }
-
       def indent(value, width)
         prefix = ' ' * width
         value.lines.map { |line| line.strip.empty? ? line : prefix + line }.join

@@ -18,8 +18,8 @@ module IntegrationGenerator
       return [] unless schema.is_a?(Hash)
 
       context = {
-        required: Array(schema['required']), mapping_entry: mapping_entry, diagnostics: diagnostics,
-        operation_id: operation[:id], money_transformations: money_transformations
+        required: Array(schema['required']), mapping_entry:, diagnostics:,
+        operation_id: operation[:id], money_transformations:
       }
       overrides = (mapping_entry && mapping_entry['fields']) || {}
 
@@ -84,7 +84,7 @@ module IntegrationGenerator
       raw = override && override['platform_source']
       return normalize_platform_source(raw) if raw
 
-      @platform_field_resolver.classify(name, field_schema, money: money, diagnostics: context.fetch(:diagnostics))
+      @platform_field_resolver.classify(name, field_schema, money:, diagnostics: context.fetch(:diagnostics))
     end
 
     def normalize_platform_source(raw)

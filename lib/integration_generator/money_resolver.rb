@@ -44,7 +44,7 @@ module IntegrationGenerator
         field: field_name, from: INTERNAL_UNIT, to: unit,
         multiplier: UNIT_MULTIPLIER.fetch(unit), rounding: :exact
       }.freeze
-      { transformation: :"#{INTERNAL_UNIT}_to_#{unit}", entry: entry }
+      { transformation: :"#{INTERNAL_UNIT}_to_#{unit}", entry: }
     end
 
     def warn_undetermined(field_name, operation_id, diagnostics)

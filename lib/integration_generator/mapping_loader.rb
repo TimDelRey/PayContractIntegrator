@@ -7,7 +7,7 @@ module IntegrationGenerator
     def call(source:, source_name:)
       return nil if source.nil?
 
-      mapping = SpecLoader.new.call(source: source, source_name: source_name)
+      mapping = SpecLoader.new.call(source:, source_name:)
       check_schema_version!(mapping, source_name)
       mapping
     end

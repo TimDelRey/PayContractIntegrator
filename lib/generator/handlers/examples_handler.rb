@@ -62,16 +62,12 @@ module Generator
 
       def callback_examples(ir)
         ir.webhooks.map.with_index do |webhook, index|
-          event_map = fetch(webhook, :event_map, {})
+          event_map = fetch_or(webhook, :event_map, {})
           next if event_map.empty?
 
           event, expected = event_map.min
           { 'name' => "callback_#{index + 1}", 'payload' => { 'event' => event }, 'expected' => expected }
         end.compact
-      end
-
-      def fetch(hash, key, default)
-        hash.fetch(key) { hash.fetch(key.to_s, default) }
       end
     end
   end

@@ -25,7 +25,7 @@ class IntegrationGeneratorLocalRefResolverTest < Minitest::Test
       }
     }
 
-    resolved = resolver.call(document: document, source_name: 'spec.yaml')
+    resolved = resolver.call(document:, source_name: 'spec.yaml')
 
     schema = resolved.dig('paths', '/payouts', 'post', 'requestBody', 'content', 'application/json', 'schema')
     assert_equal({ 'type' => 'object', 'properties' => { 'amount' => { 'type' => 'integer' } } }, schema)
@@ -39,7 +39,7 @@ class IntegrationGeneratorLocalRefResolverTest < Minitest::Test
       'components' => { 'schemas' => { 'Shared' => { 'type' => 'string' } } }
     }
 
-    resolved = resolver.call(document: document, source_name: 'spec.yaml')
+    resolved = resolver.call(document:, source_name: 'spec.yaml')
 
     assert_equal({ 'type' => 'string' }, resolved.fetch('a'))
     assert_equal({ 'type' => 'string' }, resolved.fetch('b'))
@@ -49,7 +49,7 @@ class IntegrationGeneratorLocalRefResolverTest < Minitest::Test
     document = { 'schema' => { '$ref' => 'https://example.test/schemas.yaml#/Payout' } }
 
     error = assert_raises(IntegrationGenerator::SpecError) do
-      resolver.call(document: document, source_name: 'spec.yaml')
+      resolver.call(document:, source_name: 'spec.yaml')
     end
 
     assert_equal :error, error.diagnostic.severity
@@ -62,7 +62,7 @@ class IntegrationGeneratorLocalRefResolverTest < Minitest::Test
     document = { 'schema' => { '$ref' => '#/components/schemas/Missing' }, 'components' => { 'schemas' => {} } }
 
     error = assert_raises(IntegrationGenerator::SpecError) do
-      resolver.call(document: document, source_name: 'spec.yaml')
+      resolver.call(document:, source_name: 'spec.yaml')
     end
 
     assert_equal :missing_reference, error.diagnostic.code
@@ -79,7 +79,7 @@ class IntegrationGeneratorLocalRefResolverTest < Minitest::Test
     }
 
     error = assert_raises(IntegrationGenerator::SpecError) do
-      resolver.call(document: document, source_name: 'spec.yaml')
+      resolver.call(document:, source_name: 'spec.yaml')
     end
 
     assert_equal :circular_reference, error.diagnostic.code

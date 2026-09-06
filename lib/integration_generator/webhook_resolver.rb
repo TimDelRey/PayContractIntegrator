@@ -2,7 +2,6 @@
 
 module IntegrationGenerator
   class WebhookResolver
-    SIGNATURE_NAME_PATTERN = /signature|подпис/i
     SIGNATURE_ALGORITHMS = {
       'HMAC-SHA256' => :hmac_sha256, 'HMAC-SHA1' => :hmac_sha1, 'RSA-SHA256' => :rsa_sha256
     }.freeze
@@ -13,7 +12,7 @@ module IntegrationGenerator
       return warn_missing(operation, diagnostics) if signature.nil?
       return warn_unverifiable(operation, diagnostics) if signature == :unresolved
 
-      { signature: signature, event_map: build_event_map(operation, diagnostics) }.freeze
+      { signature:, event_map: build_event_map(operation, diagnostics) }.freeze
     end
 
     private
@@ -26,7 +25,7 @@ module IntegrationGenerator
       return :unresolved unless algorithm == SUPPORTED_ALGORITHM
 
       {
-        algorithm: algorithm, encoding: :hex, signed_payload: :raw_body,
+        algorithm:, encoding: :hex, signed_payload: :raw_body,
         header: param['name'], secret_env: "#{provider_key.to_s.upcase}_CALLBACK_SECRET"
       }.freeze
     end
@@ -55,7 +54,7 @@ module IntegrationGenerator
         severity: :warning,
         code: :webhook_signature_missing,
         message: "#{operation[:id]} was classified as a webhook, but no signature header was found",
-        source_path: "#/paths/#{operation[:path]}/#{operation[:method]}",
+        source_path: JsonPointer.operation_path(operation),
         hint: 'Add a signature header parameter, or add a mapping override'
       )
       nil
@@ -67,7 +66,7 @@ module IntegrationGenerator
         code: :webhook_signature_unverifiable,
         message: "#{operation[:id]} looks like a webhook with a signature header, but the algorithm is " \
                  'unrecognized or unsupported (only HMAC-SHA256 is supported)',
-        source_path: "#/paths/#{operation[:path]}/#{operation[:method]}",
+        source_path: JsonPointer.operation_path(operation),
         hint: 'Document HMAC-SHA256 in the signature header/operation description, or add a mapping override'
       )
       nil
@@ -78,7 +77,7 @@ module IntegrationGenerator
         severity: :warning,
         code: :unmapped_status_value,
         message: "#{operation[:id]} webhook event #{value.inspect} has no known Space Payments mapping",
-        source_path: "#/paths/#{operation[:path]}/#{operation[:method]}",
+        source_path: JsonPointer.operation_path(operation),
         hint: 'Add it to integration_mapping.yml event_map'
       )
     end

@@ -21,8 +21,6 @@ class CliContractTest < Minitest::Test
     assert_match 'output/fixtures.json', stdout.string
   end
 
-  # Matches the case brief's own demo command, which never passes --mapping:
-  # `./integrate --spec provider_api.yaml --provider novapay --lang ruby`.
   test 'CLI runs without --mapping, matching the brief demo command' do
     _stdout, stderr, calls, cli = build_cli(result: [:ok, []])
 
@@ -101,7 +99,7 @@ class CliContractTest < Minitest::Test
       calls << arguments
       result
     end
-    cli = Generator::CLI.new(stdout: stdout, stderr: stderr, pipeline: pipeline)
+    cli = Generator::CLI.new(stdout:, stderr:, pipeline:)
 
     [stdout, stderr, calls, cli]
   end

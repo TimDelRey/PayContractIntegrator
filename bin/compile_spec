@@ -14,8 +14,8 @@ source_name = File.basename(path)
 mapping_path = ARGV[1]
 
 result = IntegrationGenerator::Compiler.new.call(
-  source: source,
-  source_name: source_name,
+  source:,
+  source_name:,
   provider_key: File.basename(path, '.*').split('_').first,
   mapping_source: mapping_path && File.read(mapping_path),
   mapping_source_name: mapping_path && File.basename(mapping_path)

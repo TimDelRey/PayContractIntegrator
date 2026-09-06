@@ -13,9 +13,9 @@ source = File.read(path)
 source_name = File.basename(path)
 
 begin
-  document = IntegrationGenerator::SpecLoader.new.call(source: source, source_name: source_name)
-  document = IntegrationGenerator::LocalRefResolver.new.call(document: document, source_name: source_name)
-  parsed = IntegrationGenerator::OpenApiParser.new.call(document: document, source_name: source_name)
+  document = IntegrationGenerator::SpecLoader.new.call(source:, source_name:)
+  document = IntegrationGenerator::LocalRefResolver.new.call(document:, source_name:)
+  parsed = IntegrationGenerator::OpenApiParser.new.call(document:, source_name:)
 rescue IntegrationGenerator::SpecError => e
   diagnostic = e.diagnostic
   warn "error[#{diagnostic.code}]: #{diagnostic.message}"

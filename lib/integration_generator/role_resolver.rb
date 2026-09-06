@@ -3,7 +3,6 @@
 module IntegrationGenerator
   class RoleResolver
     PAYMENT_KEYWORDS = /payout|payment|disburs|transfer|payin|checkout|charge|withdraw/i
-    SIGNATURE_NAME_PATTERN = /signature|подпис/i
 
     Context = Struct.new(:resource_prefix, :diagnostics, keyword_init: true)
 

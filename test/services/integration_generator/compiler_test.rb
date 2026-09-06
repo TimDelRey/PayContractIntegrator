@@ -3,7 +3,6 @@
 require 'test_helper'
 require_relative '../../contracts/support/integration_generator_contract_helpers'
 
-# Cases not already pinned down by the frozen test/contracts/02_compiler_contract_test.rb.
 class IntegrationGeneratorCompilerTest < Minitest::Test
   include GeneratorContractHelpers
 

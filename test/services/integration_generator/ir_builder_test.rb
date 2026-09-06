@@ -26,7 +26,7 @@ class IntegrationGeneratorIrBuilderTest < Minitest::Test
       money_transformations: [{ field: 'amount', from: 'rub', to: 'kopeck', multiplier: 100, rounding: :exact }.freeze].freeze
     }
 
-    ir = builder.call(parsed: parsed, resolved: resolved, mapping: nil, provider_key: 'novapay', source_name: 'provider_api.yaml')
+    ir = builder.call(parsed:, resolved:, mapping: nil, provider_key: 'novapay', source_name: 'provider_api.yaml')
 
     assert_predicate ir, :frozen?
     assert_equal 'novapay', ir.provider_key
@@ -48,7 +48,7 @@ class IntegrationGeneratorIrBuilderTest < Minitest::Test
       status_map: {}.freeze, error_map: {}.freeze, money_transformations: [].freeze
     }
 
-    ir = builder.call(parsed: parsed, resolved: resolved, mapping: nil, provider_key: 'novapay', source_name: 'provider_api.yaml')
+    ir = builder.call(parsed:, resolved:, mapping: nil, provider_key: 'novapay', source_name: 'provider_api.yaml')
 
     assert_equal %w[base_url], ir.configuration
     assert_empty ir.idempotency
@@ -65,7 +65,7 @@ class IntegrationGeneratorIrBuilderTest < Minitest::Test
     }
 
     ir = builder.call(
-      parsed: parsed, resolved: resolved, mapping: { 'schema_version' => '1.0' },
+      parsed:, resolved:, mapping: { 'schema_version' => '1.0' },
       provider_key: 'novapay', source_name: 'provider_api.yaml'
     )
 
@@ -83,7 +83,7 @@ class IntegrationGeneratorIrBuilderTest < Minitest::Test
       status_map: {}.freeze, error_map: {}.freeze, money_transformations: [].freeze
     }
 
-    ir = builder.call(parsed: parsed, resolved: resolved, mapping: nil, provider_key: 'acme__pay', source_name: 'x.yaml')
+    ir = builder.call(parsed:, resolved:, mapping: nil, provider_key: 'acme__pay', source_name: 'x.yaml')
 
     assert_equal 'AcmePayService', ir.provider_class
   end

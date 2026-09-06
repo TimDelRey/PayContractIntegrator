@@ -11,9 +11,9 @@ class SpecParsingPipelineTest < Minitest::Test
     source = File.read(FIXTURE_PATH)
     source_name = 'novapay_provider_api.yaml'
 
-    document = IntegrationGenerator::SpecLoader.new.call(source: source, source_name: source_name)
-    document = IntegrationGenerator::LocalRefResolver.new.call(document: document, source_name: source_name)
-    parsed = IntegrationGenerator::OpenApiParser.new.call(document: document, source_name: source_name)
+    document = IntegrationGenerator::SpecLoader.new.call(source:, source_name:)
+    document = IntegrationGenerator::LocalRefResolver.new.call(document:, source_name:)
+    parsed = IntegrationGenerator::OpenApiParser.new.call(document:, source_name:)
 
     assert_equal '3.0.3', parsed.version
     assert_equal 'https://api.sandbox.novapay.example/v1', parsed.base_urls.first

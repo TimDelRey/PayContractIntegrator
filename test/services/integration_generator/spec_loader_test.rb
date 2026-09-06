@@ -42,7 +42,7 @@ class IntegrationGeneratorSpecLoaderTest < Minitest::Test
         <<: *base
     YAML
 
-    error = assert_raises(IntegrationGenerator::SpecError) { loader.call(source: source, source_name: 'spec.yaml') }
+    error = assert_raises(IntegrationGenerator::SpecError) { loader.call(source:, source_name: 'spec.yaml') }
 
     assert_equal :disallowed_yaml_construct, error.diagnostic.code
   end
@@ -68,7 +68,7 @@ class IntegrationGeneratorSpecLoaderTest < Minitest::Test
     (IntegrationGenerator::SpecLoader::MAX_NESTING_DEPTH + 5).times { deeply_nested = { 'nested' => deeply_nested } }
     source = { 'openapi' => '3.0.3', 'deep' => deeply_nested }.to_yaml
 
-    error = assert_raises(IntegrationGenerator::SpecError) { loader.call(source: source, source_name: 'spec.yaml') }
+    error = assert_raises(IntegrationGenerator::SpecError) { loader.call(source:, source_name: 'spec.yaml') }
 
     assert_equal :nesting_too_deep, error.diagnostic.code
   end

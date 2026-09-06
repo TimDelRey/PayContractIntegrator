@@ -31,7 +31,7 @@ class IntegrationGeneratorOpenApiParserTest < Minitest::Test
       'Oauth2' => { 'type' => 'oauth2', 'flows' => { 'clientCredentials' => { 'tokenUrl' => '/oauth2/token', 'scopes' => {} } } }
     }
 
-    parsed = parser.call(document: document, source_name: 'spec.yaml')
+    parsed = parser.call(document:, source_name: 'spec.yaml')
 
     assert_equal 1, parsed.security_schemes.size
     scheme = parsed.security_schemes.first
@@ -43,7 +43,7 @@ class IntegrationGeneratorOpenApiParserTest < Minitest::Test
   test 'rejects unsupported OpenAPI versions' do
     document = minimal_document.merge('openapi' => '2.0')
 
-    error = assert_raises(IntegrationGenerator::SpecError) { parser.call(document: document, source_name: 'spec.yaml') }
+    error = assert_raises(IntegrationGenerator::SpecError) { parser.call(document:, source_name: 'spec.yaml') }
 
     assert_equal :unsupported_openapi_version, error.diagnostic.code
   end
@@ -51,7 +51,7 @@ class IntegrationGeneratorOpenApiParserTest < Minitest::Test
   test 'rejects a document with no servers' do
     document = minimal_document.merge('servers' => [])
 
-    error = assert_raises(IntegrationGenerator::SpecError) { parser.call(document: document, source_name: 'spec.yaml') }
+    error = assert_raises(IntegrationGenerator::SpecError) { parser.call(document:, source_name: 'spec.yaml') }
 
     assert_equal :missing_servers, error.diagnostic.code
   end
@@ -59,7 +59,7 @@ class IntegrationGeneratorOpenApiParserTest < Minitest::Test
   test 'rejects non-HTTPS server URLs' do
     document = minimal_document.merge('servers' => [{ 'url' => 'http://insecure.example.test' }])
 
-    error = assert_raises(IntegrationGenerator::SpecError) { parser.call(document: document, source_name: 'spec.yaml') }
+    error = assert_raises(IntegrationGenerator::SpecError) { parser.call(document:, source_name: 'spec.yaml') }
 
     assert_equal :unsafe_server_scheme, error.diagnostic.code
   end
@@ -68,7 +68,7 @@ class IntegrationGeneratorOpenApiParserTest < Minitest::Test
     document = minimal_document
     document['paths']['/payouts']['parameters'] = [{ 'name' => 'id', 'in' => 'path', 'required' => true }]
 
-    operation = parser.call(document: document, source_name: 'spec.yaml').operations.first
+    operation = parser.call(document:, source_name: 'spec.yaml').operations.first
 
     assert_equal [{ 'name' => 'id', 'in' => 'path', 'required' => true }], operation.fetch(:parameters)
   end
@@ -78,7 +78,7 @@ class IntegrationGeneratorOpenApiParserTest < Minitest::Test
     document['paths']['/payouts']['parameters'] = [{ 'name' => 'id', 'in' => 'path', 'required' => false }]
     document['paths']['/payouts']['post']['parameters'] = [{ 'name' => 'id', 'in' => 'path', 'required' => true }]
 
-    operation = parser.call(document: document, source_name: 'spec.yaml').operations.first
+    operation = parser.call(document:, source_name: 'spec.yaml').operations.first
 
     assert_equal [{ 'name' => 'id', 'in' => 'path', 'required' => true }], operation.fetch(:parameters)
   end
@@ -87,7 +87,7 @@ class IntegrationGeneratorOpenApiParserTest < Minitest::Test
     document = minimal_document
     document['paths']['/payouts']['options'] = { 'operationId' => 'preflightPayouts', 'responses' => { '204' => { 'description' => 'No Content' } } }
 
-    parsed = parser.call(document: document, source_name: 'spec.yaml')
+    parsed = parser.call(document:, source_name: 'spec.yaml')
 
     assert_equal 1, parsed.operations.size
     refute_includes parsed.operations.map { |operation| operation.fetch(:id) }, 'preflightPayouts'
