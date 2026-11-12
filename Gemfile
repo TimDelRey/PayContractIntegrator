@@ -5,5 +5,5 @@ gem "rubocop", "~> 1.75", require: false
 
 group :development, :test do
   gem "bundler-audit", require: false
-  gem "minitest", "~> 6.0"
+  gem "minitest", "~> 6.1"
 end
